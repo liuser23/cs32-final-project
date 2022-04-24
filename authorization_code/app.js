@@ -12,9 +12,24 @@ var request = require('request'); // "Request" library
 var cors = require('cors');
 var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
+var fs = require('fs')
 
-var client_id = 'e6dfc0bacb86484f944f9f0a6ec05142'; // Your client id
-var client_secret = '209c088ed91d4d46bbb85602710288fd'; // Your secret
+
+var client_id, client_secret;
+
+fs.readFile('config/secret/client_id.txt', 'utf8', function (e, content) {
+  if (e) {
+    return console.error('Could not read client id file: ', e);
+  }
+  client_id = content
+});
+fs.readFile('config/secret/client_secret.txt', 'utf8', function (e, content) {
+  if (e) {
+    return console.error('Could not read client secret file: ', e);
+  }
+  client_secret = content
+});
+
 var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
 
 /**
