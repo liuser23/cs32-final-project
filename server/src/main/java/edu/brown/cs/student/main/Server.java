@@ -123,6 +123,8 @@ public class Server {
                                 .header("Content-Type", "application/json")
                                 .build();
 
+                        System.out.println("here");
+
                         client.sendAsync(getProfile, HttpResponse.BodyHandlers.ofString())
                                 .thenApply(HttpResponse::body)
                                 .thenApply(a -> new Gson().fromJson(a, RequestProfileResponse.class))
