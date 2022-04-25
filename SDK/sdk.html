@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spotify Web Playback SDK Quick Start</title>
+</head>
+<body>
+<h1>Spotify Web Playback SDK Quick Start</h1>
+<button id="togglePlay">Toggle Play</button>
+
+<!--embed the SDK to install Web Playback-->
+<script src="https://sdk.scdn.co/spotify-player.js"></script>
+<script>
+    <!--creates instance of player-->
+    window.onSpotifyWebPlaybackSDKReady = () => {
+        // access token
+        const token = 'BQAT1Sl6m2q1J913XnfhltNROggZDlydcS9QjnvflFCcmB5RTML4SwjD_RnLq-z7lablcLa_9j16xAPPCQvd9Vl_69EFez6JmpIM_uSb1hzoPWwiyZQK8YbMp0qywbLMmcFVp1cM38djOCA-cmQajUmfWRewbCQpJw\n';
+        const player = new Spotify.Player({
+            // name of spotify instance, callback getOAuthToken that provides a valid access token, volume of player as decimal
+            // value between 0 and 1
+            name: 'Web Playback SDK Quick Start Player',
+            getOAuthToken: cb => {
+                cb(token);
+            },
+            volume: 0.5
+        });
+
+        // onclick listener and have it interact with the Player object
+        document.getElementById('togglePlay').onclick = function() {
+            player.togglePlay();
+        };
+
+        // The first two events we want to get notified are ready, emitted when
+        // the SDK is connected and ready to stream content, and not_ready, in case the connection is broken
+
+        // Ready
+        player.addListener('ready', ({device_id}) => {
+            console.log('Ready with Device ID', device_id);
+        });
+
+        // Not Ready
+        player.addListener('not_ready', ({device_id}) => {
+            console.log('Device ID has gone offline', device_id);
+        });
+
+        // Let’s add some listeners to get notified in case something happens during the SDK initialization
+        player.addListener('initialization_error', ({message}) => {
+            console.error(message);
+        });
+
+        player.addListener('authentication_error', ({message}) => {
+            console.error(message);
+        });
+
+        player.addListener('account_error', ({message}) => {
+            console.error(message);
+        });
+
+        //  call connect method to perform the connection of our new Spotify instance
+        player.connect();
+    }
+</script>
+</body>
+</html>
