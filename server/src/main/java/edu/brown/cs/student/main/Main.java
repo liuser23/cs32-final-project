@@ -53,7 +53,13 @@ public final class Main {
             return;
         }
 
+        /*
         Server server = new Server(WEBSITE_URL, DEFAULT_PORT, clientId, clientSecret, STATIC_SITE_PATH);
+        server.start();
+
+         */
+
+        ServWrapper server = new ServWrapper(WEBSITE_URL, DEFAULT_PORT, clientId, clientSecret, STATIC_SITE_PATH);
         server.start();
     }
 }

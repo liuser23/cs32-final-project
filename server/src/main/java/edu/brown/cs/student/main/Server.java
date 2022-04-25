@@ -15,6 +15,10 @@ import java.util.Base64;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * OK to delete?
+ * Probably made redundant by ServWrapper.java
+ */
 public class Server {
     private final String siteUrl;
     private final short port;
@@ -91,7 +95,7 @@ public class Server {
                 return null;
             }
             //String state = request.params("state");
-            String authorizationCode = request.params("code");
+            String authorizationCode = request.queryParams("code");
 
             String authorization = Base64.getEncoder()
                     .encodeToString((clientId + ":" + clientSecret)
@@ -109,7 +113,10 @@ public class Server {
                     .header("Content-Type", "application/x-www-form-urlencoded")
                     .build();
 
+
             HttpClient client = HttpClient.newHttpClient();
+
+
 
             client
                     .sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString())
@@ -133,6 +140,7 @@ public class Server {
                                     response.redirect(siteUrl + LOGGED_IN_LOCATION);
                                 });
                     });
+
 
             return null;
         });
