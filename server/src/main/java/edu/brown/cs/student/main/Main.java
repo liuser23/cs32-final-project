@@ -33,6 +33,7 @@ import org.json.JSONObject;
  */
 public final class Main {
     private static final short DEFAULT_PORT = 8888;
+
     private static final String STATIC_SITE_PATH = "site/build";
 
     private static final String WEBSITE_URL = "http://localhost:" + DEFAULT_PORT;
