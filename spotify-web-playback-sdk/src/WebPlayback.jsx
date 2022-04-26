@@ -14,10 +14,10 @@ const track = {
 
 function WebPlayback(props) {
 
-    const [is_paused, setPaused] = useState(false);
-    const [is_active, setActive] = useState(false);
+    const [is_paused, setPaused] = useState(false); // is a boolean variable that indicates whether the current track is being played or not.
+    const [is_active, setActive] = useState(false); // to indicate whether the current playback has been transferred to this player or not.
     const [player, setPlayer] = useState(undefined);
-    const [current_track, setTrack] = useState(track);
+    const [current_track, setTrack] = useState(track); // an object to store the currently playing track
 
     useEffect(() => {
 
@@ -47,6 +47,7 @@ function WebPlayback(props) {
 
             player.addListener('player_state_changed', ( state => {
 
+                // once the event is emitted, update the component with the current track
                 if (!state) {
                     return;
                 }
