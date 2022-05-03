@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
-import DefaultPfp from '../images/PngItem_1503945.png';
+
+import DefaultPfp from './images/PngItem_1503945.png';
 import AccMenuButton from "./AccMenuButton";
 import PicSignOut from './images/basebuttons/sign-out 1.png'
 import PicHome from './images/basebuttons/home 1.png'
@@ -11,11 +12,10 @@ import PicRecList from './images/basebuttons/list-format 1.png'
 import PicBell from './images/basebuttons/notifications 1.png'
 import ProfilePhoto from "./ProfilePhoto";
 
-function SideBar(props : {pfp : string}) {
-
+function SideBar(props: {pfp: string | undefined}) {
     return(
         <div className={"Side-bar"}>
-            <ProfilePhoto image={props.pfp}/>
+            <ProfilePhoto image={props.pfp ?? DefaultPfp}/>
             <div className={"Account-menu"}>
                 <AccMenuButton picture={PicHome} picAlt={"house"} txtContent={"Account Overview"} route={"/authorized"}/>
                 <AccMenuButton picture={PicLock} picAlt={"lock"} txtContent={"Privacy Settings"} route={"/privacysettings"}/>

@@ -3,6 +3,7 @@ package edu.brown.cs.student.main;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,17 +51,20 @@ public final class Main {
             clientId = Files.readString(Path.of("secret/client_id.txt"));
             clientSecret = Files.readString(Path.of("secret/client_secret.txt"));
         } catch (IOException e) {
+            System.out.println("Could not read config files");
             e.printStackTrace();
             return;
         }
 
-        /*
-        Server server = new Server(WEBSITE_URL, DEFAULT_PORT, clientId, clientSecret, STATIC_SITE_PATH);
-        server.start();
+        KnownUsers users;
+        try {
+            users = new KnownUsers(Path.of("secret/known.sqlite3"));
+        } catch (ClassNotFoundException | SQLException e) {
+            System.out.println("Could not open user database" + e.getMessage());
+            return;
+        }
 
-         */
-
-        ServWrapper server = new ServWrapper(WEBSITE_URL, DEFAULT_PORT, clientId, clientSecret, STATIC_SITE_PATH);
+        ServWrapper server = new ServWrapper(users, WEBSITE_URL, DEFAULT_PORT, clientId, clientSecret, STATIC_SITE_PATH);
         server.start();
     }
 }
