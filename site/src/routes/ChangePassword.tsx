@@ -4,12 +4,12 @@ import SideBar from "../SideBar";
 import DefaultPfp from '../images/PngItem_1503945.png';
 
 
-function ChangePassword() {
+function ChangePassword(props : {userPfp : string}) {
 
     return (
         <div>
             <div className={"Side-bar"}>
-                <SideBar pfp={DefaultPfp}/>
+                <SideBar pfp={props.userPfp}/>
             </div>
             <div className={"Main-window"}>
                 Change Password

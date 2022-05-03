@@ -5,9 +5,14 @@ import org.json.JSONObject;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.SpotifyHttpManager;
 import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
+import se.michaelthelin.spotify.model_objects.specification.Artist;
+import se.michaelthelin.spotify.model_objects.specification.Paging;
+import se.michaelthelin.spotify.model_objects.specification.Track;
 import se.michaelthelin.spotify.model_objects.specification.User;
 import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeRequest;
 import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeUriRequest;
+import se.michaelthelin.spotify.requests.data.personalization.simplified.GetUsersTopArtistsRequest;
+import se.michaelthelin.spotify.requests.data.personalization.simplified.GetUsersTopTracksRequest;
 import se.michaelthelin.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
 import spark.Spark;
 
@@ -45,6 +50,10 @@ public class ServWrapper {
 
     private /*static final*/ GetCurrentUsersProfileRequest getCurrentUsersProfileRequest;
 
+    private /*static final*/ GetUsersTopTracksRequest getUsersTopTracksRequest;
+
+    private /*static final*/ GetUsersTopArtistsRequest getUsersTopArtistsRequest;
+
     private URI authorizationCodeUri;
 
     private AuthorizationCodeRequest authorizationCodeRequest;
@@ -75,7 +84,7 @@ public class ServWrapper {
                 .build();
         this.authorizationCodeUriRequest = spotifyApi.authorizationCodeUri()
                 //.state("[STATE]")
-                //.scope("[SCOPES]")
+                .scope("user-read-email,user-top-read,user-follow-read,user-library-read")
                 //.show_dialog(true)
                 .build();
     }
@@ -146,6 +155,62 @@ public class ServWrapper {
             System.out.println("Display name: " + user.getDisplayName());
             //output = user.getDisplayName();
             output = user;
+        } catch (CompletionException e) {
+            System.out.println("Error: " + e.getCause().getMessage());
+        } catch (CancellationException e) {
+            System.out.println("Async operation cancelled.");
+        }
+        return output;
+    }
+
+    /**
+     *  Gets a user's top tracks
+     */
+    public /*static*/ Track[] getUsersTopTracks_Async() {
+        getUsersTopTracksRequest = spotifyApi.getUsersTopTracks()
+//          .limit(10)
+//          .offset(0)
+//          .time_range("medium_term")
+                .build();
+        Track[] output = null;
+        try {
+            final CompletableFuture<Paging<Track>> pagingFuture = getUsersTopTracksRequest.executeAsync();
+
+            // Thread free to do other tasks...
+
+            // Example Only. Never block in production code.
+            final Paging<Track> trackPaging = pagingFuture.join();
+
+            System.out.println("Total: " + trackPaging.getTotal());
+            output = trackPaging.getItems();
+        } catch (CompletionException e) {
+            System.out.println("Error: " + e.getCause().getMessage());
+        } catch (CancellationException e) {
+            System.out.println("Async operation cancelled.");
+        }
+        return output;
+    }
+
+    /**
+     * Gets a user's top artists.
+     */
+    public /*static*/ Artist[] getUsersTopArtists_Async() {
+        getUsersTopArtistsRequest = spotifyApi.getUsersTopArtists()
+//          .limit(10)
+//          .offset(0)
+//          .time_range("medium_term")
+                .build();
+        Artist[] output = null;
+        try {
+            final CompletableFuture<Paging<Artist>> pagingFuture = getUsersTopArtistsRequest.executeAsync();
+
+            // Thread free to do other tasks...
+
+            // Example Only. Never block in production code.
+            final Paging<Artist> artistPaging = pagingFuture.join();
+
+            System.out.println("Total: " + artistPaging.getTotal());
+            output = artistPaging.getItems();
         } catch (CompletionException e) {
             System.out.println("Error: " + e.getCause().getMessage());
         } catch (CancellationException e) {
@@ -227,6 +292,20 @@ public class ServWrapper {
            String userJsonString = new Gson().toJson(user);
            System.out.println(userJsonString);
            return userJsonString;
+        });
+
+        Spark.get("/topTracks", (request, response) -> {
+            Track[] tracks = getUsersTopTracks_Async();
+            String tracksJsonString = new Gson().toJson(tracks);
+            System.out.println(tracksJsonString);
+            return tracksJsonString;
+        });
+
+        Spark.get("/topArtists", (request, response) -> {
+            Artist[] artists = getUsersTopArtists_Async();
+            String artistsJsonString = new Gson().toJson(artists);
+            System.out.println(artistsJsonString);
+            return artistsJsonString;
         });
 
         Spark.get("/*", (request, response) -> {

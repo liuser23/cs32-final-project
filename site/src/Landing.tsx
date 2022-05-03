@@ -28,9 +28,8 @@ function Landing() {
     }
 
     return(
-        <div>
-            <a href={LOGIN_ENDPOINT}>Login in hello to Spotify</a>
-            <button onClick={async () => await getAuthorization({change : setAuthCodeUri})}>Click me</button>
+        <div className={"Landing-login"}>
+            <button className={"Login-button"} onClick={async () => await getAuthorization({change : setAuthCodeUri})}>Enter</button>
         </div>
     )
 }
