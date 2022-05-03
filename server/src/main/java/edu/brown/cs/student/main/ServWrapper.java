@@ -1,15 +1,22 @@
 package edu.brown.cs.student.main;
 
+import com.google.gson.Gson;
+import org.json.JSONObject;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.SpotifyHttpManager;
 import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
+import se.michaelthelin.spotify.model_objects.specification.User;
 import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeRequest;
 import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeUriRequest;
+import se.michaelthelin.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
 import spark.Spark;
 
+import java.awt.*;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -36,6 +43,8 @@ public class ServWrapper {
     private /*static*/ final URI redirectUri;
     private /*static*/ final AuthorizationCodeUriRequest authorizationCodeUriRequest;
 
+    private /*static final*/ GetCurrentUsersProfileRequest getCurrentUsersProfileRequest;
+
     private URI authorizationCodeUri;
 
     private AuthorizationCodeRequest authorizationCodeRequest;
@@ -58,6 +67,7 @@ public class ServWrapper {
         this.clientSecret = clientSecret;
         this.staticFiles = staticFiles;
         this.redirectUri = SpotifyHttpManager.makeUri(this.siteUrl + CALLBACK_LOCATION);
+        //this.redirectUri = SpotifyHttpManager.makeUri("http://localhost:3000" + CALLBACK_LOCATION);
         this.spotifyApi = new SpotifyApi.Builder()
                 .setClientId(this.clientId)
                 .setClientSecret(this.clientSecret)
@@ -70,6 +80,10 @@ public class ServWrapper {
                 .build();
     }
 
+    /**
+     * Get the Authorization Code URI from Spotify.
+     * @return the Spotify Authorization Code URI
+     */
     public /*static*/ URI authorizationCodeUri_Async() {
         URI output = null;
         try {
@@ -90,6 +104,9 @@ public class ServWrapper {
         return output;
     }
 
+    /**
+     * Get the Authorization Code from Spotify.
+     */
     public /*static*/ void authorizationCode_Async() {
         try {
             final CompletableFuture<AuthorizationCodeCredentials> authorizationCodeCredentialsFuture =
@@ -110,6 +127,31 @@ public class ServWrapper {
         } catch (CancellationException e) {
             System.out.println("Async operation cancelled.");
         }
+    }
+
+    /**
+     * Get the current user's profile from Spotify.
+     */
+    public /*static*/ User getCurrentUsersProfile_Async() {
+        this.getCurrentUsersProfileRequest = this.spotifyApi.getCurrentUsersProfile().build();
+        User output = null;
+        try {
+            final CompletableFuture<User> userFuture = getCurrentUsersProfileRequest.executeAsync();
+
+            // FROM PACKAGE DEV: Thread free to do other tasks...
+
+            // FROM PACKAGE DEV: Example Only. Never block in production code.
+            final User user = userFuture.join();
+
+            System.out.println("Display name: " + user.getDisplayName());
+            //output = user.getDisplayName();
+            output = user;
+        } catch (CompletionException e) {
+            System.out.println("Error: " + e.getCause().getMessage());
+        } catch (CancellationException e) {
+            System.out.println("Async operation cancelled.");
+        }
+        return output;
     }
 
     private void sparkStartup() {
@@ -146,12 +188,13 @@ public class ServWrapper {
     }
 
     public void start() {
+
         sparkStartup();
 
         Spark.get("/login", (request, response) -> {
             authorizationCodeUri = authorizationCodeUri_Async();
-            response.redirect(authorizationCodeUri.toString());
-            return null;
+            //response.redirect(authorizationCodeUri.toString());
+            return authorizationCodeUri.toString();
         });
 
         Spark.get(CALLBACK_LOCATION, (request, response) -> {
@@ -166,11 +209,32 @@ public class ServWrapper {
             this.authorizationCodeRequest = spotifyApi.authorizationCode(authorizationCode)
                     .build();
             authorizationCode_Async();
-            response.redirect(siteUrl + LOGGED_IN_LOCATION);
+            //response.redirect(siteUrl + LOGGED_IN_LOCATION);
+            response.redirect("http://localhost:3000" + LOGGED_IN_LOCATION);
             //response.redirect("https://www.google.com/");
+            System.out.println(spotifyApi.getAccessToken());
             return null;
         });
 
+        Spark.get("/userName", (request, response) -> {
+           //String name = getCurrentUsersProfile_Async();
+           //return name;
+           return null;
+        });
+
+        Spark.get("/userData", (request, response) -> {
+           User user = getCurrentUsersProfile_Async();
+           String userJsonString = new Gson().toJson(user);
+           System.out.println(userJsonString);
+           return userJsonString;
+        });
+
+        Spark.get("/*", (request, response) -> {
+           response.type("text/html");
+           return Files.readString(Path.of("site/build/index.html"));
+        });
+
+        /*
         Spark.get(LOGGED_IN_LOCATION, (request, response) -> {
             String errorCode = request.params("error");
             if (errorCode != null) {
@@ -180,6 +244,7 @@ public class ServWrapper {
             }
             return null;
         });
+         */
 
 
 

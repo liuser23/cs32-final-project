@@ -36,3 +36,75 @@
     transform: rotate(360deg);
   }
 }
+
+.Side-bar {
+  background-color: #282828;
+  height: 100vh;
+  width: 25vw;
+  position: fixed;
+  align-content: center;
+  align-items: center;
+}
+
+.Main-window {
+  background-color: white;
+  height: 100vh;
+  width: 75vw;
+  display: flex;
+  position: relative;
+  float: right;
+}
+
+.Account-menu {
+  background-color: #282828;
+  width: 25vw;
+  float: left;
+  text-align: right;
+  position: absolute;
+  bottom: 0px;
+}
+
+.Accmenu-button {
+  height: 70px;
+  width: 25vw;
+  left: 0px;
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+}
+
+.Button-img {
+  height: 30px;
+  width: 30px;
+  position: relative;
+  float: left;
+  left: 10px;
+  bottom: 0px;
+}
+
+.Button-text {
+  color: darkgray;
+  position: absolute;
+  right: 10px;
+  overflow: hidden;
+  font-size: 20px;
+}
+
+.Pfp-container {
+  border-radius: 50%;
+  width: 235px;
+  height: 235px;
+  background: #1DB954;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  top: 10px;
+}
+
+.Pfp-image {
+  border-radius: 50%;
+  width: 210px;
+  height: 210px;
+}
