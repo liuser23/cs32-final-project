@@ -11,13 +11,14 @@ import PicFriends from './images/basebuttons/friends 1.png'
 import PicRecList from './images/basebuttons/list-format 1.png'
 import PicBell from './images/basebuttons/notifications 1.png'
 import ProfilePhoto from "./ProfilePhoto";
+import {SidebarConfig} from "./App";
 
-function SideBar(props: {pfp: string | undefined}) {
+function SideBar(props: {sidebarConfig: SidebarConfig}) {
     return(
         <div className={"Side-bar"}>
-            <ProfilePhoto image={props.pfp ?? DefaultPfp}/>
+            <ProfilePhoto image={props.sidebarConfig.profilePicturePath ?? DefaultPfp}/>
             <div className={"Account-menu"}>
-                <AccMenuButton picture={PicHome} picAlt={"house"} txtContent={"Account Overview"} route={"/authorized"}/>
+                <AccMenuButton picture={PicHome} picAlt={"house"} txtContent={"Account Overview"} route={"/"}/>
                 <AccMenuButton picture={PicLock} picAlt={"lock"} txtContent={"Privacy Settings"} route={"/privacysettings"}/>
                 <AccMenuButton picture={PicPencil} picAlt={"pencil"} txtContent={"Edit Profile"} route={"/editprofile"}/>
                 <AccMenuButton picture={PicLock} picAlt={"lock"} txtContent={"Change Password"} route={"/changepassword"}/>

@@ -62,7 +62,7 @@ function Home(props: {sessionToken: string, sidebarConfig: SidebarConfig, setSid
     if (userData && topSongs && topArtists) {
         return (
             <>
-            <SideBar pfp={props.sidebarConfig.profilePicturePath}/>
+            <SideBar sidebarConfig={props.sidebarConfig}/>
             <div className={"Main-window"}>
                 <p>Success! You have logged in.</p>
                 <p><>Name: {userData.displayName}</></p>

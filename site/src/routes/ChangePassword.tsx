@@ -9,7 +9,7 @@ function ChangePassword(props: {sidebarConfig: SidebarConfig}) {
     return (
         <div>
             <div className={"Side-bar"}>
-                <SideBar pfp={props.sidebarConfig.profilePicturePath}/>
+                <SideBar sidebarConfig={props.sidebarConfig}/>
             </div>
             <div className={"Main-window"}>
                 Change Password
