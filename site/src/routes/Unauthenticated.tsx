@@ -18,7 +18,7 @@ function Unauthenticated() {
     return (
         <>
             <h1>Welcome to the best Spotify social media platform</h1>
-            <p>Take your first step towards new friends by signing in with your existing Spotify account</p>
+            <p>Take your first step toward making new friends by signing in with your existing Spotify account</p>
             <button onClick={getAuthorization}>Log in</button>
         </>
     )

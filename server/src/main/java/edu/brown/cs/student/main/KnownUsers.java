@@ -18,16 +18,16 @@ public class KnownUsers {
         String urlToDB = "jdbc:sqlite:" + databasePath.getFileName();
         connection = DriverManager.getConnection(urlToDB);
 
-        connection.prepareStatement("create table if not exists credentials ( id text primary key, accessToken text, refreshToken text );").executeUpdate();
+        connection.prepareStatement("create table if not exists credentials ( id text primary key, accessToken text, refreshToken text, foreign key(id) references users(id) ); );").executeUpdate();
         connection.prepareStatement("create table if not exists users ( id text primary key, displayName text, imageUrl text, followerCount text );").executeUpdate();
         connection.prepareStatement("create table if not exists sessionTokens ( sessionToken text primary key, id text, foreign key(id) references users(id) );").executeUpdate();
     }
 
-    void initializeUser(String sessionToken, String refreshToken, String accessToken, User user) throws SQLException {
+    void initializeUser(String sessionToken, Tokens tokens, User user) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("replace into credentials values ( ?, ?, ? );");
         statement.setString(1, user.getId());
-        statement.setString(2, refreshToken);
-        statement.setString(3, accessToken);
+        statement.setString(2, tokens.accessToken());
+        statement.setString(3, tokens.refreshToken());
         statement.executeUpdate();
 
         PreparedStatement statement3 = connection.prepareStatement("replace into users values ( ?, ?, ?, ? );");
@@ -45,6 +45,16 @@ public class KnownUsers {
         statement2.setString(1, sessionToken);
         statement2.setString(2, user.getId());
         statement2.executeUpdate();
+    }
+
+    Optional<Tokens> getTokens(String id) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("select accessToken, refreshToken from credentials where id = ?;");
+        statement.setString(1, id);
+        ResultSet result = statement.executeQuery();
+        if (!result.next()) {
+            return Optional.empty();
+        }
+        return Optional.of(new Tokens(result.getString(1), result.getString(2)));
     }
 
     Optional<String> userIdFromSessionToken(String sessionToken) throws SQLException {
