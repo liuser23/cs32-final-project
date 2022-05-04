@@ -145,10 +145,8 @@ public class ServWrapper {
 
         Spark.get("/login", (request, response) -> {
             String sessionToken = randomString(20);
-            return new Gson().toJson(Map.of(
-                    "redirect", getRedirectUri(sessionToken),
-                    "sessionToken", sessionToken
-            ));
+            response.redirect(getRedirectUri(sessionToken).toString());
+            return null;
         });
 
         Spark.get(CALLBACK_LOCATION, (request, response) -> {
