@@ -17,7 +17,7 @@ type UserData = {
 type TopSong = {
     name: string,
     image: string,
-    url: string,
+    uri: string,
 }
 
 type TopArtist = {
@@ -76,7 +76,7 @@ function Home(props: {sessionToken: string, sidebarConfig: SidebarConfig, setSid
                     <>
                         {topSongs.map((topSong) => {
                                 <div className={"Song-box"}>
-                                    <a href={topSong.url} className={"Song-art"}>
+                                    <a href={topSong.uri} className={"Song-art"}>
                                         <img className={"Song-art"} src={topSong.image}/>
                                     </a>
                                     {topSong.name}
