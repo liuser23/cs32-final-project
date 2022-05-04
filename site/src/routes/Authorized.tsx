@@ -6,7 +6,72 @@ import SideBar from "../SideBar";
 import ProfilePhoto from "../ProfilePhoto";
 import {Link} from "react-router-dom";
 
+type image = {
+    height : number;
+    url : string;
+    width : number;
+}
+
+type artistBySong = {
+    externalUrls : { externalUrls : {spotify : string} };
+    href : string;
+    id : string;
+    name : string;
+    type : string;
+    uri : string;
+}
+
+type artist = {
+    externalUrls : { externalUrls : {spotify : string} };
+    followers: { total : number };
+    genre : string[];
+    href : string;
+    id : string;
+    images : image[];
+    name : string;
+    popularity : number;
+    type : string;
+    uri : string;
+}
+
+type albumBySong = {
+    albumType : string;
+    artists : artistBySong[];
+    availableMarkets: string[];
+    externalUrls : { externalUrls : {spotify : string} };
+    href : "string";
+    id : string;
+    images : image[];
+    name : string;
+    type : string;
+    uri : string;
+}
+
+type track = {
+    album : albumBySong;
+    artists : artistBySong[];
+    availableMarkets : string;
+    discNumber : number;
+    durationMs : number;
+    explicit : boolean;
+    externalIds : { externalIds : {isrc : string} };
+    externalUrls : { externalUrls : {spotify : string} };
+    href : string;
+    id : string;
+    name : string;
+    popularity : number;
+    previewUrl : string;
+    trackNumber : number;
+    type : string;
+    uri : string;
+}
+
 function Authorized(props : {userPfp : string, setPfp : (uPfp : string) => void}) {
+
+
+
+    const [topSongs, setTopSongs] = useState<track[]>([]);
+    const [topArtists, setTopArtists] = useState<artist[]>([]);
 
 
 
@@ -63,7 +128,8 @@ function Authorized(props : {userPfp : string, setPfp : (uPfp : string) => void}
         sSong3 : (curSong : string) => void, sImg3 : (songImg : string) => void,
         sUrl3 : (curUrl : string) => void,
         sSong4 : (curSong : string) => void, sImg4 : (songImg : string) => void,
-        sUrl4 : (curUrl : string) => void,}) {
+        sUrl4 : (curUrl : string) => void,
+        sTracks : (curTracks : track[]) => void}) {
         let config = {
             headers: {
                 "Content-Type": "application/json",
@@ -72,7 +138,10 @@ function Authorized(props : {userPfp : string, setPfp : (uPfp : string) => void}
         }
         await axios.get("http://localhost:8888/topTracks", config)
             .then(response => {
-                console.log("response3", response.data)
+                console.log("Top Songs", response.data)
+
+                props.sTracks(response.data)
+
                 props.sSong1(response.data[0].name)
                 props.sImg1(response.data[0].album.images[0].url)
                 props.sUrl1(response.data[0].previewUrl)
@@ -94,7 +163,8 @@ function Authorized(props : {userPfp : string, setPfp : (uPfp : string) => void}
     async function getTopArtists(props : {sArtist1 : (curArtist : string) => void, sImg1 : (artistImg : string) => void,
         sArtist2 : (curArtist : string) => void, sImg2 : (artistImg : string) => void,
         sArtist3 : (curArtist : string) => void, sImg3 : (artistImg : string) => void,
-        sArtist4 : (curArtist : string) => void, sImg4 : (artistImg : string) => void,}) {
+        sArtist4 : (curArtist : string) => void, sImg4 : (artistImg : string) => void,
+        sArtists : (curArtists : artist[]) => void}) {
         let config = {
             headers: {
                 "Content-Type": "application/json",
@@ -103,7 +173,9 @@ function Authorized(props : {userPfp : string, setPfp : (uPfp : string) => void}
         }
         await axios.get("http://localhost:8888/topArtists", config)
             .then(response => {
-                console.log("response4", response.data)
+                console.log("Top Artists:", response.data)
+
+                props.sArtists(response.data)
 
                 props.sArtist1(response.data[0].name)
                 props.sImg1(response.data[0].images[0].url)
@@ -126,11 +198,13 @@ function Authorized(props : {userPfp : string, setPfp : (uPfp : string) => void}
             sSong3 : setTopSong3, sImg3 : setTopSongImg3,
             sUrl3 : setTopSongUrl3,
             sSong4 : setTopSong4, sImg4 : setTopSongImg4,
-            sUrl4 : setTopSongUrl4,});
+            sUrl4 : setTopSongUrl4,
+            sTracks : setTopSongs});
         getTopArtists({sArtist1 : setTopArtist1, sImg1 : setTopArtistImg1,
             sArtist2 : setTopArtist2, sImg2 : setTopArtistImg2,
             sArtist3 : setTopArtist3, sImg3 : setTopArtistImg3,
-            sArtist4 : setTopArtist4, sImg4 : setTopArtistImg4,});
+            sArtist4 : setTopArtist4, sImg4 : setTopArtistImg4,
+            sArtists : setTopArtists});
     });
 
     return(
@@ -149,7 +223,7 @@ function Authorized(props : {userPfp : string, setPfp : (uPfp : string) => void}
                 <div className={"Topsongs-box"}>
                     <div className={"Song-box"}>
                         <a href={topSongUrl1} className={"Song-art"}>
-                            <img className={"Song-art"} src={topSongImg1}/>
+                            <img className={"Song-art"} src={topSongs[0].album.images[0].url}/>
                         </a>
                         {topSong1}
                     </div>
