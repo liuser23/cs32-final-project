@@ -59,6 +59,10 @@ function Home(props: {sessionToken: string, sidebarConfig: SidebarConfig, setSid
         <div>
             <SideBar sidebarConfig={props.sidebarConfig}/>
             <div className={"Main-window"}>
+                { curUserName !== undefined && numFollowers !== undefined ?
+                    <><p>Hello {curUserName}</p><p>Followers: {numFollowers}</p></> :
+                    <p>Loading Loading Profile Info</p>
+                }
                 { error !== undefined ? <p>Error: {error}</p> : <></> }
                 { (topArtists !== undefined && topArtists.length !== 0) ?
                     <><p>Top Artists</p><TopArtistsBox topArtists={topArtists}/></> :
@@ -72,10 +76,6 @@ function Home(props: {sessionToken: string, sidebarConfig: SidebarConfig, setSid
                 }
                 <br/>
                 <br/>
-                { curUserName !== undefined && numFollowers !== undefined ?
-                    <><p>Hello {curUserName}</p><p>Followers: {numFollowers}</p></> :
-                    <p>Loading Loading Profile Info</p>
-                }
             </div>
         </div>
     )

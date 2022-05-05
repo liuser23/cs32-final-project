@@ -1,8 +1,5 @@
 import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
 import '../App.css';
-import axios from 'axios';
-import SideBar from "../SideBar";
-import {Async, useFetch} from "react-async";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 
 function NewSession(props: {setSessionToken: Dispatch<SetStateAction<string>>}) {
