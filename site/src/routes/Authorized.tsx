@@ -5,6 +5,8 @@ import DefaultPfp from '../images/PngItem_1503945.png';
 import SideBar from "../SideBar";
 import ProfilePhoto from "../ProfilePhoto";
 import {Link} from "react-router-dom";
+import TopSongsBox from "../TopSongsBox";
+import TopArtistsBox from "../TopArtistsBox";
 
 type image = {
     height : number;
@@ -39,7 +41,7 @@ type albumBySong = {
     artists : artistBySong[];
     availableMarkets: string[];
     externalUrls : { externalUrls : {spotify : string} };
-    href : "string";
+    href : string;
     id : string;
     images : image[];
     name : string;
@@ -50,7 +52,7 @@ type albumBySong = {
 type track = {
     album : albumBySong;
     artists : artistBySong[];
-    availableMarkets : string;
+    availableMarkets : string[];
     discNumber : number;
     durationMs : number;
     explicit : boolean;
@@ -68,41 +70,59 @@ type track = {
 
 function Authorized(props : {userPfp : string, setPfp : (uPfp : string) => void}) {
 
+    const defaultString : string = "loading..."
+    const defaultImageHeight : number = 200;
+    const defaultImageWidth : number = 200;
+    const defaultImageUrl : string = "../images/default_album_art.png";
+    const defaultNumber : number = 1;
+    const defaultBoolean : boolean = false;
+    const [curUserName, setCurUserName] = useState<string>("loading...");
+    const [numFollowers, setNumFollowers] = useState<number>(0);
+
+
+    function makeDefaultArtistBySong() {
+        let defArtist : artistBySong = {externalUrls : {externalUrls : {spotify : defaultString}},
+            href : defaultString, id : defaultString, name : defaultString, type : defaultString, uri : defaultString};
+        return defArtist;
+    }
+
+    function makeDefaultImage() {
+        let defImage : image = {height : defaultImageHeight, url : defaultImageUrl, width : defaultImageWidth};
+        return defImage;
+    }
+
+    function makeDefaultAlbumBySong() {
+        let defAlbum : albumBySong = {albumType : defaultString, artists : [makeDefaultArtistBySong()],
+            availableMarkets : [defaultString], externalUrls : {externalUrls : {spotify : defaultString}},
+            href : defaultString, id : defaultString, images : [makeDefaultImage()], name : defaultString,
+            type : defaultString, uri : defaultString};
+        return defAlbum;
+    }
+
+    function makeDefaultTrack() {
+        let defTrack : track = {album : makeDefaultAlbumBySong(), artists : [makeDefaultArtistBySong()],
+            availableMarkets : [defaultString], discNumber : defaultNumber, durationMs : defaultNumber,
+            explicit : defaultBoolean, externalIds : {externalIds : {isrc : defaultString}},
+            externalUrls : {externalUrls : {spotify : defaultString}}, href : defaultString, id : defaultString,
+            name : defaultString, popularity : defaultNumber, previewUrl : defaultString, trackNumber : defaultNumber,
+            type : defaultString, uri : defaultString};
+        return defTrack;
+    }
+
+    function makeDefaultArtist() {
+        let defArtist : artist = {externalUrls : {externalUrls : {spotify : defaultString}},
+            followers : {total : defaultNumber}, genre : [defaultString], href : defaultString, id : defaultString,
+            images : [makeDefaultImage()], name : defaultString, popularity : defaultNumber, type : defaultString,
+            uri : defaultString};
+        return defArtist;
+    }
+
 
 
     const [topSongs, setTopSongs] = useState<track[]>([]);
     const [topArtists, setTopArtists] = useState<artist[]>([]);
 
 
-
-    const [curUserName, setCurUserName] = useState<string>("loading...");
-    const [numFollowers, setNumFollowers] = useState<number>(0);
-
-    const [topSong1, setTopSong1] = useState<string>("");
-    const [topSongImg1, setTopSongImg1] = useState<string>("loading...");
-    const [topSongUrl1, setTopSongUrl1] = useState<string>("");
-
-    const [topSong2, setTopSong2] = useState<string>("");
-    const [topSongImg2, setTopSongImg2] = useState<string>("loading...");
-    const [topSongUrl2, setTopSongUrl2] = useState<string>("");
-
-    const [topSong3, setTopSong3] = useState<string>("");
-    const [topSongImg3, setTopSongImg3] = useState<string>("loading...");
-    const [topSongUrl3, setTopSongUrl3] = useState<string>("");
-
-    const [topSong4, setTopSong4] = useState<string>("");
-    const [topSongImg4, setTopSongImg4] = useState<string>("loading...");
-    const [topSongUrl4, setTopSongUrl4] = useState<string>("");
-
-
-    const [topArtist1, setTopArtist1] = useState<string>("");
-    const [topArtistImg1, setTopArtistImg1] = useState<string>("loading...");
-    const [topArtist2, setTopArtist2] = useState<string>("");
-    const [topArtistImg2, setTopArtistImg2] = useState<string>("loading...");
-    const [topArtist3, setTopArtist3] = useState<string>("");
-    const [topArtistImg3, setTopArtistImg3] = useState<string>("loading...");
-    const [topArtist4, setTopArtist4] = useState<string>("");
-    const [topArtistImg4, setTopArtistImg4] = useState<string>("loading...");
 
     async function getUserData(props : {sName : (curName : string) => void,
         sFollowers : (curFollowers : number) => void, sPfp : (curPfp : string) => void}) {
@@ -121,15 +141,7 @@ function Authorized(props : {userPfp : string, setPfp : (uPfp : string) => void}
             })
     }
 
-    async function getTopTracks(props : {sSong1 : (curSong : string) => void, sImg1 : (songImg : string) => void,
-        sUrl1 : (curUrl : string) => void,
-        sSong2 : (curSong : string) => void, sImg2 : (songImg : string) => void,
-        sUrl2 : (curUrl : string) => void,
-        sSong3 : (curSong : string) => void, sImg3 : (songImg : string) => void,
-        sUrl3 : (curUrl : string) => void,
-        sSong4 : (curSong : string) => void, sImg4 : (songImg : string) => void,
-        sUrl4 : (curUrl : string) => void,
-        sTracks : (curTracks : track[]) => void}) {
+    async function getTopTracks(props : {sTracks : (curTracks : track[]) => void}) {
         let config = {
             headers: {
                 "Content-Type": "application/json",
@@ -139,32 +151,11 @@ function Authorized(props : {userPfp : string, setPfp : (uPfp : string) => void}
         await axios.get("http://localhost:8888/topTracks", config)
             .then(response => {
                 console.log("Top Songs", response.data)
-
                 props.sTracks(response.data)
-
-                props.sSong1(response.data[0].name)
-                props.sImg1(response.data[0].album.images[0].url)
-                props.sUrl1(response.data[0].previewUrl)
-
-                props.sSong2(response.data[1].name)
-                props.sImg2(response.data[1].album.images[0].url)
-                props.sUrl2(response.data[1].previewUrl)
-
-                props.sSong3(response.data[2].name)
-                props.sImg3(response.data[2].album.images[0].url)
-                props.sUrl3(response.data[2].previewUrl)
-
-                props.sSong4(response.data[3].name)
-                props.sImg4(response.data[3].album.images[0].url)
-                props.sUrl4(response.data[3].previewUrl)
             })
     }
 
-    async function getTopArtists(props : {sArtist1 : (curArtist : string) => void, sImg1 : (artistImg : string) => void,
-        sArtist2 : (curArtist : string) => void, sImg2 : (artistImg : string) => void,
-        sArtist3 : (curArtist : string) => void, sImg3 : (artistImg : string) => void,
-        sArtist4 : (curArtist : string) => void, sImg4 : (artistImg : string) => void,
-        sArtists : (curArtists : artist[]) => void}) {
+    async function getTopArtists(props : {sArtists : (curArtists : artist[]) => void}) {
         let config = {
             headers: {
                 "Content-Type": "application/json",
@@ -174,38 +165,16 @@ function Authorized(props : {userPfp : string, setPfp : (uPfp : string) => void}
         await axios.get("http://localhost:8888/topArtists", config)
             .then(response => {
                 console.log("Top Artists:", response.data)
-
                 props.sArtists(response.data)
-
-                props.sArtist1(response.data[0].name)
-                props.sImg1(response.data[0].images[0].url)
-                props.sArtist2(response.data[1].name)
-                props.sImg2(response.data[1].images[0].url)
-                props.sArtist3(response.data[2].name)
-                props.sImg3(response.data[2].images[0].url)
-                props.sArtist4(response.data[3].name)
-                props.sImg4(response.data[3].images[0].url)
             })
     }
 
     useEffect(() => {
         //getUserName({change : setCurUserName})
         getUserData({sName : setCurUserName, sFollowers : setNumFollowers, sPfp : props.setPfp})
-        getTopTracks({sSong1 : setTopSong1, sImg1 : setTopSongImg1,
-            sUrl1 : setTopSongUrl1,
-            sSong2 : setTopSong2, sImg2 : setTopSongImg2,
-            sUrl2 : setTopSongUrl2,
-            sSong3 : setTopSong3, sImg3 : setTopSongImg3,
-            sUrl3 : setTopSongUrl3,
-            sSong4 : setTopSong4, sImg4 : setTopSongImg4,
-            sUrl4 : setTopSongUrl4,
-            sTracks : setTopSongs});
-        getTopArtists({sArtist1 : setTopArtist1, sImg1 : setTopArtistImg1,
-            sArtist2 : setTopArtist2, sImg2 : setTopArtistImg2,
-            sArtist3 : setTopArtist3, sImg3 : setTopArtistImg3,
-            sArtist4 : setTopArtist4, sImg4 : setTopArtistImg4,
-            sArtists : setTopArtists});
-    });
+        getTopTracks({sTracks : setTopSongs});
+        getTopArtists({sArtists : setTopArtists});
+    }, []);
 
     return(
         <div>
@@ -217,55 +186,12 @@ function Authorized(props : {userPfp : string, setPfp : (uPfp : string) => void}
                 <br/>
                 <br/>
                 <br/>
-                <p><>Top Song: {topSong1}</></p>
                 <br/>
                 <p><>Top Songs</></p>
-                <div className={"Topsongs-box"}>
-                    <div className={"Song-box"}>
-                        <a href={topSongUrl1} className={"Song-art"}>
-                            <img className={"Song-art"} src={topSongs[0].album.images[0].url}/>
-                        </a>
-                        {topSong1}
-                    </div>
-                    <div className={"Song-box"}>
-                        <a href={topSongUrl2} className={"Song-art"}>
-                            <img className={"Song-art"} src={topSongImg2}/>
-                        </a>
-                        {topSong2}
-                    </div>
-                    <div className={"Song-box"}>
-                        <a href={topSongUrl3} className={"Song-art"}>
-                            <img className={"Song-art"} src={topSongImg3}/>
-                        </a>
-                        {topSong3}
-                    </div>
-                    <div className={"Song-box"}>
-                        <a href={topSongUrl4} className={"Song-art"}>
-                            <img className={"Song-art"} src={topSongImg4}/>
-                        </a>
-                        {topSong4}
-                    </div>
-                </div>
+                <TopSongsBox topSongs={topSongs}/>
                 <br/>
                 <p><>Top Artists</></p>
-                <div className={"Topsongs-box"}>
-                    <div className={"Song-box"}>
-                        <img className={"Song-art"} src={topArtistImg1}/>
-                        {topArtist1}
-                    </div>
-                    <div className={"Song-box"}>
-                        <img className={"Song-art"} src={topArtistImg2}/>
-                        {topArtist2}
-                    </div>
-                    <div className={"Song-box"}>
-                        <img className={"Song-art"} src={topArtistImg3}/>
-                        {topArtist3}
-                    </div>
-                    <div className={"Song-box"}>
-                        <img className={"Song-art"} src={topArtistImg4}/>
-                        {topArtist4}
-                    </div>
-                </div>
+                <TopArtistsBox topArtists={topArtists}/>
             </div>
         </div>
     )
