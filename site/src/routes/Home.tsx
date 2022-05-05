@@ -9,7 +9,7 @@ import {artist, track} from "../MyTypes";
 import TopSongsBox from "../TopSongsBox";
 import TopArtistsBox from "../TopArtistsBox";
 
-function Home(props: {sessionToken: string, sidebarConfig: SidebarConfig, setSidebarConfig: Dispatch<SetStateAction<SidebarConfig>>}) {
+function Home(props: {sessionToken: string, setSidebarConfig: Dispatch<SetStateAction<SidebarConfig>>}) {
     const [error, setError] = useState<string>()
     const [curUserName, setCurUserName] = useState<string>();
     const [numFollowers, setNumFollowers] = useState<number>();
@@ -30,7 +30,7 @@ function Home(props: {sessionToken: string, sidebarConfig: SidebarConfig, setSid
                 response => {
                     setCurUserName(response.data.displayName)
                     setNumFollowers(response.data.followers.total)
-                    props.setSidebarConfig(response.data.images[0]?.url ?? DefaultPfp)
+                    props.setSidebarConfig({profilePicturePath : response.data.images[0].url})
                 },
                 reason => setError(reason),
             )
@@ -57,7 +57,6 @@ function Home(props: {sessionToken: string, sidebarConfig: SidebarConfig, setSid
 
     return (
         <div>
-            <SideBar sidebarConfig={props.sidebarConfig}/>
             <div className={"Main-window"}>
                 { curUserName !== undefined && numFollowers !== undefined ?
                     <><p>Hello {curUserName}</p><p>Followers: {numFollowers}</p></> :

@@ -5,12 +5,9 @@ import DefaultPfp from '../images/PngItem_1503945.png';
 import {SidebarConfig} from "../App";
 
 
-function ChangePassword(props: {sidebarConfig: SidebarConfig}) {
+function ChangePassword() {
     return (
         <div>
-            <div className={"Side-bar"}>
-                <SideBar sidebarConfig={props.sidebarConfig}/>
-            </div>
             <div className={"Main-window"}>
                 Change Password
             </div>

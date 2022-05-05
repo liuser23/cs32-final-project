@@ -13,9 +13,9 @@ public class KnownUsers {
 
     // create table if not exists users ( id text primary key, accessToken text, refreshToken text, displayName text, imageUrl text, followerCount text );
     // create table if not exists sessionTokens ( primary key sessionToken text, id text, foreign key(id) references users(id) );
-    KnownUsers(Path databasePath) throws ClassNotFoundException, SQLException {
+    KnownUsers(String filename) throws ClassNotFoundException, SQLException {
         Class.forName("org.sqlite.JDBC");
-        String urlToDB = "jdbc:sqlite:" + databasePath.getFileName();
+        String urlToDB = "jdbc:sqlite:" + filename;
         connection = DriverManager.getConnection(urlToDB);
 
         connection.prepareStatement("create table if not exists credentials ( id text primary key, accessToken text, refreshToken text, foreign key(id) references users(id) ); );").executeUpdate();

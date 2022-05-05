@@ -14,21 +14,26 @@ import ProfilePhoto from "./ProfilePhoto";
 import {SidebarConfig} from "./App";
 
 function SideBar(props: {sidebarConfig: SidebarConfig}) {
-    return(
-        <div className={"Side-bar"}>
-            <ProfilePhoto image={props.sidebarConfig.profilePicturePath ?? DefaultPfp}/>
-            <div className={"Account-menu"}>
-                <AccMenuButton picture={PicHome} picAlt={"house"} txtContent={"Account Overview"} route={"/"}/>
-                <AccMenuButton picture={PicLock} picAlt={"lock"} txtContent={"Privacy Settings"} route={"/privacysettings"}/>
-                <AccMenuButton picture={PicPencil} picAlt={"pencil"} txtContent={"Edit Profile"} route={"/editprofile"}/>
-                <AccMenuButton picture={PicLock} picAlt={"lock"} txtContent={"Change Password"} route={"/changepassword"}/>
-                <AccMenuButton picture={PicBell} picAlt={"bell"} txtContent={"Notification Settings"} route={"/notificationsettings"}/>
-                <AccMenuButton picture={PicFriends} picAlt={"friends"} txtContent={"Friends List"} route={"/friendslist"}/>
-                <AccMenuButton picture={PicRecList} picAlt={"list"} txtContent={"My Recommendations"} route={"/myrecommendations"}/>
-                <AccMenuButton picture={PicSignOut} picAlt={"exit"} txtContent={"Sign Out"} route={"/signout"}/>
+    //if (props.sidebarConfig.authenticated) {
+        return(
+            <div className={"Side-bar"}>
+                <ProfilePhoto image={props.sidebarConfig.profilePicturePath ?? DefaultPfp}/>
+                <div className={"Account-menu"}>
+                    <AccMenuButton picture={PicHome} picAlt={"house"} txtContent={"Account Overview"} route={"/"}/>
+                    <AccMenuButton picture={PicLock} picAlt={"lock"} txtContent={"Privacy Settings"} route={"/privacysettings"}/>
+                    <AccMenuButton picture={PicPencil} picAlt={"pencil"} txtContent={"Edit Profile"} route={"/editprofile"}/>
+                    <AccMenuButton picture={PicLock} picAlt={"lock"} txtContent={"Change Password"} route={"/changepassword"}/>
+                    <AccMenuButton picture={PicBell} picAlt={"bell"} txtContent={"Notification Settings"} route={"/notificationsettings"}/>
+                    <AccMenuButton picture={PicFriends} picAlt={"friends"} txtContent={"Friends List"} route={"/friendslist"}/>
+                    <AccMenuButton picture={PicRecList} picAlt={"list"} txtContent={"My Recommendations"} route={"/myrecommendations"}/>
+                    <AccMenuButton picture={PicSignOut} picAlt={"exit"} txtContent={"Sign Out"} route={"/signout"}/>
+                </div>
             </div>
-        </div>
-    )
+        )
+    //} else {
+    //    return(
+    //        <></>)
+    //}
 }
 
 export default SideBar;

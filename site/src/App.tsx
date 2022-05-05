@@ -16,10 +16,13 @@ import DefaultPfp from "./images/PngItem_1503945.png";
 import Home from "./routes/Home";
 import NewSession from "./routes/NewSession";
 import Unauthenticated from "./routes/Unauthenticated";
+import SideBar from "./SideBar";
 
 type SidebarConfig = {
     profilePicturePath: string,
 }
+
+
 
 function App() {
     const [sessionToken, setSessionToken] = useState<string>('')
@@ -27,21 +30,34 @@ function App() {
         profilePicturePath: DefaultPfp,
     })
 
-    return (
-      <BrowserRouter>
-          <Routes>
-              <Route path={"/"} element={<Authenticate sessionToken={sessionToken}><Home sessionToken={sessionToken} setSidebarConfig={setSidebarConfig} sidebarConfig={sidebarConfig}/></Authenticate>}/>
-              <Route path={"newSession"} element={<NewSession setSessionToken={setSessionToken}/>}/>
-              <Route path={"privacysettings"} element={<Authenticate sessionToken={sessionToken}><PrivacySettings sidebarConfig={sidebarConfig}/></Authenticate>}/>
-              <Route path={"editprofile"} element={<Authenticate sessionToken={sessionToken}><EditProfile sidebarConfig={sidebarConfig}/></Authenticate>}/>
-              <Route path={"changepassword"} element={<Authenticate sessionToken={sessionToken}><ChangePassword sidebarConfig={sidebarConfig}/></Authenticate>}/>
-              <Route path={"notificationsettings"} element={<Authenticate sessionToken={sessionToken}><NotificationSettings sidebarConfig={sidebarConfig}/></Authenticate>}/>
-              <Route path={"FriendsList"} element={<Authenticate sessionToken={sessionToken}><FriendsList sidebarConfig={sidebarConfig}/></Authenticate>}/>
-              <Route path={"myrecommendations"} element={<Authenticate sessionToken={sessionToken}><MyRecommendations sidebarConfig={sidebarConfig}/></Authenticate>}/>
-              <Route path={"signout"} element={<Authenticate sessionToken={sessionToken}><SignOut sidebarConfig={sidebarConfig}/></Authenticate>}/>
-          </Routes>
-      </BrowserRouter>
-    )
+    if (sessionToken) {
+        return (
+            <BrowserRouter>
+                <SideBar sidebarConfig={sidebarConfig}/>
+                <Routes>
+                    <Route path={"/"} element={<Authenticate sessionToken={sessionToken}><Home sessionToken={sessionToken} setSidebarConfig={setSidebarConfig}/></Authenticate>}/>
+                    <Route path={"newSession"} element={<NewSession setSessionToken={setSessionToken}/>}/>
+                    <Route path={"privacysettings"} element={<Authenticate sessionToken={sessionToken}><PrivacySettings/></Authenticate>}/>
+                    <Route path={"editprofile"} element={<Authenticate sessionToken={sessionToken}><EditProfile/></Authenticate>}/>
+                    <Route path={"changepassword"} element={<Authenticate sessionToken={sessionToken}><ChangePassword/></Authenticate>}/>
+                    <Route path={"notificationsettings"} element={<Authenticate sessionToken={sessionToken}><NotificationSettings/></Authenticate>}/>
+                    <Route path={"FriendsList"} element={<Authenticate sessionToken={sessionToken}><FriendsList/></Authenticate>}/>
+                    <Route path={"myrecommendations"} element={<Authenticate sessionToken={sessionToken}><MyRecommendations/></Authenticate>}/>
+                    <Route path={"signout"} element={<Authenticate sessionToken={sessionToken}><SignOut/></Authenticate>}/>
+                </Routes>
+            </BrowserRouter>
+        )
+    } else {
+        return (
+            <BrowserRouter>
+                <Routes>
+                    <Route path={"/"} element={<Authenticate sessionToken={sessionToken}><Home sessionToken={sessionToken} setSidebarConfig={setSidebarConfig}/></Authenticate>}/>
+                    <Route path={"newSession"} element={<NewSession setSessionToken={setSessionToken}/>}/>
+                </Routes>
+            </BrowserRouter>
+        )
+
+    }
 }
 
 function Authenticate(props: {sessionToken: string, children: JSX.Element}) {

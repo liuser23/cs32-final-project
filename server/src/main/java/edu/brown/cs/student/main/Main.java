@@ -59,9 +59,10 @@ public final class Main {
 
         KnownUsers users;
         try {
-            users = new KnownUsers(Path.of("secret/known.sqlite3"));
+            users = new KnownUsers("secret/known.sqlite3");
         } catch (ClassNotFoundException | SQLException e) {
             System.out.println("Could not open user database" + e.getMessage());
+            e.printStackTrace();
             return;
         }
 

@@ -4,13 +4,10 @@ import SideBar from "../SideBar";
 import DefaultPfp from "../images/PngItem_1503945.png";
 import {SidebarConfig} from "../App";
 
-function FriendsList(props: {sidebarConfig: SidebarConfig}) {
+function FriendsList() {
 
     return (
         <div>
-            <div className={"Side-bar"}>
-                <SideBar sidebarConfig={props.sidebarConfig}/>
-            </div>
             <div className={"Main-window"}>
                 Friends List
             </div>
