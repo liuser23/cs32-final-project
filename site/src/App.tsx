@@ -1,12 +1,10 @@
 import React, {useState} from 'react';
 import './App.css';
-import Unauthenticated from "./routes/Unauthenticated";
 import {
     BrowserRouter,
     Routes,
-    Route, useSearchParams, useNavigate,
+    Route,
 } from "react-router-dom";
-import NewSession from "./routes/NewSession";
 import PrivacySettings from "./routes/PrivacySettings";
 import EditProfile from "./routes/EditProfile";
 import ChangePassword from "./routes/ChangePassword";
@@ -14,8 +12,10 @@ import NotificationSettings from "./routes/NotificationSettings";
 import FriendsList from "./routes/FriendsList";
 import MyRecommendations from "./routes/MyRecommendations";
 import SignOut from "./routes/SignOut";
-import Home from "./routes/Home";
 import DefaultPfp from "./images/PngItem_1503945.png";
+import Home from "./routes/Home";
+import NewSession from "./routes/NewSession";
+import Unauthenticated from "./routes/Unauthenticated";
 
 type SidebarConfig = {
     profilePicturePath: string,
@@ -44,7 +44,7 @@ function App() {
     )
 }
 
-function Authenticate(props: {sessionToken: string | undefined, children: JSX.Element}) {
+function Authenticate(props: {sessionToken: string, children: JSX.Element}) {
     if (props.sessionToken) {
         return props.children
     } else {

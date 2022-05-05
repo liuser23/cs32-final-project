@@ -40,6 +40,7 @@ public final class Main {
     private static final String WEBSITE_URL = "http://localhost:" + DEFAULT_PORT;
 
     /**
+     *
      * Public entrypoint.
      * @param args from command line
      */

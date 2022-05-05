@@ -3,109 +3,82 @@ import '../App.css';
 import axios from 'axios';
 import DefaultPfp from '../images/PngItem_1503945.png';
 import SideBar from "../SideBar";
-import ProfilePhoto from "../ProfilePhoto";
-import {Link} from "react-router-dom";
 import '../App.css';
 import {SidebarConfig} from "../App";
-
-type UserData = {
-    displayName: string,
-    followerCount: number,
-    imageUrl: string,
-}
-
-type TopSong = {
-    name: string,
-    image: string,
-    uri: string,
-}
-
-type TopArtist = {
-    name: string,
-    image: string,
-}
+import {artist, track} from "../MyTypes";
+import TopSongsBox from "../TopSongsBox";
+import TopArtistsBox from "../TopArtistsBox";
 
 function Home(props: {sessionToken: string, sidebarConfig: SidebarConfig, setSidebarConfig: Dispatch<SetStateAction<SidebarConfig>>}) {
     const [error, setError] = useState<string>()
-    const [userData, setUserData] = useState<UserData>()
-    const [topSongs, setTopSongs] = useState<TopSong[]>([])
-    const [topArtists, setTopArtists] = useState<TopArtist[]>()
+    const [curUserName, setCurUserName] = useState<string>();
+    const [numFollowers, setNumFollowers] = useState<number>();
+    const [topSongs, setTopSongs] = useState<track[]>();
+    const [topArtists, setTopArtists] = useState<artist[]>();
 
-    useEffect(() => {
-        let config = {
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
-                'Authentication': props.sessionToken,
-            }
+    const config = {
+        headers: {
+            'Authentication': props.sessionToken,
+            "Content-Type": "application/json",
+            'Access-Control-Allow-Origin': '*',
         }
-        fetch('http://localhost:8888/userData', config)
-            .then(result => result.json())
-            .then(
-                (result) => setUserData(result),
-                (error) => setError(error),
-            )
-        fetch('http://localhost:8888/topTracks', config)
-            .then(result => result.json())
-            .then(
-                (result) => setTopSongs(result),
-                (error) => setError(error),
-            )
-        fetch('http://localhost:8888/topArtists', config)
-            .then(result => result.json())
-            .then(
-                (result) => setTopArtists(result),
-                (error) => setError(error),
-            )
-    }, [])
-
-    if (userData && topSongs && topArtists) {
-        return (
-            <>
-            <SideBar sidebarConfig={props.sidebarConfig}/>
-            <div className={"Main-window"}>
-                <p>Success! You have logged in.</p>
-                <p><>Name: {userData.displayName}</></p>
-                <p><>Followers: {userData.followerCount}</></p>
-                <br/>
-                <br/>
-                <br/>
-                <br/>
-                <div className={"Topsongs-box"}>
-                    <h2>Top Songs</h2>
-                    <>
-                        {topSongs.map((topSong) => {
-                                <div className={"Song-box"}>
-                                    <a href={topSong.uri} className={"Song-art"}>
-                                        <img className={"Song-art"} src={topSong.image}/>
-                                    </a>
-                                    {topSong.name}
-                                </div>
-                            })}
-                    </>
-                </div>
-                <br/>
-                <div className={"Topsongs-box"}>
-                    <h2>Top Artists</h2>
-                    <>
-                        {topArtists.map((topArtist) => {
-                                <div className={"Song-box"}>
-                                    <img className={"Song-art"} src={topArtist.image}/>
-                                    {topArtist.name}
-                                </div>
-                            })}
-                    </>
-                </div>
-            </div>
-        </>
-        )
-
-    } else if (error) {
-        return <pre>Error: {error}</pre>
-    } else {
-        return <h1>Loading...</h1>
     }
 
+    const getUserData = async () =>
+        await axios.get("http://localhost:8888/userData", config)
+            .then(
+                response => {
+                    setCurUserName(response.data.displayName)
+                    setNumFollowers(response.data.followers.total)
+                    props.setSidebarConfig(response.data.images[0]?.url ?? DefaultPfp)
+                },
+                reason => setError(reason),
+            )
+
+    const getTopTracks = async () =>
+        await axios.get("http://localhost:8888/topTracks", config)
+            .then(
+                response => setTopSongs(response.data),
+                reason => setError(reason),
+            )
+
+    const getTopArtists = async () =>
+        await axios.get("http://localhost:8888/topArtists", config)
+            .then(
+                response => setTopArtists(response.data),
+                reason => setError(reason),
+            )
+
+    useEffect(() => {
+        getUserData()
+        getTopTracks()
+        getTopArtists()
+    }, []);
+
+    return (
+        <div>
+            <SideBar sidebarConfig={props.sidebarConfig}/>
+            <div className={"Main-window"}>
+                { error !== undefined ? <p>Error: {error}</p> : <></> }
+                { (topArtists !== undefined && topArtists.length !== 0) ?
+                    <><p>Top Artists</p><TopArtistsBox topArtists={topArtists}/></> :
+                    <></>
+                }
+                <br/>
+                <br/>
+                { topSongs !== undefined && topSongs.length !== 0 ?
+                    <><p>Top Songs</p><TopSongsBox topSongs={topSongs}/></> :
+                    <></>
+                }
+                <br/>
+                <br/>
+                { curUserName !== undefined && numFollowers !== undefined ?
+                    <><p>Hello {curUserName}</p><p>Followers: {numFollowers}</p></> :
+                    <p>Loading Loading Profile Info</p>
+                }
+            </div>
+        </div>
+    )
 }
 
 export default Home;
