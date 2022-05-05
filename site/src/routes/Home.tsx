@@ -25,7 +25,7 @@ function Home(props: {sessionToken: string, sidebarConfig: SidebarConfig, setSid
     }
 
     const getUserData = async () =>
-        await axios.get("http://localhost:8888/userData", config)
+        await axios.get(process.env.REACT_APP_USER_DATA_ENDPOINT as string, config)
             .then(
                 response => {
                     setCurUserName(response.data.displayName)
@@ -36,14 +36,14 @@ function Home(props: {sessionToken: string, sidebarConfig: SidebarConfig, setSid
             )
 
     const getTopTracks = async () =>
-        await axios.get("http://localhost:8888/topTracks", config)
+        await axios.get(process.env.REACT_APP_TOP_TRACKS_ENDPOINT as string, config)
             .then(
                 response => setTopSongs(response.data),
                 reason => setError(reason),
             )
 
     const getTopArtists = async () =>
-        await axios.get("http://localhost:8888/topArtists", config)
+        await axios.get(process.env.REACT_APP_TOP_ARTISTS_ENDPOINT as string, config)
             .then(
                 response => setTopArtists(response.data),
                 reason => setError(reason),
