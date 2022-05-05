@@ -7,122 +7,14 @@ import ProfilePhoto from "../ProfilePhoto";
 import {Link} from "react-router-dom";
 import TopSongsBox from "../TopSongsBox";
 import TopArtistsBox from "../TopArtistsBox";
-
-type image = {
-    height : number;
-    url : string;
-    width : number;
-}
-
-type artistBySong = {
-    externalUrls : { externalUrls : {spotify : string} };
-    href : string;
-    id : string;
-    name : string;
-    type : string;
-    uri : string;
-}
-
-type artist = {
-    externalUrls : { externalUrls : {spotify : string} };
-    followers: { total : number };
-    genre : string[];
-    href : string;
-    id : string;
-    images : image[];
-    name : string;
-    popularity : number;
-    type : string;
-    uri : string;
-}
-
-type albumBySong = {
-    albumType : string;
-    artists : artistBySong[];
-    availableMarkets: string[];
-    externalUrls : { externalUrls : {spotify : string} };
-    href : string;
-    id : string;
-    images : image[];
-    name : string;
-    type : string;
-    uri : string;
-}
-
-type track = {
-    album : albumBySong;
-    artists : artistBySong[];
-    availableMarkets : string[];
-    discNumber : number;
-    durationMs : number;
-    explicit : boolean;
-    externalIds : { externalIds : {isrc : string} };
-    externalUrls : { externalUrls : {spotify : string} };
-    href : string;
-    id : string;
-    name : string;
-    popularity : number;
-    previewUrl : string;
-    trackNumber : number;
-    type : string;
-    uri : string;
-}
+import {track, artist} from "../MyTypes";
 
 function Authorized(props : {userPfp : string, setPfp : (uPfp : string) => void}) {
 
-    const defaultString : string = "loading..."
-    const defaultImageHeight : number = 200;
-    const defaultImageWidth : number = 200;
-    const defaultImageUrl : string = "../images/default_album_art.png";
-    const defaultNumber : number = 1;
-    const defaultBoolean : boolean = false;
     const [curUserName, setCurUserName] = useState<string>("loading...");
     const [numFollowers, setNumFollowers] = useState<number>(0);
-
-
-    function makeDefaultArtistBySong() {
-        let defArtist : artistBySong = {externalUrls : {externalUrls : {spotify : defaultString}},
-            href : defaultString, id : defaultString, name : defaultString, type : defaultString, uri : defaultString};
-        return defArtist;
-    }
-
-    function makeDefaultImage() {
-        let defImage : image = {height : defaultImageHeight, url : defaultImageUrl, width : defaultImageWidth};
-        return defImage;
-    }
-
-    function makeDefaultAlbumBySong() {
-        let defAlbum : albumBySong = {albumType : defaultString, artists : [makeDefaultArtistBySong()],
-            availableMarkets : [defaultString], externalUrls : {externalUrls : {spotify : defaultString}},
-            href : defaultString, id : defaultString, images : [makeDefaultImage()], name : defaultString,
-            type : defaultString, uri : defaultString};
-        return defAlbum;
-    }
-
-    function makeDefaultTrack() {
-        let defTrack : track = {album : makeDefaultAlbumBySong(), artists : [makeDefaultArtistBySong()],
-            availableMarkets : [defaultString], discNumber : defaultNumber, durationMs : defaultNumber,
-            explicit : defaultBoolean, externalIds : {externalIds : {isrc : defaultString}},
-            externalUrls : {externalUrls : {spotify : defaultString}}, href : defaultString, id : defaultString,
-            name : defaultString, popularity : defaultNumber, previewUrl : defaultString, trackNumber : defaultNumber,
-            type : defaultString, uri : defaultString};
-        return defTrack;
-    }
-
-    function makeDefaultArtist() {
-        let defArtist : artist = {externalUrls : {externalUrls : {spotify : defaultString}},
-            followers : {total : defaultNumber}, genre : [defaultString], href : defaultString, id : defaultString,
-            images : [makeDefaultImage()], name : defaultString, popularity : defaultNumber, type : defaultString,
-            uri : defaultString};
-        return defArtist;
-    }
-
-
-
     const [topSongs, setTopSongs] = useState<track[]>([]);
     const [topArtists, setTopArtists] = useState<artist[]>([]);
-
-
 
     async function getUserData(props : {sName : (curName : string) => void,
         sFollowers : (curFollowers : number) => void, sPfp : (curPfp : string) => void}) {

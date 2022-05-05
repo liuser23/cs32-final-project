@@ -1,24 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
-
-type image = {
-    height : number;
-    url : string;
-    width : number;
-}
-
-type artist = {
-    externalUrls : { externalUrls : {spotify : string} };
-    followers: { total : number };
-    genre : string[];
-    href : string;
-    id : string;
-    images : image[];
-    name : string;
-    popularity : number;
-    type : string;
-    uri : string;
-}
+import {artist} from "./MyTypes";
 
 
 function TopArtistsBox(props : {topArtists : artist[]}) {
