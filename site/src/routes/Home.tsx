@@ -30,7 +30,7 @@ function Home(props: {sessionToken: string, setSidebarConfig: Dispatch<SetStateA
                 response => {
                     setCurUserName(response.data.displayName)
                     setNumFollowers(response.data.followers.total)
-                    props.setSidebarConfig({profilePicturePath : response.data.images[0].url})
+                    props.setSidebarConfig({profilePicturePath : response.data.images[0]?.url})
                 },
                 reason => setError(reason),
             )
