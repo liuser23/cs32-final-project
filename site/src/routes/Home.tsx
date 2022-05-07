@@ -4,12 +4,12 @@ import axios from 'axios';
 import DefaultPfp from '../images/PngItem_1503945.png';
 import SideBar from "../SideBar";
 import '../App.css';
-import {SidebarConfig} from "../App";
+import {Authentication, SidebarConfig} from "../App";
 import {artist, track} from "../MyTypes";
 import TopSongsBox from "../TopSongsBox";
 import TopArtistsBox from "../TopArtistsBox";
 
-function Home(props: {sessionToken: string, setSidebarConfig: Dispatch<SetStateAction<SidebarConfig>>}) {
+function Home(props: {authentication: Authentication, setSidebarConfig: Dispatch<SetStateAction<SidebarConfig>>}) {
     const [error, setError] = useState<string>()
     const [curUserName, setCurUserName] = useState<string>();
     const [numFollowers, setNumFollowers] = useState<number>();
@@ -18,7 +18,7 @@ function Home(props: {sessionToken: string, setSidebarConfig: Dispatch<SetStateA
 
     const config = {
         headers: {
-            'Authentication': props.sessionToken,
+            'Authentication': props.authentication.sessionToken,
             "Content-Type": "application/json",
             'Access-Control-Allow-Origin': '*',
         }
@@ -53,7 +53,7 @@ function Home(props: {sessionToken: string, setSidebarConfig: Dispatch<SetStateA
         getUserData()
         getTopTracks()
         getTopArtists()
-    }, []);
+    }, [])
 
     return (
         <div>

@@ -12,6 +12,7 @@ import se.michaelthelin.spotify.requests.authorization.authorization_code.Author
 import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeUriRequest;
 import se.michaelthelin.spotify.requests.data.personalization.simplified.GetUsersTopArtistsRequest;
 import se.michaelthelin.spotify.requests.data.personalization.simplified.GetUsersTopTracksRequest;
+import se.michaelthelin.spotify.requests.data.search.simplified.SearchTracksRequest;
 import se.michaelthelin.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
 import spark.Request;
 import spark.Spark;
@@ -45,6 +46,7 @@ public class ServWrapper {
     private static final String CALLBACK_LOCATION = "/callback"; // must change in spotify dashboard
     private static final String LOGGED_IN_LOCATION = "/newSession";
 
+    private static final String REQUIRED_SCOPES = "user-read-email,user-top-read,user-follow-read,user-library-read,streaming";
 
     // TODO: put these in a config file
     private static final short SITE_SERVER_PORT = 3000;
@@ -85,7 +87,7 @@ public class ServWrapper {
     public URI getRedirectUri(String sessionToken) {
         AuthorizationCodeUriRequest authorizationCodeUriRequest = spotifyApi.authorizationCodeUri()
                 .state(sessionToken)
-                .scope("user-read-email,user-top-read,user-follow-read,user-library-read")
+                .scope(REQUIRED_SCOPES)
                 .build();
         CompletableFuture<URI> uriFuture = authorizationCodeUriRequest.executeAsync();
         URI uri = uriFuture.join();
@@ -129,6 +131,18 @@ public class ServWrapper {
     }
 
     /**
+     *  Get's the lyrics to a song
+     */
+    public Track[] searchTracks(Tokens tokens, String query) {
+        this.spotifyApi.setAccessToken(tokens.accessToken());
+        this.spotifyApi.setRefreshToken(tokens.refreshToken());
+        SearchTracksRequest request = spotifyApi.searchTracks(query).build();
+        CompletableFuture<Paging<Track>> pagingFuture = request.executeAsync();
+        Paging<Track> trackPaging = pagingFuture.join();
+        return trackPaging.getItems();
+    }
+
+    /**
      * Gets a user's top artists.
      */
     public Artist[] getTopArtists(Tokens tokens) {
@@ -152,9 +166,7 @@ public class ServWrapper {
         Spark.get(CALLBACK_LOCATION, (request, response) -> {
             String errorCode = request.params("error");
             if (errorCode != null) {
-                System.out.println(errorCode);
-                response.body("<pre>Error" + errorCode + "</pre>");
-                return null;
+                throw new RuntimeException("Spotify returned error: " + errorCode);
             }
             String sessionToken = request.queryParams("state");
             if (sessionToken == null) {
@@ -163,14 +175,11 @@ public class ServWrapper {
             String authorizationCode = request.queryParams("code");
             Tokens tokens = getAccessTokens(authorizationCode);
             User user = getUserProfile(tokens);
-            try {
-                users.initializeUser(sessionToken, tokens, user);
-            } catch (SQLException e) {
-                System.out.println("Storing user details failed: " + e.getMessage());
-            }
-
-            String queryParameter = "?sessionToken=" + sessionToken;
-            response.redirect(SITE_SERVER_URI + LOGGED_IN_LOCATION + queryParameter);
+            users.initializeUser(sessionToken, tokens, user);
+            String queryParameters =
+                    "?sessionToken=" + sessionToken
+                    + "&accessToken=" + tokens.accessToken();
+            response.redirect(SITE_SERVER_URI + LOGGED_IN_LOCATION + queryParameters);
             return null;
         });
 
@@ -191,29 +200,11 @@ public class ServWrapper {
             return new Gson().toJson(artists);
         });
 
-//        Spark.get(LOGGED_IN_LOCATION, (request, response) -> {
-//            String errorCode = request.params("error");
-//            if (errorCode != null) {
-//                System.out.println(errorCode);
-//                response.body("<pre>Error" + errorCode + "</pre>");
-//                return null;
-//            }
-//            Optional<String> result = users.userIdFromSessionToken(sessionToken);
-//            if (result.isEmpty()) {
-//                throw new RuntimeException("Session token `" + sessionToken + "` could not be found in database");
-//            }
-//            Optional<String> result2 = users.userDataJson(result.get());
-//            if (result2.isEmpty()) {
-//                throw new RuntimeException("User data for " + result.get() + " could not be found in database");
-//            }
-//            return result2.get();
-//        });
-
-//        TODO: re-enable when we merge servers
-//        Spark.get("/*", (request, response) -> {
-//           response.type("text/html");
-//           return Files.readString(Path.of("site/build/index.html"));
-//        });
+        Spark.get("/searchTracks", (request, response) -> {
+            String query = request.queryParams("query");
+            Track[] tracks = searchTracks(tokensFromRequest(request), query);
+            return new Gson().toJson(tracks);
+        });
     }
 
     private Tokens tokensFromRequest(Request request) throws SQLException {
@@ -264,7 +255,7 @@ public class ServWrapper {
     private static String randomString(int len) {
         char[] hex = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
         StringBuilder ret = new StringBuilder(len);
-        byte[] randomBytes = new byte[len];
+        byte[] randomBytes = new byte[len/2];
         new SecureRandom().nextBytes(randomBytes);
         for (byte b : randomBytes) {
             ret.append(hex[(b & 0b1111) & 0xf]);

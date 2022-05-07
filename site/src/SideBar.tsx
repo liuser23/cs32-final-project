@@ -20,6 +20,7 @@ function SideBar(props: {sidebarConfig: SidebarConfig}) {
                 <ProfilePhoto image={props.sidebarConfig.profilePicturePath ?? DefaultPfp}/>
                 <div className={"Account-menu"}>
                     <AccMenuButton picture={PicHome} picAlt={"house"} txtContent={"Account Overview"} route={"/"}/>
+                    <AccMenuButton picture={PicLock} picAlt={"lock"} txtContent={"Web Playback"} route={"/playback"}/>
                     <AccMenuButton picture={PicLock} picAlt={"lock"} txtContent={"Privacy Settings"} route={"/privacysettings"}/>
                     <AccMenuButton picture={PicPencil} picAlt={"pencil"} txtContent={"Edit Profile"} route={"/editprofile"}/>
                     <AccMenuButton picture={PicLock} picAlt={"lock"} txtContent={"Change Password"} route={"/changepassword"}/>
