@@ -4,41 +4,16 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Arrays;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.Gson;
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import spark.ExceptionHandler;
-import spark.ModelAndView;
-import spark.QueryParamsMap;
-import spark.Request;
-import spark.Response;
-import spark.Route;
-import spark.Filter;
-import spark.Spark;
-import spark.TemplateViewRoute;
-import spark.template.freemarker.FreeMarkerEngine;
-
-import freemarker.template.Configuration;
-
-import org.json.JSONObject;
 
 /**
  * The Main class of our project. This is where execution begins.
  *
  */
 public final class Main {
-    private static final short DEFAULT_PORT = 8888;
-
+    private static final short OUR_PORT = 8888;
     private static final String STATIC_SITE_PATH = "site/build";
-
-    private static final String WEBSITE_URL = "http://localhost:" + DEFAULT_PORT;
-
+    private static final String OUR_URL = "http://localhost:8888/";
+    private static final String STATIC_SITE_URL = "http://localhost:3000/";
     /**
      *
      * Public entrypoint.
@@ -66,7 +41,14 @@ public final class Main {
             return;
         }
 
-        ServWrapper server = new ServWrapper(users, WEBSITE_URL, DEFAULT_PORT, clientId, clientSecret, STATIC_SITE_PATH);
+        Server server = new Server(
+                users,
+                STATIC_SITE_URL,
+                OUR_URL,
+                OUR_PORT,
+                clientId,
+                clientSecret,
+                STATIC_SITE_PATH);
         server.start();
     }
 }

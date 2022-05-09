@@ -1,49 +1,220 @@
 package edu.brown.cs.student.main;
 
 import com.google.gson.Gson;
-import spark.*;
+import se.michaelthelin.spotify.SpotifyApi;
+import se.michaelthelin.spotify.SpotifyHttpManager;
+import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
+import se.michaelthelin.spotify.model_objects.specification.Artist;
+import se.michaelthelin.spotify.model_objects.specification.Paging;
+import se.michaelthelin.spotify.model_objects.specification.Track;
+import se.michaelthelin.spotify.model_objects.specification.User;
+import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeUriRequest;
+import se.michaelthelin.spotify.requests.data.personalization.simplified.GetUsersTopArtistsRequest;
+import se.michaelthelin.spotify.requests.data.personalization.simplified.GetUsersTopTracksRequest;
+import se.michaelthelin.spotify.requests.data.search.simplified.SearchTracksRequest;
+import se.michaelthelin.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
+import spark.Request;
+import spark.Spark;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
-import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
+import java.security.SecureRandom;
+import java.sql.SQLException;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
- * OK to delete?
- * Probably made redundant by ServWrapper.java
+ * This class is an attempt to implement the Authorization Code Flow using
+ * the Spotify Web API Java Wrapper: https://github.com/spotify-web-api-java/spotify-web-api-java
+ *
+ * Should be renamed Server if Server.java is deleted.
  */
+
 public class Server {
-    private final String siteUrl;
-    private final short port;
+    private static final String CALLBACK_LOCATION = "callback"; // must change in spotify dashboard
+    private static final String LOGGED_IN_LOCATION = "newSession";
+    private static final String REQUIRED_SCOPES = "user-read-email,user-top-read,user-follow-read,user-library-read,streaming,user-read-private,user-read-playback-state,user-modify-playback-state,user-library-modify";
+
+    private final String staticSiteUrl;
+    private final String ourUrl;
+    private final short ourPort;
     private final String clientId;
     private final String clientSecret;
     private final String staticFiles;
+    private final KnownUsers users;
+    private final SpotifyApi spotifyApi;
 
-    private static final String REQUESTED_SCOPES = "user-read-private user-read-email";
-    private static final String SPOTIFY_AUTHENTICATION_URL = "https://accounts.spotify.com/authorize?";
-    private static final URI SPOTIFY_GET_API_TOKEN = URI.create("https://accounts.spotify.com/api/token");
-    private static final URI SPOTIFY_GET_PROFILE = URI.create("https://api.spotify.com/v1/me");
-    private static final String CALLBACK_LOCATION = "/callback"; // must change in spotify dashboard
-    private static final String LOGGED_IN_LOCATION = "/authorized";
-
-
-    Server(String siteUrl, short port, String clientId, String clientSecret, String staticFiles) {
-        this.siteUrl = siteUrl;
-        this.port = port;
+    /**
+     * Constructor, sets local variables for site URL, port, ID and Secret codes, and static files.
+     * Builds redirect URI and Spotify API
+     *
+     * @param ourUrl
+     * @param ourPort
+     * @param clientId
+     * @param clientSecret
+     * @param staticFiles
+     */
+    Server(KnownUsers users, String staticSiteUrl, String ourUrl, short ourPort, String clientId, String clientSecret, String staticFiles) {
+        this.staticSiteUrl = staticSiteUrl;
+        this.ourUrl = ourUrl;
+        this.ourPort = ourPort;
         this.clientId =  clientId;
         this.clientSecret = clientSecret;
         this.staticFiles = staticFiles;
+        this.users = users;
+
+        URI redirectUri = SpotifyHttpManager.makeUri(this.ourUrl + CALLBACK_LOCATION);
+        this.spotifyApi = new SpotifyApi.Builder()
+                .setClientId(this.clientId)
+                .setClientSecret(this.clientSecret)
+                .setRedirectUri(redirectUri)
+                .build();
+    }
+
+    /**
+     * Get the Authorization Code URI from Spotify.
+     * @return the Spotify Authorization Code URI
+     */
+    public URI getRedirectUri(String sessionToken) {
+        AuthorizationCodeUriRequest authorizationCodeUriRequest = spotifyApi.authorizationCodeUri()
+                .state(sessionToken)
+                .scope(REQUIRED_SCOPES)
+                .build();
+        CompletableFuture<URI> uriFuture = authorizationCodeUriRequest.executeAsync();
+        URI uri = uriFuture.join();
+        System.out.println("URI: " + uri.toString());
+        return uri;
+    }
+
+
+    /**
+     * Get the Authorization Code from Spotify.
+     */
+    public Tokens getAccessTokens(String authorizationCode) {
+        AuthorizationCodeCredentials credentials = spotifyApi.authorizationCode(authorizationCode)
+                .build()
+                .executeAsync()
+                .join();
+        return new Tokens(credentials.getAccessToken(), credentials.getRefreshToken());
+    }
+
+    /**
+     * Get the current user's profile from Spotify.
+     */
+    public User getUserProfile(Tokens tokens) {
+        this.spotifyApi.setAccessToken(tokens.accessToken());
+        this.spotifyApi.setRefreshToken(tokens.refreshToken());
+        GetCurrentUsersProfileRequest getCurrentUsersProfileRequest = this.spotifyApi.getCurrentUsersProfile().build();
+        final CompletableFuture<User> userFuture = getCurrentUsersProfileRequest.executeAsync();
+        return userFuture.join();
+    }
+
+    /**
+     *  Gets a user's top tracks
+     */
+    public Track[] getTopTracks(Tokens tokens) {
+        this.spotifyApi.setAccessToken(tokens.accessToken());
+        this.spotifyApi.setRefreshToken(tokens.refreshToken());
+        GetUsersTopTracksRequest getUsersTopTracksRequest = spotifyApi.getUsersTopTracks().build();
+        CompletableFuture<Paging<Track>> pagingFuture = getUsersTopTracksRequest.executeAsync();
+        Paging<Track> trackPaging = pagingFuture.join();
+        return trackPaging.getItems();
+    }
+
+    /**
+     *  Get's the lyrics to a song
+     */
+    public Track[] searchTracks(Tokens tokens, String query) {
+        this.spotifyApi.setAccessToken(tokens.accessToken());
+        this.spotifyApi.setRefreshToken(tokens.refreshToken());
+        SearchTracksRequest request = spotifyApi.searchTracks(query).build();
+        CompletableFuture<Paging<Track>> pagingFuture = request.executeAsync();
+        Paging<Track> trackPaging = pagingFuture.join();
+        return trackPaging.getItems();
+    }
+
+    /**
+     * Gets a user's top artists.
+     */
+    public Artist[] getTopArtists(Tokens tokens) {
+        this.spotifyApi.setAccessToken(tokens.accessToken());
+        this.spotifyApi.setRefreshToken(tokens.refreshToken());
+        GetUsersTopArtistsRequest getUsersTopArtistsRequest = spotifyApi.getUsersTopArtists().build();
+        CompletableFuture<Paging<Artist>> pagingFuture = getUsersTopArtistsRequest.executeAsync();
+        Paging<Artist> artistPaging = pagingFuture.join();
+        return artistPaging.getItems();
     }
 
     public void start() {
-        Spark.port(port);
+        sparkStartup();
+
+        Spark.get("/login", (request, response) -> {
+            String sessionToken = randomString(20);
+            response.redirect(getRedirectUri(sessionToken).toString());
+            return null;
+        });
+
+        Spark.get(CALLBACK_LOCATION, (request, response) -> {
+            String errorCode = request.params("error");
+            if (errorCode != null) {
+                throw new RuntimeException("Spotify returned error: " + errorCode);
+            }
+            String sessionToken = request.queryParams("state");
+            if (sessionToken == null) {
+                throw new RuntimeException("Spotify did not provide session token");
+            }
+            String authorizationCode = request.queryParams("code");
+            Tokens tokens = getAccessTokens(authorizationCode);
+            User user = getUserProfile(tokens);
+            users.initializeUser(sessionToken, tokens, user);
+            String queryParameters =
+                    "?sessionToken=" + sessionToken
+                    + "&accessToken=" + tokens.accessToken();
+            response.redirect(staticSiteUrl + LOGGED_IN_LOCATION + queryParameters);
+            return null;
+        });
+
+        Spark.get("/userData", (request, response) -> {
+            User user = getUserProfile(tokensFromRequest(request));
+            String userJsonString = new Gson().toJson(user);
+            System.out.println(userJsonString);
+            return userJsonString;
+        });
+
+        Spark.get("/topTracks", (request, response) -> {
+            Track[] tracks = getTopTracks(tokensFromRequest(request));
+            return new Gson().toJson(tracks);
+        });
+
+        Spark.get("/topArtists", (request, response) -> {
+            Artist[] artists = getTopArtists(tokensFromRequest(request));
+            return new Gson().toJson(artists);
+        });
+
+        Spark.get("/searchTracks", (request, response) -> {
+            String query = request.queryParams("query");
+            Track[] tracks = searchTracks(tokensFromRequest(request), query);
+            return new Gson().toJson(tracks);
+        });
+    }
+
+    private Tokens tokensFromRequest(Request request) throws SQLException {
+        String sessionToken = request.headers("Authentication");
+        Optional<String> userId = users.userIdFromSessionToken(sessionToken);
+        if (userId.isEmpty()) {
+            throw new RuntimeException("user was not found");
+        }
+        Optional<Tokens> tokens = users.getTokens(userId.get());
+        if (tokens.isEmpty()) {
+            throw new RuntimeException("tokens were not found");
+        }
+        return tokens.get();
+    }
+
+    private void sparkStartup() {
+        Spark.port(ourPort);
         Spark.externalStaticFileLocation(staticFiles);
 
         Spark.options("/*", (request, response) -> {
@@ -67,114 +238,22 @@ public class Server {
             response.status(500);
             StringWriter stacktrace = new StringWriter();
             try (PrintWriter pw = new PrintWriter(stacktrace)) {
-                pw.println("<pre>");
                 exception.printStackTrace(pw);
-                pw.println("</pre>");
             }
-            response.body(stacktrace.toString());
+            String body = new Gson().toJson(Map.of("error", stacktrace.toString()));
+            response.body(body);
         });
-
-        Spark.get("/login", (request, response) -> {
-            Map<String, String> params = Map.of(
-                    "response_type", "code",
-                    "client_id", clientId,
-                    "scope", REQUESTED_SCOPES,
-                    "state", randomString(20),
-                    "redirect_uri", siteUrl + CALLBACK_LOCATION);
-
-            String uri = SPOTIFY_AUTHENTICATION_URL + encodeQueryParameters(params);
-            response.redirect(uri);
-            return null;
-        });
-
-        Spark.get(CALLBACK_LOCATION, (request, response) -> {
-            String errorCode = request.params("error");
-            if (errorCode != null) {
-                System.out.println(errorCode);
-                response.body("<pre>Error" + errorCode + "</pre>");
-                return null;
-            }
-            //String state = request.params("state");
-            String authorizationCode = request.queryParams("code");
-
-            String authorization = Base64.getEncoder()
-                    .encodeToString((clientId + ":" + clientSecret)
-                            .getBytes(StandardCharsets.UTF_8));
-
-            String body = encodeQueryParameters(Map.of(
-                    "grant_type", "authorization_code",
-                    "code", authorizationCode,
-                    "redirect_uri", siteUrl + CALLBACK_LOCATION));
-
-            HttpRequest httpRequest = HttpRequest.newBuilder()
-                    .uri(SPOTIFY_GET_API_TOKEN)
-                    .POST(HttpRequest.BodyPublishers.ofString(body))
-                    .header("Authorization", "Basic " + authorization)
-                    .header("Content-Type", "application/x-www-form-urlencoded")
-                    .build();
-
-
-            HttpClient client = HttpClient.newHttpClient();
-
-
-
-            client
-                    .sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString())
-                    .thenApply(HttpResponse::body)
-                    .thenApply(b -> new Gson().fromJson(b, RequestAccessTokenResponse.class))
-                    .thenAccept(b -> {
-                        HttpRequest getProfile = HttpRequest.newBuilder()
-                                .GET()
-                                .uri(SPOTIFY_GET_PROFILE)
-                                .header("Authorization", "Bearer " + b.access_token)
-                                .header("Content-Type", "application/json")
-                                .build();
-
-                        System.out.println("here");
-
-                        client.sendAsync(getProfile, HttpResponse.BodyHandlers.ofString())
-                                .thenApply(HttpResponse::body)
-                                .thenApply(a -> new Gson().fromJson(a, RequestProfileResponse.class))
-                                .thenAccept(a -> {
-                                    System.out.println(a.id + " " + a.display_name + " " + b.access_token + " " + b.refresh_token);
-                                    response.redirect(siteUrl + LOGGED_IN_LOCATION);
-                                });
-                    });
-
-
-            return null;
-        });
-
-    }
-
-    private record RequestAccessTokenResponse(String access_token, String token_type, String scope, int expires_in, String refresh_token) {
-    }
-    private record RequestProfileResponse(String country, String display_name, String email, String id, String uri) {
     }
 
     private static String randomString(int len) {
-        final String CHAR_SET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        char[] hex = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
         StringBuilder ret = new StringBuilder(len);
-        for (int i=0; i<len; i++) {
-            int chosen = (int)(Math.random()*CHAR_SET.length());
-            ret.append(CHAR_SET.charAt(chosen));
+        byte[] randomBytes = new byte[len/2];
+        new SecureRandom().nextBytes(randomBytes);
+        for (byte b : randomBytes) {
+            ret.append(hex[b & 0xf]);
+            ret.append(hex[(b >>> 4) & 0xf]);
         }
         return ret.toString();
-    }
-
-
-
-    String encodeQueryParameters(Map<String, String> parameters) {
-        String encoded = parameters.keySet().stream()
-                .map(key -> {
-                    String keyEncoded = URLEncoder.encode(key, StandardCharsets.UTF_8);
-                    String valueEncoded = URLEncoder.encode(parameters.get(key), StandardCharsets.UTF_8);
-                    return keyEncoded + "=" + valueEncoded;
-                })
-                .collect(Collectors.joining("&"));
-
-        System.out.println(encoded);
-
-        return encoded;
     }
 }
