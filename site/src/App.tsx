@@ -16,9 +16,6 @@ import Home from "./routes/Home";
 import NewSession from "./routes/NewSession";
 import Unauthenticated from "./routes/Unauthenticated";
 import SideBar from "./SideBar";
-import AccMenuButton from "./AccMenuButton";
-import PicLock from "./images/basebuttons/lock 1.png";
-import WebPlayback from "./routes/WebPlayback";
 
 type SidebarConfig = {
     profilePicturePath: string,
@@ -38,10 +35,13 @@ function App() {
     if (authentication) {
         return (
             <BrowserRouter>
-                <SideBar sidebarConfig={sidebarConfig}/>
+                <SideBar
+                    currentlyPlaying={'4viOYBzu6F1SUMxALd6pfn'}
+                    authentication={authentication}
+                    sidebarConfig={sidebarConfig}
+                />
                 <Routes>
                     <Route path={"/"} element={<Home authentication={authentication} setSidebarConfig={setSidebarConfig}/>}/>
-                    <Route path={"playback"} element={<WebPlayback authentication={authentication}/>}/>
                     <Route path={"privacysettings"} element={<PrivacySettings/>}/>
                     <Route path={"editprofile"} element={<EditProfile/>}/>
                     <Route path={"changepassword"} element={<ChangePassword/> }/>
