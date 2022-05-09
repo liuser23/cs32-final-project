@@ -21,6 +21,7 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.security.SecureRandom;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -193,8 +194,9 @@ public class Server {
             return new Gson().toJson(artists);
         });
 
-        Spark.get("/searchTracks", (request, response) -> {
+        Spark.get("/search", (request, response) -> {
             String query = request.queryParams("query");
+            if (query == null) return new Gson().toJson(List.of());
             Track[] tracks = searchTracks(tokensFromRequest(request), query);
             return new Gson().toJson(tracks);
         });

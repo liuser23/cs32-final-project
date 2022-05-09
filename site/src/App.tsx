@@ -16,6 +16,7 @@ import Home from "./routes/Home";
 import NewSession from "./routes/NewSession";
 import Unauthenticated from "./routes/Unauthenticated";
 import SideBar from "./SideBar";
+import Search from "./routes/Search";
 
 type SidebarConfig = {
     profilePicturePath: string,
@@ -31,17 +32,19 @@ function App() {
     const [sidebarConfig, setSidebarConfig] = useState<SidebarConfig>({
         profilePicturePath: DefaultPfp,
     })
+    const [nowPlaying, setNowPlaying] = useState<string | undefined>()
 
     if (authentication) {
         return (
             <BrowserRouter>
                 <SideBar
-                    currentlyPlaying={'4viOYBzu6F1SUMxALd6pfn'}
+                    nowPlaying={nowPlaying}
                     authentication={authentication}
                     sidebarConfig={sidebarConfig}
                 />
                 <Routes>
                     <Route path={"/"} element={<Home authentication={authentication} setSidebarConfig={setSidebarConfig}/>}/>
+                    <Route path={"search"} element={<Search authentication={authentication} setNowPlaying={setNowPlaying} />} />
                     <Route path={"privacysettings"} element={<PrivacySettings/>}/>
                     <Route path={"editprofile"} element={<EditProfile/>}/>
                     <Route path={"changepassword"} element={<ChangePassword/> }/>

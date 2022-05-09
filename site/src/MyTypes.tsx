@@ -43,6 +43,7 @@ type albumBySong = {
 }
 
 type track = {
+    images : image[];
     album : albumBySong;
     artists : artistBySong[];
     availableMarkets : string[];

@@ -12,21 +12,24 @@ import PicRecList from './images/basebuttons/list-format 1.png'
 import PicBell from './images/basebuttons/notifications 1.png'
 import ProfilePhoto from "./ProfilePhoto";
 import {Authentication, SidebarConfig} from "./App";
-import Playback from "./Playback";
 import SpotifyPlayer from "react-spotify-web-playback";
 
-function SideBar(props: {currentlyPlaying: string, authentication: Authentication, sidebarConfig: SidebarConfig}) {
-    return(
+function SideBar(props: {nowPlaying: string | undefined, authentication: Authentication, sidebarConfig: SidebarConfig}) {
+    console.log(props.nowPlaying)
+    return (
         <div className={"Side-bar"}>
             <ProfilePhoto image={props.sidebarConfig.profilePicturePath ?? DefaultPfp}/>
-            <SpotifyPlayer
-                uris={[`spotify:track:${props.currentlyPlaying}`]}
-                token={props.authentication.accessToken}
-            />
+            {props.nowPlaying !== undefined ?
+                <SpotifyPlayer
+                    uris={[props.nowPlaying]}
+                    token={props.authentication.accessToken}
+                />
+                : <></>
+            }
 
             <div className={"Account-menu"}>
                 <AccMenuButton picture={PicHome} picAlt={"house"} txtContent={"Account Overview"} route={"/"}/>
-                <AccMenuButton picture={PicLock} picAlt={"lock"} txtContent={"Web Playback"} route={"/playback"}/>
+                <AccMenuButton picture={PicLock} picAlt={"lock"} txtContent={"Search"} route={"/search"}/>
                 <AccMenuButton picture={PicLock} picAlt={"lock"} txtContent={"Privacy Settings"} route={"/privacysettings"}/>
                 <AccMenuButton picture={PicPencil} picAlt={"pencil"} txtContent={"Edit Profile"} route={"/editprofile"}/>
                 <AccMenuButton picture={PicLock} picAlt={"lock"} txtContent={"Change Password"} route={"/changepassword"}/>
