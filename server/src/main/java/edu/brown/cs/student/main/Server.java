@@ -3,12 +3,12 @@ package edu.brown.cs.student.main;
 import com.google.gson.Gson;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.SpotifyHttpManager;
+import se.michaelthelin.spotify.enums.ModelObjectType;
 import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
-import se.michaelthelin.spotify.model_objects.specification.Artist;
-import se.michaelthelin.spotify.model_objects.specification.Paging;
-import se.michaelthelin.spotify.model_objects.specification.Track;
-import se.michaelthelin.spotify.model_objects.specification.User;
+import se.michaelthelin.spotify.model_objects.specification.*;
 import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeUriRequest;
+import se.michaelthelin.spotify.requests.data.artists.GetArtistRequest;
+import se.michaelthelin.spotify.requests.data.follow.GetUsersFollowedArtistsRequest;
 import se.michaelthelin.spotify.requests.data.personalization.simplified.GetUsersTopArtistsRequest;
 import se.michaelthelin.spotify.requests.data.personalization.simplified.GetUsersTopTracksRequest;
 import se.michaelthelin.spotify.requests.data.search.simplified.SearchTracksRequest;
@@ -21,10 +21,10 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.security.SecureRandom;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class is an attempt to implement the Authorization Code Flow using
@@ -146,6 +146,58 @@ public class Server {
         CompletableFuture<Paging<Artist>> pagingFuture = getUsersTopArtistsRequest.executeAsync();
         Paging<Artist> artistPaging = pagingFuture.join();
         return artistPaging.getItems();
+    }
+
+    /**
+     * Gets a user's top artists.
+     */
+    public Artist[] getFollowedArtists(Tokens tokens) {
+        this.spotifyApi.setAccessToken(tokens.accessToken());
+        this.spotifyApi.setRefreshToken(tokens.refreshToken());
+        GetUsersFollowedArtistsRequest request = spotifyApi.getUsersFollowedArtists(ModelObjectType.ARTIST).build();
+        PagingCursorbased<Artist> pagingFuture = request.executeAsync().join();
+        return pagingFuture.getItems();
+    }
+
+    public Artist getArtist(Tokens tokens, String artistId) {
+        this.spotifyApi.setAccessToken(tokens.accessToken());
+        this.spotifyApi.setRefreshToken(tokens.refreshToken());
+        GetArtistRequest request = spotifyApi.getArtist(artistId).build();
+        return request.executeAsync().join();
+    }
+
+    public RecommendationData getRecommendationData(Tokens tokens) {
+        this.spotifyApi.setAccessToken(tokens.accessToken());
+        this.spotifyApi.setRefreshToken(tokens.refreshToken());
+
+        Track[] topTracks = getTopTracks(tokens);
+
+        Stream<Artist> followedArtists = Stream.of(getFollowedArtists(tokens));
+        Stream<Artist> topArtists = Stream.of(getTopArtists(tokens));
+        Stream<Artist> trackArtists = Stream.of(topTracks)
+                .map(Track::getArtists)
+                .flatMap(Stream::of)
+                .map(ArtistSimplified::getId)
+                .map(artistId -> getArtist(tokens, artistId));
+
+        List<Artist> allArtists = Stream.concat(Stream.concat(followedArtists, topArtists), trackArtists).toList();
+
+        List<RecommendationData.Artist> artists = allArtists.stream()
+                .map(Artist::getId)
+                .map(RecommendationData.Artist::new).toList();
+
+        List<RecommendationData.Song> songs = Stream.of(topTracks)
+                .map(Track::getId)
+                .map(RecommendationData.Song::new)
+                .toList();
+
+        List<RecommendationData.Genre> genres = allArtists.stream()
+                .map(Artist::getGenres)
+                .flatMap(Stream::of)
+                .map(RecommendationData.Genre::new)
+                .toList();
+
+        return new RecommendationData(artists, songs, genres);
     }
 
     public void start() {
