@@ -184,16 +184,20 @@ public class Server {
 
         List<RecommendationData.Artist> artists = allArtists.stream()
                 .map(Artist::getId)
-                .map(RecommendationData.Artist::new).toList();
+                .distinct()
+                .map(RecommendationData.Artist::new)
+                .toList();
 
         List<RecommendationData.Song> songs = Stream.of(topTracks)
                 .map(Track::getId)
+                .distinct()
                 .map(RecommendationData.Song::new)
                 .toList();
 
         List<RecommendationData.Genre> genres = allArtists.stream()
                 .map(Artist::getGenres)
                 .flatMap(Stream::of)
+                .distinct()
                 .map(RecommendationData.Genre::new)
                 .toList();
 
