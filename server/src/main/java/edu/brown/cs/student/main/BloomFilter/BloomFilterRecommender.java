@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 
 /**
  * The BloomFilterRecommender stores functionality for getting a list of neighbors and returning
- * the IDs of those neighbors in a string format. This is used for the similar_bf command
- * when generating a list of k nearest neighbors to a student with given id.
+ * the IDs of those neighbors in a string format. Uses different BloomFilterMaps to generate
+ * recommendation (weighting similarity scores).
  *
  */
 public class BloomFilterRecommender {
