@@ -5,16 +5,20 @@ import DefaultPfp from '../images/PngItem_1503945.png';
 import SideBar from "../SideBar";
 import '../App.css';
 import {Authentication, SidebarConfig} from "../App";
-import {artist, track} from "../MyTypes";
+import {artist, artistBySong, track} from "../MyTypes";
 import TopSongsBox from "../TopSongsBox";
 import TopArtistsBox from "../TopArtistsBox";
+import ProfileHeader from "../ProfileHeader";
 
-function Home(props: {authentication: Authentication, setSidebarConfig: Dispatch<SetStateAction<SidebarConfig>>}) {
+function Home(props: {authentication: Authentication, setSidebarConfig: Dispatch<SetStateAction<SidebarConfig>>,
+    setNowPlaying: Dispatch<SetStateAction<string | undefined>>}) {
     const [error, setError] = useState<string>()
     const [curUserName, setCurUserName] = useState<string>();
     const [numFollowers, setNumFollowers] = useState<number>();
     const [topSongs, setTopSongs] = useState<track[]>();
     const [topArtists, setTopArtists] = useState<artist[]>();
+    const [topGenres, setTopGenres] = useState<Map<string,number>>(new Map<string,number>());
+    let otherTopGenres : Map<string,number> = new Map<string,number>();
 
     const config = {
         headers: {
@@ -28,6 +32,7 @@ function Home(props: {authentication: Authentication, setSidebarConfig: Dispatch
         await axios.get(process.env.REACT_APP_USER_DATA_ENDPOINT as string, config)
             .then(
                 response => {
+                    console.log(response.data)
                     setCurUserName(response.data.displayName)
                     setNumFollowers(response.data.followers.total)
                     props.setSidebarConfig({profilePicturePath : response.data.images[0]?.url})
@@ -35,12 +40,16 @@ function Home(props: {authentication: Authentication, setSidebarConfig: Dispatch
                 reason => setError(reason),
             )
 
-    const getTopTracks = async () =>
+    const getTopTracks = async () => {
         await axios.get(process.env.REACT_APP_TOP_TRACKS_ENDPOINT as string, config)
             .then(
-                response => setTopSongs(response.data),
+                response => {
+                    setTopSongs(response.data);
+
+                },
                 reason => setError(reason),
-            )
+            );
+    }
 
     const getTopArtists = async () =>
         await axios.get(process.env.REACT_APP_TOP_ARTISTS_ENDPOINT as string, config)
@@ -48,6 +57,8 @@ function Home(props: {authentication: Authentication, setSidebarConfig: Dispatch
                 response => setTopArtists(response.data),
                 reason => setError(reason),
             )
+
+
 
     useEffect(() => {
         getUserData()
@@ -59,18 +70,19 @@ function Home(props: {authentication: Authentication, setSidebarConfig: Dispatch
         <div>
             <div className={"Main-window"}>
                 { curUserName !== undefined && numFollowers !== undefined ?
-                    <><p>Hello {curUserName}</p><p>Followers: {numFollowers}</p></> :
+                    <ProfileHeader username={curUserName}/> :
                     <p>Loading Loading Profile Info</p>
                 }
+                <hr className = {"Profile-horizontal-line"}/>
                 { error !== undefined ? <p>Error: {error}</p> : <></> }
                 { (topArtists !== undefined && topArtists.length !== 0) ?
-                    <><p>Top Artists</p><TopArtistsBox topArtists={topArtists}/></> :
+                    <><TopArtistsBox topArtists={topArtists}/></> :
                     <></>
                 }
                 <br/>
                 <br/>
                 { topSongs !== undefined && topSongs.length !== 0 ?
-                    <><p>Top Songs</p><TopSongsBox topSongs={topSongs}/></> :
+                    <><TopSongsBox topSongs={topSongs} setNowPlaying={props.setNowPlaying}/></> :
                     <></>
                 }
                 <br/>

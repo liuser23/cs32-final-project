@@ -5,14 +5,31 @@ import DefaultAlbum from './images/default_album_art.png';
 
 function TopArtistsBox(props : {topArtists : artist[]}) {
 
-    let index : number = 0;
+    const [index, setIndex] = useState<number>(0);
+
+    function incrementIndex() {
+        if (index < 16) {
+            setIndex(index + 1);
+        }
+    }
+
+    function decrementIndex() {
+        if (index > 0) {
+            setIndex(index -1);
+        }
+    }
 
     return (
         <div className={"Topsongs-box"}>
-            {props.topArtists.slice(index,index+4).map(x => <div className={"Song-box"}>
-                <img className={"Song-art"} src={x.images[0]?.url ?? DefaultAlbum} alt={`album cover of ` + x.name}/>
-                {x.name}
-            </div>)}
+            <p className={"Top-title"}>Top Artists</p>
+                <button className={"Top-navbutton-left"} onClick={decrementIndex}></button>
+                <div className={"Top-items-list"}>
+                    {props.topArtists.slice(index,index+4).map(x => <div className={"Song-box"}>
+                        <img className={"Song-art"} src={x.images[0]?.url ?? DefaultAlbum} alt={`album cover of ` + x.name}/>
+                        {x.name}
+                    </div>)}
+                </div>
+                <button className={"Top-navbutton-right"} onClick={incrementIndex}></button>
         </div>
     );
 }
