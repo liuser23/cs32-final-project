@@ -322,8 +322,17 @@ public class Server {
             if (userId.isEmpty()) {
                 throw new RuntimeException("user was not found");
             }
-            List<String> data = recommendations(userId.get(), 5);
-           return new Gson().toJson(data);
+
+            List<User> ret = new ArrayList<>();
+
+            for (String id : recommendations(userId.get(), 5)) {
+                Optional<Tokens> tokens = users.getTokens(userId.get());
+                if (tokens.isEmpty()) {
+                    throw new RuntimeException("tokens were not found");
+                }
+                ret.add(getCurrentUserProfile(tokens.get()));
+            }
+           return new Gson().toJson(ret);
         });
     }
 
