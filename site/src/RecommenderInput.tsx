@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {Dispatch, SetStateAction, useState} from 'react';
 import './App.css';
 import {FormControlLabel, FormGroup, Slider, Switch, ToggleButton, ToggleButtonGroup} from "@mui/material";
 import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
@@ -8,15 +8,13 @@ import FormatAlignJustifyIcon from '@mui/icons-material/FormatAlignJustify';
 import Box from "@mui/material/Box";
 
 
-function RecommenderInput(props : {title : string, type: number}) {
+function RecommenderInput(props : {title : string, type: number, val : number | number[], updateValue : Dispatch<SetStateAction<number | number[]>>}) {
 
-    const [alignment, setAlignment] = React.useState<string | null>('left');
-
-    const handleAlignment = (
+    const handleValue = (
         event: React.MouseEvent<HTMLElement>,
-        newAlignment: string | null,
+        newVal: number,
     ) => {
-        setAlignment(newAlignment);
+        props.updateValue(newVal);
     };
 
     let inputSwitch = <></>;
@@ -25,15 +23,15 @@ function RecommenderInput(props : {title : string, type: number}) {
         inputSwitch =
             <div className={"Recommender-switch"}>
                 <ToggleButtonGroup
-                    value={alignment}
+                    value={props.val}
                     exclusive
-                    onChange={handleAlignment}
+                    onChange={handleValue}
                     aria-label="recommendation type"
                 >
-                    <ToggleButton value="left" aria-label="left aligned">
+                    <ToggleButton value={0} aria-label="similar rec type">
                         Similar
                     </ToggleButton>
-                    <ToggleButton value="center" aria-label="centered">
+                    <ToggleButton value={1} aria-label="different rec type">
                         Different
                     </ToggleButton>
                     </ToggleButtonGroup>
@@ -42,7 +40,7 @@ function RecommenderInput(props : {title : string, type: number}) {
         inputSwitch =
             <div className={"Recommender-switch"}>
                 <Box width={300}>
-                <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" step={10}
+                <Slider defaultValue={50} onChange={(_, value) => props.updateValue(value)} aria-label="Default" valueLabelDisplay="auto" step={10}
                         marks
                         min={10}
                         max={100} color={"secondary"}/>
