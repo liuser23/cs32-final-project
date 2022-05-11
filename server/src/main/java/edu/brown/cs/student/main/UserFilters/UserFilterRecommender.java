@@ -73,7 +73,6 @@ public class UserFilterRecommender {
    * @return String containing IDs for each of the neighbors/similar students
    *
    */
-  @Deprecated
   public String nearestNeighborsString() {
     return String.join("\n", getNeighborIDs());
   }
