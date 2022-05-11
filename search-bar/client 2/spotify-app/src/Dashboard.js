@@ -189,13 +189,14 @@ export default function Dashboard({code}) {
                           </IconButton>
                       </React.Fragment>
                   }>
+            <ListItemAvatar>
+                <Avatar sx={{ height: '60px', width: '60px', marginRight: "10px" }} alt="Album cover" src={song.albumArt}/>
+            </ListItemAvatar>
             <ListItemText primary={song.trackName} secondary={song.artistName} style={{color: "black"}}/>
         </ListItem>
     )
 
-    {/*<ListItemAvatar>*/}
-    {/*        <Avatar alt="Album cover" src={song.albumURL}/>*/}
-    {/*</ListItemAvatar>*/}
+
 
     function startPlaying(trackName) {
         console.log("PLAYING + " + trackName.trackName)
@@ -246,6 +247,7 @@ export default function Dashboard({code}) {
                 list1[0].trackName = trackTitle;
                 list1[0].artistName = artist
                 list1[0].isUsed = true
+                list1[0].albumArt = track.albumUrl
                 console.log("added 1st rec")
                 console.log("list1[0].isUsed : " + list1[0].isUsed)
                 console.log("ID" + list1[0].id);
@@ -254,6 +256,7 @@ export default function Dashboard({code}) {
                 list1[1].trackName = trackTitle;
                 list1[1].artistName = artist
                 list1[1].isUsed = true
+                list1[1].albumArt = track.albumUrl
                 console.log("added 2nd rec")
 
                 // list1[1].albumURL = albumArt
@@ -261,6 +264,7 @@ export default function Dashboard({code}) {
                 list1[2].trackName = trackTitle;
                 list1[2].artistName = artist
                 list1[2].isUsed = true
+                list1[2].albumArt = track.albumUrl
                 console.log("added 3rd rec")
 
                 // list1[2].albumURL =albumArt
@@ -462,14 +466,17 @@ export default function Dashboard({code}) {
                                 <div className="currently-playing">
                                     {/*style={{height: "250px", width: "250px"}}   */}
                                     <img src={currPlayingSongAlbumArt}
-                                         style={{height: "240px", width: "240px", border: '10px solid rgb(0, 0, 0)'}}/>
-                                    <List sx={{width: '240px'}}>
+                                         style={{height: "300px", width: "300px", border: '10px solid rgb(0, 0, 0)'}}/>
+                                    <List sx={{width: '300px'}}>
                                         <ListItem className={classes.customHoverFocusNoMargin}
                                                   style={{border: '1px solid rgba(0, 0, 0, 0.1)'}}>
                                             <ListItemText primary={currPlayingSong} secondary={currPlayingSongArtist}/>
                                             <IconButton onClick={() => addToRecList(currPlayingTrack)} edge="end"
                                                         aria-label="add">
                                                 <Add/>
+                                            </IconButton>
+                                            <IconButton onClick={() => addToPlaylist()} edge="end" aria-label="Play">
+                                                <PlaylistAddIcon/>
                                             </IconButton>
                                         </ListItem>
                                     </List>
