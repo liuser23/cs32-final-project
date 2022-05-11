@@ -71,9 +71,8 @@ public class UserFiltersMap {
    * @param key the key to associate with the new bloom filter.
    * @param data a string list of data to insert into the new bloom filter.
    * @param filterSizes the max number of elements to be inserted into each bloom filter
-   * @return this UserFiltersMap itself after modification, for chaining purposes.
    */
-  public UserFiltersMap addUserFilter(String key, UserInfo data, int[] filterSizes) {
+  public void addUserFilter(String key, UserInfo data, int[] filterSizes) {
     // create a new BloomFilter with the desired parameters, insert everything, put it into the map
     BloomFilter artistBF = new BloomFilter(this.falsePositiveRate, filterSizes[0]);
     data.getArtistData().forEach(artistBF::insertElement);
@@ -85,7 +84,6 @@ public class UserFiltersMap {
     data.getGenreData().forEach(genreBF::insertElement);
 
     this.userFilters.put(key, new UserFilters(artistBF, songBF, genreBF, data.getMetrics(), data.getWeights()));
-    return this;
   }
 
   /**

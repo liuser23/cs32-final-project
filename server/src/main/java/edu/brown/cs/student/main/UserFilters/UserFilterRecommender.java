@@ -21,7 +21,7 @@ public class UserFilterRecommender {
   private final UserFiltersMap userMap;
   private final UserFilterComparator userComparator;
   private SimilarityMetric[] defaultSimilarityMetric =  {new SimilarXNOR(), new SimilarXNOR(), new SimilarXNOR()};
-  private double[] defaultWeights = {1, 1, 1};
+  private double[] defaultWeights = {0.333, 0.333, 0.333};
   /**
    * The BloomFilterRecommender constructor takes in a number of neighbors, id, BloomFilterList,
    * and similarity metric.
@@ -84,6 +84,7 @@ public class UserFilterRecommender {
   private void setDefaultMetrics(SimilarityMetric[] metrics) {
     this.defaultSimilarityMetric = metrics;
   }
+
   private void setDefaultWeights(double[] weights) {
     this.defaultWeights = weights;
   }
