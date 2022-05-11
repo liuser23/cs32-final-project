@@ -25,6 +25,9 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline'
 import SpotifyLogo from './spotify-logo.png'
+import HomeIcon from '@material-ui/icons/Home'
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+import PlaylistAddCheckRoundedIcon from '@mui/icons-material/PlaylistAddCheckRounded';
 import LooksOneIcon from '@mui/icons-material/LooksOne'
 import LooksTwoIcon from '@mui/icons-material/LooksTwo'
 
@@ -81,6 +84,10 @@ const useStyles = makeStyles((theme) => ({
     icons: {
         color: "black",
         fontSize: '40px'
+    },
+    homeIcon: {
+        color: "#1DB954",
+        fontSize: '40px'
     }
 }))
 
@@ -129,9 +136,41 @@ export default function Dashboard({code}) {
     const [list1, setList1] = useState([{trackName: ""}, {artistName: ""}, {isUsed: false}])
     //const [listRecs2, setListRecs2] = useState([])
     // ([defaultString, defaultString, defaultString])
+    let topSong1 = [{trackName: "Top Song"}, {artistName: "CS32"}, {isUsed: false}]
+    let topSong2 = [{trackName: "Top Song 2"}, {artistName: "CS32"}, {isUsed: false}]
+    let topSong3 = [{trackName: "Top Song 3"}, {artistName: "CS32"}, {isUsed: false}]
 
+    const[topSongs, setTopSongs] = useState([topSong1, topSong2, topSong3])
+
+    let placeHolderTop3List = [{topSong1, topSong2, topSong3}]
     //let listRecs = list.map((item) => <ListItem key={getRandomInt(1000000)}> <ListItemText {item} />{item}</ListItem>);
-    let listRecs1 = list1.map((item) => <li key={getRandomInt(1000000)}>{item.trackName}</li>)
+    // let listRecs1 = list1.map((item) => <li key={getRandomInt(1000000)}>{item.trackName}</li>)
+
+    let topSongsList = topSongs.map((song) =>
+        <ListItem key={getRandomInt(1000000)} alignItems="flex-start"
+                  style={{margin: "8px", padding: "20px", border: '1px solid rgba(0, 0, 0, 0.1)'}}
+                  className={classes.customHoverFocus}
+                  secondaryAction={
+                      <React.Fragment>
+                          <IconButton onClick={() => startPlaying(song)} edge="end" aria-label="play">
+                              <PlayCircleOutlineIcon style={{marginLeft: "10px"}}/>
+                          </IconButton>
+                          <IconButton onClick={() => addToPlaylist()} edge="end" aria-label="Play">
+                              <PlaylistAddIcon/>
+                          </IconButton>
+                          <IconButton onClick={() => handleDelete(song.trackName)} edge="end" aria-label="delete">
+                              <DeleteIcon style={{marginRight: "10px"}}/>
+                          </IconButton>
+                      </React.Fragment>
+                  }>
+            <ListItemAvatar>
+                <Avatar class="material-icons">
+                    <LooksOne className={classes.icons}/>
+                </Avatar>
+            </ListItemAvatar>
+            <ListItemText primary={song.trackName} secondary={song.artistName} style={{color: "black"}}/>
+        </ListItem>
+    )
 
     let listRecs2 = list1.map((song) =>
         <ListItem key={getRandomInt(1000000)} alignItems="flex-start"
@@ -142,19 +181,21 @@ export default function Dashboard({code}) {
                           <IconButton onClick={() => startPlaying(song)} edge="end" aria-label="play">
                               <PlayCircleOutlineIcon style={{margin: "10px"}}/>
                           </IconButton>
+                          <IconButton onClick={() => addToPlaylist()} edge="end" aria-label="Play">
+                              <PlaylistAddIcon/>
+                          </IconButton>
                           <IconButton onClick={() => handleDelete(song.trackName)} edge="end" aria-label="delete">
                               <DeleteIcon style={{margin: "20px"}}/>
                           </IconButton>
                       </React.Fragment>
                   }>
-            {/*<ListItemAvatar>*/}
-            {/*        <Avatar alt="Album cover" src={song.albumURL}/>*/}
-            {/*</ListItemAvatar>*/}
             <ListItemText primary={song.trackName} secondary={song.artistName} style={{color: "black"}}/>
-
         </ListItem>
     )
 
+    {/*<ListItemAvatar>*/}
+    {/*        <Avatar alt="Album cover" src={song.albumURL}/>*/}
+    {/*</ListItemAvatar>*/}
 
     function startPlaying(trackName) {
         console.log("PLAYING + " + trackName.trackName)
@@ -228,7 +269,7 @@ export default function Dashboard({code}) {
             }
         }
     }
-    
+
     const handleDelete = (song) => {
         console.log("song.trackname" + song)
         const newListRecs = listRecs2.filter((record) => record.trackName !== song)
@@ -263,9 +304,19 @@ export default function Dashboard({code}) {
     // const ListTag = () => list.map(item => (<li>{item}</li>));
 
     function addToPlaylist() {
+        // playlist ID 7xrIGuwvonS17zWjYzpUeR?si=665954b6a7874cf8
+        // song uri https://open.spotify.com/track/0xcl9XT60Siji6CSG4y6nb?si=9be52965d755468d
+        // 0xcl9XT60Siji6CSG4y6nb?si=9be52965d755468d
         console.log("trying to add to playlist")
-        spotifyApi.addTracksToPlaylist('6vyOfcFtyazSj70NR9uK5A?si=a0dc19451e0f41ba', ["spotify:track:5enxwA8aAbwZbf5qCHORXi?si=831ea5c31d67452a", "spotify:track:01K4zKU104LyJ8gMb7227B?si=79243f9619c443d8"])
-            .then(function (data) {
+        // spotifyApi.createPlaylist('My playlist 2', {'description': 'My description', 'collaborative' : false, 'public': true}).then(function(data){
+        //     console.log("added new playlist!");
+        //     const playlistId = data.id;
+        //     console.log(playlistId)
+        // }, function (err) {
+        //     console.log("something went wrong!", err);
+        // })
+
+        spotifyApi.addTracksToPlaylist('7xrIGuwvonS17zWjYzpUeR?si=665954b6a7874cf8', '["spotify:track:0xcl9XT60Siji6CSG4y6nb?si=9be52965d755468d"]').then(function (data) {
                 console.log('Added tracks to playlist!');
             }, function (err) {
                 console.log('Something went wrong!', err);
@@ -301,10 +352,11 @@ export default function Dashboard({code}) {
             searchArray = res.body.tracks.items;
             console.log("search array: " + searchArray)
             setSearchResults(res.body.tracks.items.map(track => {
-                const smallestAlbumImage = track.album.images.reduce((smallest, image) => {
-                    if (image.height < smallest.height) return image
-                    return smallest
-                }, track.album.images[0])
+                const smallestAlbumImage = track.album.images[0];
+                // const smallestAlbumImage = track.album.images.reduce((smallest, image) => {
+                //     if (image.height < smallest.height) return image
+                //     return smallest
+                // }, track.album.images[0])
 
                 return {
                     artist: track.artists[0].name,
@@ -361,23 +413,29 @@ export default function Dashboard({code}) {
     return (
         <div style={{background: darkModeOn ? 'black' : 'white'}}>
             <Container className="d-flex flex-column py-2" style={{height: "100vh"}}>
-                <FormGroup>
-                    {/*<FormControlLabel*/}
-                    {/*    control={<CoolSwitch sx={{ m: 1 }} defaultChecked onChange={toggleDarkMode}/>}*/}
-                    {/*/>*/}
-                    <FormControlLabel control={
-                        <Switch
-                            defaultChecked
-                            onChange={toggleDarkMode}
-                        />
-                    } label="Dark Mode" styles={{color: darkModeOn ? 'black' : 'white'}}/>
-                </FormGroup>
-                <Form.Control
-                    type="search"
-                    placeholder="Search Songs/Albums"
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                />
+                <div className="top-bar">
+                    <IconButton className={classes.homeIcon} edge="end"
+                                aria-label="Home">
+                        <HomeIcon/>
+                    </IconButton>
+                    {/*<FormGroup>*/}
+                    {/*    /!*<FormControlLabel*!/*/}
+                    {/*    /!*    control={<CoolSwitch sx={{ m: 1 }} defaultChecked onChange={toggleDarkMode}/>}*!/*/}
+                    {/*    /!*//*/}
+                {/*    <FormControlLabel control={*/}
+                    {/*        <Switch*/}
+                    {/*            defaultChecked*/}
+                    {/*            onChange={toggleDarkMode}*/}
+                    {/*        />*/}
+                    {/*    } label="Dark Mode" styles={{color: darkModeOn ? 'black' : 'white'}}/>*/}
+                    {/*</FormGroup>*/}
+                    <Form.Control
+                        type="search"
+                        placeholder="Search Songs/Albums"
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                    />
+                </div>
                 <div className="flex-grow-1 my-2" style={{overflowY: "auto"}}>
                     {searchResults.map(track => (
                         <TrackSearchResult
@@ -416,50 +474,73 @@ export default function Dashboard({code}) {
                                         </ListItem>
                                     </List>
                                 </div>
-                                <div className="top-recs">
-                                    <List sx={{width: '100%'}}>
-                                        <ListItem className={classes.customHoverFocus}
-                                                  style={{border: '1px solid rgba(0, 0, 0, 0.1)', margin: "20px"}}
-                                                  secondaryAction={
-                                                      <IconButton onClick={() => addToPlaylist()} edge="end"
-                                                                  aria-label="add">
-                                                          <Add/>
-                                                      </IconButton>}>
-                                            <ListItemAvatar>
-                                                <Avatar class="material-icons">
-                                                    <LooksOne className={classes.icons}/>
-                                                </Avatar>
-                                            </ListItemAvatar>
-                                            <ListItemText primary="Song Number 1" secondary="Arist Number 1"/>
-                                        </ListItem>
-                                        <ListItem className={classes.customHoverFocus}
-                                                  style={{border: '1px solid rgba(0, 0, 0, 0.1)', margin: "20px"}}
-                                                  secondaryAction={
-                                                      <IconButton edge="end" aria-label="add">
-                                                          <Add/>
-                                                      </IconButton>}>
-                                            <ListItemAvatar>
-                                                <Avatar class="material-icons">
-                                                    <LooksTwo className={classes.icons}/>
-                                                </Avatar>
-                                            </ListItemAvatar>
-                                            <ListItemText primary="Song Number 2" secondary="Artist Number 2"/>
-                                        </ListItem>
-                                        <ListItem className={classes.customHoverFocus}
-                                                  style={{border: '1px solid rgba(0, 0, 0, 0.1)', margin: "20px"}}
-                                                  secondaryAction={
-                                                      <IconButton edge="end" aria-label="add">
-                                                          <Add/>
-                                                      </IconButton>}>
-                                            <ListItemAvatar>
-                                                <Avatar class='material-icons'>
-                                                    <Looks3 className={classes.icons}/>
-                                                </Avatar>
-                                            </ListItemAvatar>
-                                            <ListItemText primary="Song Number 3" secondary="Artist Number 3"/>
-                                        </ListItem>
+                                <div className="topSongsList">
+                                    <List sx={{width: '450px', padding: "10px"}}>
+                                        {topSongsList}
                                     </List>
                                 </div>
+                            {/*    <div className="top-recs">*/}
+                            {/*        <List sx={{width: '350px'}}>*/}
+                            {/*            <ListItem className={classes.customHoverFocus}*/}
+                            {/*                      style={{border: '1px solid rgba(0, 0, 0, 0.1)', margin: "20px"}}*/}
+                            {/*                      secondaryAction={*/}
+                            {/*                          <React.Fragment>*/}
+                            {/*                              <IconButton onClick={() => addToPlaylist()} edge="end"*/}
+                            {/*                                          aria-label="Play">*/}
+                            {/*                                  <PlaylistAddIcon/>*/}
+                            {/*                              </IconButton>*/}
+                            {/*                              <IconButton onClick={() => addToRecList()} edge="end"*/}
+                            {/*                                          aria-label="add">*/}
+                            {/*                                  <Add/>*/}
+                            {/*                              </IconButton>*/}
+                            {/*                          </React.Fragment>}>*/}
+                            {/*                <ListItemAvatar>*/}
+                            {/*                    <Avatar class="material-icons">*/}
+                            {/*                        <LooksOne className={classes.icons}/>*/}
+                            {/*                    </Avatar>*/}
+                            {/*                </ListItemAvatar>*/}
+                            {/*                <ListItemText primary="Song Number 1" secondary="Arist Number 1"/>*/}
+                            {/*            </ListItem>*/}
+                            {/*            <ListItem className={classes.customHoverFocus}*/}
+                            {/*                      style={{border: '1px solid rgba(0, 0, 0, 0.1)', margin: "20px"}}*/}
+                            {/*                      secondaryAction={*/}
+                            {/*                          <React.Fragment>*/}
+                            {/*                              <IconButton onClick={() => addToPlaylist()} edge="end"*/}
+                            {/*                                          aria-label="Play">*/}
+                            {/*                                  <PlaylistAddIcon/>*/}
+                            {/*                              </IconButton>*/}
+                            {/*                              <IconButton onClick={() => addToRecList()} edge="end" aria-label="add">*/}
+                            {/*                                  <Add/>*/}
+                            {/*                              </IconButton>*/}
+                            {/*                          </React.Fragment>}>*/}
+                            {/*                <ListItemAvatar>*/}
+                            {/*                    <Avatar class="material-icons">*/}
+                            {/*                        <LooksTwo className={classes.icons}/>*/}
+                            {/*                    </Avatar>*/}
+                            {/*                </ListItemAvatar>*/}
+                            {/*                <ListItemText primary="Song Number 2" secondary="Artist Number 2"/>*/}
+                            {/*            </ListItem>*/}
+                            {/*            <ListItem className={classes.customHoverFocus}*/}
+                            {/*                      style={{border: '1px solid rgba(0, 0, 0, 0.1)', margin: "20px"}}*/}
+                            {/*                      secondaryAction={*/}
+                            {/*                          <React.Fragment>*/}
+                            {/*                              <IconButton onClick={() => addToPlaylist()} edge="end"*/}
+                            {/*                                          aria-label="Play">*/}
+                            {/*                                  <PlaylistAddIcon/>*/}
+                            {/*                              </IconButton>*/}
+                            {/*                              <IconButton onClick={() => addToRecList()} edge="end" aria-label="add">*/}
+                            {/*                                  <Add/>*/}
+                            {/*                              </IconButton>*/}
+                            {/*                          </React.Fragment>}>*/}
+                            {/*                <ListItemAvatar>*/}
+                            {/*                    <Avatar class='material-icons'>*/}
+                            {/*                        <Looks3 className={classes.icons}/>*/}
+                            {/*                    </Avatar>*/}
+                            {/*                </ListItemAvatar>*/}
+                            {/*                <ListItemText primary="Song Number 3" secondary="Artist Number 3"/>*/}
+                            {/*            </ListItem>*/}
+                            {/*        </List>*/}
+                            {/*    </div>*/}
                             </div>
                             <div>
                                 <div

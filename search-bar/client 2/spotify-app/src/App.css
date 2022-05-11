@@ -52,6 +52,17 @@ label {
     /*flex-direction: row;*/
 }
 
+.top-bar {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.home-button {
+    align-content: flex-end;
+}
+
 .top-recs{
     display: flex;
     align-content: center;
