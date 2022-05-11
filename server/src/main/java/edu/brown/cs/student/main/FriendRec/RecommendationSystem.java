@@ -54,7 +54,6 @@ public class RecommendationSystem {
 
     // need to keep track of the maximum-sized list of qualitative attributes, as all other
     // bloom filters will be sized acccording to this.
-    //todo: consider normalizing
     int[] maxEles = {-1, -1, -1};
     for (Map.Entry<String, UserInfo> entry : userData.entrySet()) {
       if (entry.getValue().getArtistData().size() > maxEles[0]) {

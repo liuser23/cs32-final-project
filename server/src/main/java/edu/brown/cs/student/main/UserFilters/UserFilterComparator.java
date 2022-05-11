@@ -16,8 +16,6 @@ public class UserFilterComparator implements Comparator <UserFilters>{
   }
   // need fields defining each similarity metric and weights(default similar xnor)
   // get similarity score between each filter
-
-  //Todo: normalize scores? might need to store all results somewhere and not use comparator directly
   @Override
   public int compare(UserFilters o1, UserFilters o2) {
     double score11 = metrics[0].similarityScore(mainFilters.getArtistBF(), o1.getArtistBF());
