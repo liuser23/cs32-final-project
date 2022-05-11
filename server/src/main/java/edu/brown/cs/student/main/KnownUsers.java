@@ -5,6 +5,8 @@ import se.michaelthelin.spotify.model_objects.specification.User;
 
 import java.nio.file.Path;
 import java.sql.*;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -21,7 +23,26 @@ public class KnownUsers {
         connection.prepareStatement("create table if not exists credentials ( id text primary key, accessToken text, refreshToken text, foreign key(id) references users(id) ); );").executeUpdate();
         connection.prepareStatement("create table if not exists users ( id text primary key, displayName text, imageUrl text, followerCount text );").executeUpdate();
         connection.prepareStatement("create table if not exists sessionTokens ( sessionToken text primary key, id text, foreign key(id) references users(id) );").executeUpdate();
+
     }
+
+    Map<String, Tokens> getAllCredentials() throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("select id, accessToken, refreshToken from credentials;");
+        ResultSet result = statement.executeQuery();
+
+        Map<String, Tokens> ret = new HashMap<>();
+        while (result.next()) {
+            String userId = result.getString(1);
+            Tokens tokens = new Tokens(result.getString(2), result.getString(3));
+            ret.put(userId, tokens);
+        }
+
+        return ret;
+    }
+
+
+
+
 
     void initializeUser(String sessionToken, Tokens tokens, User user) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("replace into credentials values ( ?, ?, ? );");

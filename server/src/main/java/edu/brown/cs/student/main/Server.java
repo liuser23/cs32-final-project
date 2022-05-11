@@ -2,6 +2,7 @@ package edu.brown.cs.student.main;
 
 import com.google.gson.Gson;
 import edu.brown.cs.student.main.FriendRec.RecommendationSystem;
+import edu.brown.cs.student.main.FriendRec.UserInfo;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.SpotifyHttpManager;
 import se.michaelthelin.spotify.enums.ModelObjectType;
@@ -24,6 +25,7 @@ import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -182,32 +184,39 @@ public class Server {
 
         List<Artist> allArtists = Stream.concat(Stream.concat(followedArtists, topArtists), trackArtists).toList();
 
-        List<RecommendationData.Artist> artists = allArtists.stream()
+        List<String> artists = allArtists.stream()
                 .map(Artist::getId)
                 .distinct()
-                .map(RecommendationData.Artist::new)
                 .toList();
 
-        List<RecommendationData.Song> songs = Stream.of(topTracks)
+        List<String> songs = Stream.of(topTracks)
                 .map(Track::getId)
                 .distinct()
-                .map(RecommendationData.Song::new)
                 .toList();
 
-        List<RecommendationData.Genre> genres = allArtists.stream()
+        List<String> genres = allArtists.stream()
                 .map(Artist::getGenres)
                 .flatMap(Stream::of)
                 .distinct()
-                .map(RecommendationData.Genre::new)
                 .toList();
 
         return new RecommendationData(artists, songs, genres);
     }
 
-    public List<String> recommendations(String userId, int numRecs) {
+    public List<String> recommendations(String userId, int numRecs) throws SQLException {
+        Map<String, Tokens> tokens = users.getAllCredentials();
 
+        Map<String, UserInfo> data = tokens.entrySet().stream()
+                .map(e -> {
+                    Tokens t = e.getValue();
+                    RecommendationData d = getRecommendationData(t);
+                    UserInfo info = new UserInfo(d.artists(), d.songs(), d.genres(), null, null);
 
-        RecommendationSystem system = RecommendationSystem.fromStudents(null);
+                    return new AbstractMap.SimpleEntry<>(e.getKey(), info);
+                })
+                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+
+        RecommendationSystem system = RecommendationSystem.fromStudents(data);
         return system.getRecsFor(userId, numRecs);
     }
 
@@ -269,6 +278,16 @@ public class Server {
            if (query == null) return new Gson().toJson(List.of());
            Artist artist = getArtist(tokensFromRequest(request), query);
            return new Gson().toJson(artist);
+        });
+
+        Spark.get("/recommendations", (request, response) -> {
+            String sessionToken = request.headers("Authentication");
+            Optional<String> userId = users.userIdFromSessionToken(sessionToken);
+            if (userId.isEmpty()) {
+                throw new RuntimeException("user was not found");
+            }
+            List<String> data = recommendations(userId.get(), 5);
+           return new Gson().toJson(data);
         });
     }
 
