@@ -326,7 +326,7 @@ public class Server {
             List<User> ret = new ArrayList<>();
 
             for (String id : recommendations(userId.get(), 5)) {
-                Optional<Tokens> tokens = users.getTokens(userId.get());
+                Optional<Tokens> tokens = users.getTokens(id);
                 if (tokens.isEmpty()) {
                     throw new RuntimeException("tokens were not found");
                 }
