@@ -160,7 +160,7 @@ export default function Dashboard({code}) {
                     <LooksOne className={classes.icons}/>
                 </Avatar>
             </ListItemAvatar>
-            <ListItemText primary={song.trackName} secondary={song.artistName} style={{color: "black"}}/>
+            <ListItemText primary={song.trackName? song.trackName : "Song Title"} secondary={song.artistName? song.artistName : "Song Artist"} style={{color: "black"}}/>
         </ListItem>
     )
 
@@ -182,9 +182,9 @@ export default function Dashboard({code}) {
                       </React.Fragment>
                   }>
             <ListItemAvatar>
-                <Avatar sx={{ height: '60px', width: '60px', marginRight: "10px" }} alt="Album cover" src={song.albumArt}/>
+                <Avatar sx={{ height: '60px', width: '60px', marginRight: "10px" }} alt="Album cover" src={song.albumArt? song.albumArt : SpotifyLogo}/>
             </ListItemAvatar>
-            <ListItemText primary={song.trackName} secondary={song.artistName} style={{color: "black"}}/>
+            <ListItemText primary={song.trackName? song.trackName : "Song Title"} secondary={song.artistName? song.artistName : "Song Artist"} style={{color: "black"}}/>
         </ListItem>
     )
 
@@ -274,16 +274,19 @@ export default function Dashboard({code}) {
             list1[0].trackName = "";
             list1[0].artistName = "";
             list1[0].isUsed = false;
+            list1[0].albumArt = SpotifyLogo;
         } else if (list1[1].trackName == song) {
             console.log("songToDelete is in spot 1")
             list1[1].trackName = "";
             list1[1].artistName = "";
             list1[1].isUsed = false;
+            list1[1].albumArt = SpotifyLogo;
         } else if (list1[2].trackName == song) {
             console.log("songToDelete is in spot 2")
             list1[2].trackName = "";
             list1[2].artistName = "";
             list1[2].isUsed = false;
+            list1[2].albumArt = SpotifyLogo;
         } else {
             console.log("deletion error")
         }
@@ -465,6 +468,7 @@ export default function Dashboard({code}) {
                                     <List sx={{width: '300px'}}>
                                         <ListItem className={classes.customHoverFocusNoMargin}
                                                   style={{border: '1px solid rgba(0, 0, 0, 0.1)'}}>
+                                            {/*<ListItemText primary={playingTrack?.title : "Song Title"} secondary={playingTrack.artist? playingTrack.artist : "Song Artist"} style={{color: "black"}}/>*/}
                                             <ListItemText primary={playingTrack?.title} secondary={playingTrack?.artist}/>
                                             <IconButton onClick={() => addToRecList(playingTrack)} edge="end"
                                                         aria-label="add">
