@@ -53,6 +53,7 @@ function Search(props: {authentication: Authentication, setNowPlaying: Dispatch<
     return (
         <Container className="d-flex flex-column py-2 Main-window" style={{height: "100vh"}}>
             <Form.Control
+                size="lg"
                 type="search"
                 placeholder="Search Songs/Albums"
                 value={query}
