@@ -17,6 +17,7 @@ import NewSession from "./routes/NewSession";
 import Unauthenticated from "./routes/Unauthenticated";
 import SideBar from "./SideBar";
 import Search from "./routes/Search";
+import MyRecommendations from "./routes/MyRecommendations";
 
 type SidebarConfig = {
     profilePicturePath: string,
@@ -44,13 +45,14 @@ function App() {
                 />
                 <Routes>
                     <Route path={"/"} element={<Home authentication={authentication} setSidebarConfig={setSidebarConfig} setNowPlaying={setNowPlaying}/>}/>
-                    <Route path={"search"} element={<Search authentication={authentication} setNowPlaying={setNowPlaying} />} />
+                    <Route path={"search"} element={<Search authentication={authentication} setNowPlaying={setNowPlaying}/>}/>
                     <Route path={"privacysettings"} element={<PrivacySettings/>}/>
                     <Route path={"editprofile"} element={<EditProfile/>}/>
                     <Route path={"changepassword"} element={<ChangePassword/> }/>
                     <Route path={"notificationsettings"} element={<NotificationSettings/>}/>
                     <Route path={"FriendsList"} element={<FriendsList/>}/>
                     <Route path={"signout"} element={<SignOut/>}/>
+                    <Route path={"myrecommendations"} element={<MyRecommendations/>}/>
                 </Routes>
             </BrowserRouter>
         )

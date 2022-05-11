@@ -13,6 +13,7 @@ import PicBell from './images/basebuttons/notifications 1.png'
 import ProfilePhoto from "./ProfilePhoto";
 import {Authentication, SidebarConfig} from "./App";
 import SpotifyPlayer from "react-spotify-web-playback";
+import SearchIcon from './images/basebuttons/search_icon2.png';
 
 function SideBar(props: {nowPlaying: string | undefined, authentication: Authentication, sidebarConfig: SidebarConfig}) {
     console.log(props.nowPlaying)
@@ -32,7 +33,7 @@ function SideBar(props: {nowPlaying: string | undefined, authentication: Authent
                     }
                 </div>
                 <AccMenuButton picture={PicHome} picAlt={"house"} txtContent={"Account Overview"} route={"/"}/>
-                <AccMenuButton picture={PicLock} picAlt={"lock"} txtContent={"Search"} route={"/search"}/>
+                <AccMenuButton picture={SearchIcon} picAlt={"lock"} txtContent={"Search"} route={"/search"}/>
                 <AccMenuButton picture={PicPencil} picAlt={"pencil"} txtContent={"Edit Profile"} route={"/editprofile"}/>
                 <AccMenuButton picture={PicLock} picAlt={"lock"} txtContent={"Settings"} route={"/changepassword"}/>
                 <AccMenuButton picture={PicFriends} picAlt={"friends"} txtContent={"Friends List"} route={"/friendslist"}/>
