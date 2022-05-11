@@ -43,7 +43,7 @@ function App() {
                     sidebarConfig={sidebarConfig}
                 />
                 <Routes>
-                    <Route path={"/"} element={<Home authentication={authentication} setSidebarConfig={setSidebarConfig}/>}/>
+                    <Route path={"/"} element={<Home authentication={authentication} setSidebarConfig={setSidebarConfig} setNowPlaying={setNowPlaying}/>}/>
                     <Route path={"search"} element={<Search authentication={authentication} setNowPlaying={setNowPlaying} />} />
                     <Route path={"privacysettings"} element={<PrivacySettings/>}/>
                     <Route path={"editprofile"} element={<EditProfile/>}/>

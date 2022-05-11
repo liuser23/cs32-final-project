@@ -19,21 +19,22 @@ function SideBar(props: {nowPlaying: string | undefined, authentication: Authent
     return (
         <div className={"Side-bar"}>
             <ProfilePhoto image={props.sidebarConfig.profilePicturePath ?? DefaultPfp}/>
-            {props.nowPlaying !== undefined ?
-                <SpotifyPlayer
-                    uris={[props.nowPlaying]}
-                    token={props.authentication.accessToken}
-                />
-                : <></>
-            }
+
 
             <div className={"Account-menu"}>
+                <div className={"Player-box"}>
+                    {props.nowPlaying !== undefined ?
+                        <SpotifyPlayer
+                            uris={[props.nowPlaying]}
+                            token={props.authentication.accessToken}
+                        />
+                        : <></>
+                    }
+                </div>
                 <AccMenuButton picture={PicHome} picAlt={"house"} txtContent={"Account Overview"} route={"/"}/>
                 <AccMenuButton picture={PicLock} picAlt={"lock"} txtContent={"Search"} route={"/search"}/>
-                <AccMenuButton picture={PicLock} picAlt={"lock"} txtContent={"Privacy Settings"} route={"/privacysettings"}/>
                 <AccMenuButton picture={PicPencil} picAlt={"pencil"} txtContent={"Edit Profile"} route={"/editprofile"}/>
-                <AccMenuButton picture={PicLock} picAlt={"lock"} txtContent={"Change Password"} route={"/changepassword"}/>
-                <AccMenuButton picture={PicBell} picAlt={"bell"} txtContent={"Notification Settings"} route={"/notificationsettings"}/>
+                <AccMenuButton picture={PicLock} picAlt={"lock"} txtContent={"Settings"} route={"/changepassword"}/>
                 <AccMenuButton picture={PicFriends} picAlt={"friends"} txtContent={"Friends List"} route={"/friendslist"}/>
                 <AccMenuButton picture={PicRecList} picAlt={"list"} txtContent={"My Recommendations"} route={"/myrecommendations"}/>
                 <AccMenuButton picture={PicSignOut} picAlt={"exit"} txtContent={"Sign Out"} route={"/signout"}/>

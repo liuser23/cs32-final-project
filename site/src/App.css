@@ -67,7 +67,7 @@
 }
 
 .Accmenu-button {
-  height: 70px;
+  height: 7vmin;
   width: 25vw;
   left: 0px;
   display: flex;
@@ -76,8 +76,8 @@
 }
 
 .Button-img {
-  height: 30px;
-  width: 30px;
+  height: 3vmin;
+  width: 3vmin;
   position: relative;
   float: left;
   left: 10px;
@@ -89,7 +89,7 @@
   position: absolute;
   right: 10px;
   overflow: hidden;
-  font-size: 20px;
+  font-size: 2.5vmin;
 }
 
 .Pfp-container {
@@ -134,11 +134,13 @@
 .Topsongs-box {
   background-color: #1DB954;
   border-radius: 15px;
+  position: relative;
   min-height: 325px;
   width: 1000px;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   margin: 10px;
+  align-items: center;
 }
 
 .Song-box {
@@ -157,4 +159,66 @@
   height: 200px;
   width: 200px;
   box-shadow: 1px 1px 2px dimgray;
+}
+
+.Player-box {
+
+}
+
+.Top-navbutton-left {
+  position: absolute;
+  top: 10%;
+  bottom: 10%;
+  left: 0%;
+  border-radius: 20px;
+  background-color: #1DB954;
+}
+
+.Top-navbutton-right {
+  position: absolute;
+  top: 10%;
+  bottom: 10%;
+  right: 0%;
+  border-radius: 20px;
+  background-color: #1DB954;
+}
+
+.Top-items-list {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+}
+
+.Top-content {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.Top-title {
+  position: absolute;
+  background-color: #1DB954;
+  border-radius: 10px;
+  font-size: 24px;
+}
+
+.Profile-header {
+  margin-right: auto;
+  margin-left: 5%;
+  margin-top: 0px;
+  display: grid;
+  line-height: 5px;
+}
+
+.User-name {
+  font-size: 50px;
+}
+
+.Profile-horizontal-line {
+  border-top: 5px solid black;
+  width: 80%;
+  border-radius: 20px;
 }

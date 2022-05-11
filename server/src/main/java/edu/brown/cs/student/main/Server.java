@@ -23,7 +23,6 @@ import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -104,7 +103,7 @@ public class Server {
     /**
      * Get the current user's profile from Spotify.
      */
-    public User getUserProfile(Tokens tokens) {
+    public User getCurrentUserProfile(Tokens tokens) {
         this.spotifyApi.setAccessToken(tokens.accessToken());
         this.spotifyApi.setRefreshToken(tokens.refreshToken());
         GetCurrentUsersProfileRequest getCurrentUsersProfileRequest = this.spotifyApi.getCurrentUsersProfile().build();
@@ -224,7 +223,7 @@ public class Server {
             }
             String authorizationCode = request.queryParams("code");
             Tokens tokens = getAccessTokens(authorizationCode);
-            User user = getUserProfile(tokens);
+            User user = getCurrentUserProfile(tokens);
             users.initializeUser(sessionToken, tokens, user);
             String queryParameters =
                     "?sessionToken=" + sessionToken
@@ -234,7 +233,7 @@ public class Server {
         });
 
         Spark.get("/userData", (request, response) -> {
-            User user = getUserProfile(tokensFromRequest(request));
+            User user = getCurrentUserProfile(tokensFromRequest(request));
             String userJsonString = new Gson().toJson(user);
             System.out.println(userJsonString);
             return userJsonString;
@@ -255,6 +254,13 @@ public class Server {
             if (query == null) return new Gson().toJson(List.of());
             Track[] tracks = searchTracks(tokensFromRequest(request), query);
             return new Gson().toJson(tracks);
+        });
+
+        Spark.get("/findArtist", (request, response) -> {
+           String query = request.queryParams("query");
+           if (query == null) return new Gson().toJson(List.of());
+           Artist artist = getArtist(tokensFromRequest(request), query);
+           return new Gson().toJson(artist);
         });
     }
 
