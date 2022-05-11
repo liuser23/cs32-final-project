@@ -118,21 +118,12 @@ export default function Dashboard({code}) {
     const [searchResultsRecommendation, setSearchResultsRecommendation] = useState([])
     const [playingTrack, setPlayingTrack] = useState()
     const [lyrics, setLyrics] = useState("")
-    const [recommendations, setRecommendation] = useState("")
-    const [currPlayingSong, setCurrPlayingSong] = useState("No Song Playing")
-    const [currPlayingTrack, setCurrPlayingTrack] = useState()
-
-    const [currPlayingSongArtist, setCurrPlayingSongArtist] = useState("No Song Playing")
-    const [currPlayingSongAlbumArt, setCurrPlayingSongAlbumArt] = useState(SpotifyLogo)
 
     let searchArray = [];
     let searchRecsArray = [];
     let searchUserArray = [];
-    // let currPlayingSongArtist = "";
-    let currPlayingSongTitle = "";
-    let currPlayingSongAlbumURI = "";
-    //let list = ["hello", "hello2", "hello3"]
-    // const [list, setList] = useState(String[3]);
+
+
     const [list, setList] = useState(["First Recommendation", "Second Recommendation", "Third Recommendation"])
     const [list1, setList1] = useState([{trackName: ""}, {artistName: ""}, {isUsed: false}])
     //const [listRecs2, setListRecs2] = useState([])
@@ -153,7 +144,7 @@ export default function Dashboard({code}) {
                   className={classes.customHoverFocus}
                   secondaryAction={
                       <React.Fragment>
-                          <IconButton onClick={() => chooseTrack(song)} edge="end" aria-label="play">
+                          <IconButton onClick={() => chooseTrack(song.track)} edge="end" aria-label="play">
                               <PlayCircleOutlineIcon style={{marginLeft: "10px"}}/>
                           </IconButton>
                           <IconButton onClick={() => addToPlaylist()} edge="end" aria-label="Play">
@@ -179,7 +170,7 @@ export default function Dashboard({code}) {
                   className={classes.customHoverFocus}
                   secondaryAction={
                       <React.Fragment>
-                          <IconButton onClick={() => chooseTrack(song)} edge="end" aria-label="play">
+                          <IconButton onClick={() => chooseTrack(song.track)} edge="end" aria-label="play">
                               <PlayCircleOutlineIcon style={{margin: "10px"}}/>
                           </IconButton>
                           <IconButton onClick={() => addToPlaylist()} edge="end" aria-label="Play">
@@ -212,15 +203,8 @@ export default function Dashboard({code}) {
     }
 
     function chooseTrack(track) {
-        console.log("choosing + " + track)
+        console.log("choosing + " + track.title)
         setPlayingTrack(track)
-        setCurrPlayingTrack(track)
-        setCurrPlayingSong(track.title)
-        setCurrPlayingSongArtist(track.artist)
-        //currPlayingSongArtist = track.artist;
-        setCurrPlayingSongAlbumArt(track.albumUrl)
-        console.log("currPlayingSong + " + currPlayingSong)
-        console.log("currPlayingSongArtist + " + currPlayingSongArtist)
         setSearch("")
         setLyrics("")
     }
@@ -246,6 +230,7 @@ export default function Dashboard({code}) {
                 list1[0].artistName = artist
                 list1[0].isUsed = true
                 list1[0].albumArt = track.albumUrl
+                list1[0].track = track
                 console.log("added 1st rec")
                 console.log("list1[0].isUsed : " + list1[0].isUsed)
                 console.log("ID" + list1[0].id);
@@ -255,6 +240,7 @@ export default function Dashboard({code}) {
                 list1[1].artistName = artist
                 list1[1].isUsed = true
                 list1[1].albumArt = track.albumUrl
+                list1[1].track = track
                 console.log("added 2nd rec")
 
                 // list1[1].albumURL = albumArt
@@ -263,6 +249,7 @@ export default function Dashboard({code}) {
                 list1[2].artistName = artist
                 list1[2].isUsed = true
                 list1[2].albumArt = track.albumUrl
+                list1[2].track = track
                 console.log("added 3rd rec")
 
                 // list1[2].albumURL =albumArt
