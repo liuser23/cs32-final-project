@@ -1,6 +1,7 @@
 package edu.brown.cs.student.main;
 
 import com.google.gson.Gson;
+import edu.brown.cs.student.main.FriendRec.RecommendationSystem;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.SpotifyHttpManager;
 import se.michaelthelin.spotify.enums.ModelObjectType;
@@ -202,6 +203,13 @@ public class Server {
                 .toList();
 
         return new RecommendationData(artists, songs, genres);
+    }
+
+    public List<String> recommendations(String userId, int numRecs) {
+
+
+        RecommendationSystem system = RecommendationSystem.fromStudents(null);
+        return system.getRecsFor(userId, numRecs);
     }
 
     public void start() {
