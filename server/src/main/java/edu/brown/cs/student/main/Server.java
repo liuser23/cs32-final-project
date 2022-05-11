@@ -1,6 +1,7 @@
 package edu.brown.cs.student.main;
 
 import com.google.gson.Gson;
+import edu.brown.cs.student.main.BloomFilter.SimilarityMetrics.SimilarityMetric;
 import edu.brown.cs.student.main.FriendRec.RecommendationSystem;
 import edu.brown.cs.student.main.FriendRec.UserInfo;
 import se.michaelthelin.spotify.SpotifyApi;
@@ -204,19 +205,31 @@ public class Server {
     }
 
     public List<String> recommendations(String userId, int numRecs) throws SQLException {
-        Map<String, Tokens> tokens = users.getAllCredentials();
-
-        Map<String, UserInfo> data = tokens.entrySet().stream()
+        Map<String, UserInfo> data = users.getRecommendations().entrySet().stream()
                 .map(e -> {
-                    Tokens t = e.getValue();
-                    RecommendationData d = getRecommendationData(t);
-                    UserInfo info = new UserInfo(d.artists(), d.songs(), d.genres(), null, null);
+                    Map<String, KnownUsers.Data> t = e.getValue();
+
+                    List<String> artists = t.get("artists").items();
+                    List<String> songs = t.get("songs").items();
+                    List<String> genres = t.get("genres").items();
+
+                    boolean[] metrics = {
+                            t.get("artists").matchSame(),
+                            t.get("songs").matchSame(),
+                            t.get("genres").matchSame()};
+
+                    int[] weights = {
+                            t.get("artists").weight(),
+                            t.get("songs").weight(),
+                            t.get("genres").weight()};
+
+                    UserInfo info = new UserInfo(artists, songs, genres, metrics, weights);
 
                     return new AbstractMap.SimpleEntry<>(e.getKey(), info);
                 })
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
 
-        RecommendationSystem system = RecommendationSystem.fromStudents(data);
+        RecommendationSystem system = RecommendationSystem.fromUserData(data);
         return system.getRecsFor(userId, numRecs);
     }
 
@@ -280,6 +293,29 @@ public class Server {
            return new Gson().toJson(artist);
         });
 
+        Spark.post("storeRecommendationPreferences", (request, response) -> {
+            String sessionToken = request.headers("Authentication");
+            Optional<String> userId = users.userIdFromSessionToken(sessionToken);
+            if (userId.isEmpty()) {
+                throw new RuntimeException("user was not found");
+            }
+            Optional<Tokens> tokens = users.getTokens(userId.get());
+            if (tokens.isEmpty()) {
+                throw new RuntimeException("tokens were not found");
+            }
+
+            DataWithoutItemsAssociated data = new Gson().fromJson(request.body(), DataWithoutItemsAssociated.class);
+            RecommendationData recommendationData = getRecommendationData(tokens.get());
+
+            users.initializeRecommendations(userId.get(), Map.of(
+                    "songs", new KnownUsers.Data(data.data().get("songs").matchSame, recommendationData.songs(), data.data().get("songs").matchWeight),
+                    "genres", new KnownUsers.Data(data.data().get("genres").matchSame, recommendationData.genres(), data.data().get("genres").matchWeight),
+                    "artists", new KnownUsers.Data(data.data().get("artists").matchSame, recommendationData.artists(), data.data().get("artists").matchWeight)
+            ));
+
+            return null;
+        });
+
         Spark.get("/recommendations", (request, response) -> {
             String sessionToken = request.headers("Authentication");
             Optional<String> userId = users.userIdFromSessionToken(sessionToken);
@@ -290,6 +326,10 @@ public class Server {
            return new Gson().toJson(data);
         });
     }
+
+    record DataWithoutItemsAssociated(Map<String, DataWithoutItems> data) {}
+
+    record DataWithoutItems(boolean matchSame, int matchWeight) { }
 
     private Tokens tokensFromRequest(Request request) throws SQLException {
         String sessionToken = request.headers("Authentication");

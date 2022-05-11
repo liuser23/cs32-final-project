@@ -1,14 +1,11 @@
 package edu.brown.cs.student.main;
 
 import com.google.gson.Gson;
+import edu.brown.cs.student.main.BloomFilter.SimilarityMetrics.SimilarXNOR;
 import se.michaelthelin.spotify.model_objects.specification.User;
 
-import java.nio.file.Path;
 import java.sql.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class KnownUsers {
     private final Connection connection;
@@ -23,7 +20,8 @@ public class KnownUsers {
         connection.prepareStatement("create table if not exists credentials ( id text primary key, accessToken text, refreshToken text, foreign key(id) references users(id) ); );").executeUpdate();
         connection.prepareStatement("create table if not exists users ( id text primary key, displayName text, imageUrl text, followerCount text );").executeUpdate();
         connection.prepareStatement("create table if not exists sessionTokens ( sessionToken text primary key, id text, foreign key(id) references users(id) );").executeUpdate();
-
+        connection.prepareStatement("create table if not exists recommendation ( id text, dataName text, itemName text, similarity boolean, weight integer, foreign key(id) references users(id)) );").executeUpdate();
+        connection.prepareStatement("create table if not exists suggestions ( id text, songId text, suggestion1 text, suggestion2 text, suggestion3 text, foreign key(id) references users(id)) );").executeUpdate();
     }
 
     Map<String, Tokens> getAllCredentials() throws SQLException {
@@ -41,8 +39,49 @@ public class KnownUsers {
     }
 
 
+    record Data(boolean matchSame, List<String> items, int weight) {
 
+    }
 
+    void initializeRecommendations(String userId, Map<String, Data> data) throws SQLException {
+        // let's delete everything in the recommendations table that matches userId
+        PreparedStatement statement = connection.prepareStatement("delete from recommendation where id = ?;");
+        statement.setString(1, userId);
+        statement.executeUpdate();
+
+        for (Map.Entry<String, Data> datas : data.entrySet()) {
+            Data value = datas.getValue();
+            for (String item : value.items) {
+                PreparedStatement addItem = connection.prepareStatement("insert into recommendation values ( ?, ?, ?, ?, ?)");
+                addItem.setString(1, userId);
+                addItem.setString(2, datas.getKey());
+                addItem.setString(3, item);
+                addItem.setBoolean(4, value.matchSame);
+                addItem.setInt(5, value.weight);
+                addItem.executeUpdate();
+            }
+        }
+    }
+
+    Map<String, Map<String, Data>> getRecommendations() throws SQLException {
+        Map<String, Map<String, Data>> ret = new HashMap<>();
+
+        PreparedStatement statement = connection.prepareStatement("select id, dataName, itemName, similarity, weight from recommendation;");
+        ResultSet result = statement.executeQuery();
+
+        while (result.next()) {
+            String userId = result.getString(1);
+            String dataName = result.getString(2);
+            String itemName = result.getString(3);
+            boolean matchSame = result.getBoolean(4);
+            int weight = result.getInt(5);
+            Map<String, Data> user = ret.getOrDefault(userId, new HashMap<>(0));
+            Data data = user.getOrDefault(dataName, new Data(matchSame, new ArrayList<>(1), weight));
+            data.items.add(itemName);
+        }
+
+        return ret;
+    }
 
     void initializeUser(String sessionToken, Tokens tokens, User user) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("replace into credentials values ( ?, ?, ? );");
