@@ -38,7 +38,6 @@ public class RecommendationSystem {
     if (num < 0) {
       throw new IllegalArgumentException("num must be non-negative.");
     }
-
     UserFilters currUser = data.get(id);
 
     UserFilterRecommender recommender = new UserFilterRecommender(num, id,
@@ -49,28 +48,27 @@ public class RecommendationSystem {
   }
 
 
-  public static RecommendationSystem fromStudents(Map<String, UserInfo> userData) {
+  public static RecommendationSystem fromUserData(Map<String, UserInfo> userData) {
     UserFiltersMap userFiltersMap = new UserFiltersMap();
 
     // need to keep track of the maximum-sized list of qualitative attributes, as all other
     // bloom filters will be sized acccording to this.
-    //todo: consider normalizing
-    int[] maxEles = {-1, -1, -1};
+    int[] maxEls = {-1, -1, -1};
     for (Map.Entry<String, UserInfo> entry : userData.entrySet()) {
-      if (entry.getValue().getArtistData().size() > maxEles[0]) {
-        maxEles[0] = entry.getValue().getArtistData().size();
+      if (entry.getValue().getArtistData().size() > maxEls[0]) {
+        maxEls[0] = entry.getValue().getArtistData().size();
       }
-      if (entry.getValue().getSongData().size() > maxEles[1]) {
-        maxEles[1] = entry.getValue().getSongData().size();
+      if (entry.getValue().getSongData().size() > maxEls[1]) {
+        maxEls[1] = entry.getValue().getSongData().size();
       }
-      if (entry.getValue().getGenreData().size() > maxEles[2]) {
-        maxEles[2] = entry.getValue().getGenreData().size();
+      if (entry.getValue().getGenreData().size() > maxEls[2]) {
+        maxEls[2] = entry.getValue().getGenreData().size();
       }
     }
 
     // Add the qualitative data for each student into a new bloom filter in the BloomFilterMap.
     for (Map.Entry<String, UserInfo> entry : userData.entrySet()) {
-      userFiltersMap.addUserFilter(entry.getKey(), entry.getValue(), maxEles);
+      userFiltersMap.addUserFilter(entry.getKey(), entry.getValue(), maxEls);
     }
 
     // Now that we have completed building a BloomFilterMap put it into
