@@ -8,13 +8,18 @@ export default function Player({accessToken, trackUri}) {
 
     if (!accessToken) return null
     return (
-        <SpotifyPlayer
+        <SpotifyPlayer style={{
+            activeColor: '#fff',
+            backgroundColor: '#1DB954',
+            sliderColor: '#1DB954',
+        }}
         token={accessToken}
         showSaveIcon
         callback={state => {
             if (!state.isPlaying) setPlay(false)
         }}
         play={play}
+        magnifySliderOnHover={true}
         uris={trackUri ? [trackUri] : []}
         />
     )

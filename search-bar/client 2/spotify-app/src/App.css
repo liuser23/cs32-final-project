@@ -1,3 +1,11 @@
+.background-black {
+    background-color: black;
+}
+
+.background-white {
+    background-color: white;
+}
+
 .recommendationForm {
     display: flex;
     align-content: center;
@@ -6,6 +14,20 @@
     padding: 10px;
     margin: 20px;
 
+}
+
+.recsList {
+    display: flex;
+    align-content: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.deleteButtons {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    padding: 10px;
 }
 
 .my-rec{
@@ -26,8 +48,35 @@ label {
     padding: 10px;
     display: flex;
     justify-content: center;
+    /*flex-wrap: wrap;*/
+    /*flex-direction: row;*/
+}
+
+.top-recs{
+    display: flex;
+    align-content: center;
+    flex-direction: column;
     flex-wrap: wrap;
+    padding: 10px;
+    margin: 10px;
+}
+
+.currently-playing {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    flex-wrap: wrap;
+    height: auto;
+    width: auto;
+}
+
+.playing-and-top-recs {
+    display: flex;
+    justify-content: center;
     flex-direction: row;
+    flex-wrap: wrap;
+    padding: 10px;
+    margin: 20px;
 }
 
 .form-rec {
