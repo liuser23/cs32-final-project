@@ -118,7 +118,7 @@ export default function Dashboard({code}) {
     const [searchResultsRecommendation, setSearchResultsRecommendation] = useState([])
     const [playingTrack, setPlayingTrack] = useState()
     const [lyrics, setLyrics] = useState("")
-
+    const [listRecommendation, setListRecommendations] = useState([])
     let searchArray = [];
     let searchRecsArray = [];
     let searchUserArray = [];
@@ -188,6 +188,59 @@ export default function Dashboard({code}) {
         </ListItem>
     )
 
+    function reRenderList(){
+        listRecs2 = list1.map((song) =>
+            <ListItem key={getRandomInt(1000000)} alignItems="flex-start"
+                      style={{margin: "8px", padding: "20px", border: '1px solid rgba(0, 0, 0, 0.1)'}}
+                      className={classes.customHoverFocus}
+                      secondaryAction={
+                          <React.Fragment>
+                              <IconButton onClick={() => chooseTrack(song.track)} edge="end" aria-label="play">
+                                  <PlayCircleOutlineIcon style={{margin: "10px"}}/>
+                              </IconButton>
+                              <IconButton onClick={() => addToPlaylist()} edge="end" aria-label="Play">
+                                  <PlaylistAddIcon/>
+                              </IconButton>
+                              <IconButton onClick={() => handleDelete(song.trackName)} edge="end" aria-label="delete">
+                                  <DeleteIcon style={{margin: "20px"}}/>
+                              </IconButton>
+                          </React.Fragment>
+                      }>
+                <ListItemAvatar>
+                    <Avatar sx={{ height: '60px', width: '60px', marginRight: "10px" }} alt="Album cover" src={song.albumArt? song.albumArt : SpotifyLogo}/>
+                </ListItemAvatar>
+                <ListItemText primary={song.trackName? song.trackName : "Song Title"} secondary={song.artistName? song.artistName : "Song Artist"} style={{color: "black"}}/>
+            </ListItem>
+        )
+        setListRecommendations(listRecs2)
+    }
+
+
+
+    // setListRecommendations(
+    //     list1.map((song) =>
+    //     <ListItem key={getRandomInt(1000000)} alignItems="flex-start"
+    //               style={{margin: "8px", padding: "20px", border: '1px solid rgba(0, 0, 0, 0.1)'}}
+    //               className={classes.customHoverFocus}
+    //               secondaryAction={
+    //                   <React.Fragment>
+    //                       <IconButton onClick={() => chooseTrack(song.track)} edge="end" aria-label="play">
+    //                           <PlayCircleOutlineIcon style={{margin: "10px"}}/>
+    //                       </IconButton>
+    //                       <IconButton onClick={() => addToPlaylist()} edge="end" aria-label="Play">
+    //                           <PlaylistAddIcon/>
+    //                       </IconButton>
+    //                       <IconButton onClick={() => handleDelete(song.trackName)} edge="end" aria-label="delete">
+    //                           <DeleteIcon style={{margin: "20px"}}/>
+    //                       </IconButton>
+    //                   </React.Fragment>
+    //               }>
+    //         <ListItemAvatar>
+    //             <Avatar sx={{ height: '60px', width: '60px', marginRight: "10px" }} alt="Album cover" src={song.albumArt? song.albumArt : SpotifyLogo}/>
+    //         </ListItemAvatar>
+    //         <ListItemText primary={song.trackName? song.trackName : "Song Title"} secondary={song.artistName? song.artistName : "Song Artist"} style={{color: "black"}}/>
+    //     </ListItem>
+    // ))
 
 
     function startPlaying(trackName) {
@@ -203,6 +256,7 @@ export default function Dashboard({code}) {
     }
 
     function chooseTrack(track) {
+        setListRecommendations(listRecs2)
         console.log("choosing + " + track.title)
         setPlayingTrack(track)
         setSearch("")
@@ -219,78 +273,89 @@ export default function Dashboard({code}) {
             const trackTitle = track.title;
             const artist = track.artist;
 
+            let tempList = list1
 
-            if ((list1[0].trackName === trackTitle && list1[0].isUsed) || (list1[1].trackName === trackTitle && list1[1].isUsed) || (list1[2].trackName === trackTitle && list1[2].isUsed)) {
+            if ((tempList[0].trackName === trackTitle && tempList[0].isUsed) || (tempList[1].trackName === trackTitle && tempList[1].isUsed) || (tempList[2].trackName === trackTitle && tempList[2].isUsed)) {
                 console.log("can't repeat recommendations")
-                console.log("list1[0].trackName: " + list1[0].trackName)
-                console.log("list1[1].trackName: " + list1[1].trackName)
-                console.log("list1[2].trackName: " + list1[2].trackName)
-            } else if (list1[0].isUsed != true) {
-                list1[0].trackName = trackTitle;
-                list1[0].artistName = artist
-                list1[0].isUsed = true
-                list1[0].albumArt = track.albumUrl
-                list1[0].track = track
+                console.log("list1[0].trackName: " + tempList[0].trackName)
+                console.log("list1[1].trackName: " + tempList[1].trackName)
+                console.log("list1[2].trackName: " + tempList[2].trackName)
+            } else if (tempList[0].isUsed != true) {
+                tempList[0].trackName = trackTitle;
+                tempList[0].artistName = artist
+                tempList[0].isUsed = true
+                tempList[0].albumArt = track.albumUrl
+                tempList[0].track = track
                 console.log("added 1st rec")
                 console.log("list1[0].isUsed : " + list1[0].isUsed)
                 console.log("ID" + list1[0].id);
                 // list1[0].albumURL = albumArt
-            } else if (list1[1].isUsed != true) {
-                list1[1].trackName = trackTitle;
-                list1[1].artistName = artist
-                list1[1].isUsed = true
-                list1[1].albumArt = track.albumUrl
-                list1[1].track = track
+            } else if (tempList[1].isUsed != true) {
+                tempList[1].trackName = trackTitle;
+                tempList[1].artistName = artist
+                tempList[1].isUsed = true
+                tempList[1].albumArt = track.albumUrl
+                tempList[1].track = track
                 console.log("added 2nd rec")
 
                 // list1[1].albumURL = albumArt
-            } else if (list1[2].isUsed != true) {
-                list1[2].trackName = trackTitle;
-                list1[2].artistName = artist
-                list1[2].isUsed = true
-                list1[2].albumArt = track.albumUrl
-                list1[2].track = track
+            } else if (tempList[2].isUsed != true) {
+                tempList[2].trackName = trackTitle;
+                tempList[2].artistName = artist
+                tempList[2].isUsed = true
+                tempList[2].albumArt = track.albumUrl
+                tempList[2].track = track
                 console.log("added 3rd rec")
 
                 // list1[2].albumURL =albumArt
             } else {
                 console.log("Too many song recs")
             }
+            setList1(tempList)
+            // setListRecommendations(listRecs2)
+            reRenderList()
         }
     }
 
     const handleDelete = (song) => {
         console.log("song.trackname" + song)
-        const newListRecs = listRecs2.filter((record) => record.trackName !== song)
-        const songToDelete = listRecs2.filter((record) => record.trackName === song)
-        console.log("songToDelete" + songToDelete)
-        console.log("listRecs2 b4 " + listRecs2[0].MuiListItemText)
-        listRecs2 = newListRecs
-        console.log("listRecs2 after" + listRecs2)
-        // list1 = list1.filter((song) => song.id !== id) )
+        // const newListRecs = listRecs2.filter((record) => record.trackName !== song)
+        // const songToDelete = listRecs2.filter((record) => record.trackName === song)
+        const newListRecs = listRecommendation.filter((record) => record.trackName !== song)
+        const songToDelete = listRecommendation.filter((record) => record.trackName === song)
 
-        if (list1[0].trackName == song) {
+        console.log("songToDelete" + songToDelete)
+        // console.log("listRecs2 b4 " + listRecs2[0].MuiListItemText)
+        // listRecs2 = newListRecs
+
+        // console.log("listRecs2 after" + listRecs2)
+        // list1 = list1.filter((song) => song.id !== id) )
+        let tempList = list1
+
+
+        if (tempList[0].trackName == song) {
             console.log("songToDelete is in spot 0")
-            list1[0].trackName = "";
-            list1[0].artistName = "";
-            list1[0].isUsed = false;
-            list1[0].albumArt = SpotifyLogo;
-        } else if (list1[1].trackName == song) {
+            tempList[0].trackName = "";
+            tempList[0].artistName = "";
+            tempList[0].isUsed = false;
+            tempList[0].albumArt = SpotifyLogo;
+        } else if (tempList[1].trackName == song) {
             console.log("songToDelete is in spot 1")
-            list1[1].trackName = "";
-            list1[1].artistName = "";
-            list1[1].isUsed = false;
-            list1[1].albumArt = SpotifyLogo;
-        } else if (list1[2].trackName == song) {
+            tempList[1].trackName = "";
+            tempList[1].artistName = "";
+            tempList[1].isUsed = false;
+            tempList[1].albumArt = SpotifyLogo;
+        } else if (tempList[2].trackName == song) {
             console.log("songToDelete is in spot 2")
-            list1[2].trackName = "";
-            list1[2].artistName = "";
-            list1[2].isUsed = false;
-            list1[2].albumArt = SpotifyLogo;
+            tempList[2].trackName = "";
+            tempList[2].artistName = "";
+            tempList[2].isUsed = false;
+            tempList[2].albumArt = SpotifyLogo;
         } else {
             console.log("deletion error")
         }
-        addToRecList(null)
+        setList1(tempList)
+        setListRecommendations(newListRecs)
     }
 
     // const ListTag = () => list.map(item => (<li>{item}</li>));
@@ -519,7 +584,7 @@ export default function Dashboard({code}) {
                                 </div>
                                 <div className="recsList">
                                     <List sx={{width: '100%', padding: "10px"}}>
-                                        {listRecs2}
+                                        {listRecommendation}
                                     </List>
                                 </div>
                             </div>
@@ -620,3 +685,40 @@ export default function Dashboard({code}) {
 {/*            </ListItem>*/}
 {/*        </List>*/}
 {/*    </div>*/}
+
+// if ((list1[0].trackName === trackTitle && list1[0].isUsed) || (list1[1].trackName === trackTitle && list1[1].isUsed) || (list1[2].trackName === trackTitle && list1[2].isUsed)) {
+//     console.log("can't repeat recommendations")
+//     console.log("list1[0].trackName: " + list1[0].trackName)
+//     console.log("list1[1].trackName: " + list1[1].trackName)
+//     console.log("list1[2].trackName: " + list1[2].trackName)
+// } else if (list1[0].isUsed != true) {
+//     list1[0].trackName = trackTitle;
+//     list1[0].artistName = artist
+//     list1[0].isUsed = true
+//     list1[0].albumArt = track.albumUrl
+//     list1[0].track = track
+//     console.log("added 1st rec")
+//     console.log("list1[0].isUsed : " + list1[0].isUsed)
+//     console.log("ID" + list1[0].id);
+//     // list1[0].albumURL = albumArt
+// } else if (list1[1].isUsed != true) {
+//     list1[1].trackName = trackTitle;
+//     list1[1].artistName = artist
+//     list1[1].isUsed = true
+//     list1[1].albumArt = track.albumUrl
+//     list1[1].track = track
+//     console.log("added 2nd rec")
+//
+//     // list1[1].albumURL = albumArt
+// } else if (list1[2].isUsed != true) {
+//     list1[2].trackName = trackTitle;
+//     list1[2].artistName = artist
+//     list1[2].isUsed = true
+//     list1[2].albumArt = track.albumUrl
+//     list1[2].track = track
+//     console.log("added 3rd rec")
+//
+//     // list1[2].albumURL =albumArt
+// } else {
+//     console.log("Too many song recs")
+// }
