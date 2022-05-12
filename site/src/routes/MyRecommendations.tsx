@@ -4,17 +4,21 @@ import RecommenderInput from "../RecommenderInput";
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import {Button, Card, CardActions, CardContent, Typography} from "@mui/material";
+import {Authentication} from "../App";
+import axios from "axios";
 
-function MyRecommendations() {
+function MyRecommendations(props: {authentication: Authentication}) {
 
     const [isClicked, setIsClicked] = useState<boolean>(false);
-    const [recType, setRecType] = useState<number | number[]>(0);
+    const [recType, setRecType] = useState<number | number[]>(1);
     const [songWeight, setSongWeight] = useState<number | number[]>(50);
     const [artistWeight, setArtistWeight] = useState<number | number[]>(50);
     const [genreWeight, setGenreWeight] = useState<number | number[]>(50);
     const [results, setResults] = useState<JSX.Element>(<></>);
 
-    function getRecommendations() {
+
+
+    async function getRecommendations() {
         setIsClicked(true)
         console.log("button clicked!")
         console.log("Is clicked: " + isClicked)
@@ -23,6 +27,39 @@ function MyRecommendations() {
         console.log("Artist weight: " + artistWeight)
         console.log("Genre weight: " + genreWeight)
         setResults(<div>nice, results! rt: {recType} sw: {songWeight} aw: {artistWeight} gw: {genreWeight}</div>)
+        let mSame : boolean = true;
+        if (recType === 0) {
+            mSame = false;
+        }
+        const config = {
+            headers: {
+                'Authentication': props.authentication.sessionToken,
+                "Content-Type": "application/json",
+                'Access-Control-Allow-Origin': '*',
+            }
+        }
+        type mappedData = {matchSame : boolean, matchWeight : number | number[]}
+        let dataMap : Map<string, mappedData> = new Map<string, mappedData>()
+        dataMap.set("songs", {matchSame : mSame, matchWeight: songWeight})
+        dataMap.set("genres", {matchSame : mSame, matchWeight: genreWeight})
+        dataMap.set("artists", {matchSame : mSame, matchWeight: artistWeight})
+        const postData = {
+            data: {
+                "songs": {matchSame : mSame, matchWeight : songWeight},
+                "genres": {matchSame : mSame, matchWeight : genreWeight},
+                "artists": {matchSame : mSame, matchWeight : artistWeight},
+            }
+        }
+        await axios.post(process.env.REACT_APP_POST_CREATE_RECS as string, postData, config).then(
+            response => {console.log(response)}
+        );
+        await axios.get(process.env.REACT_APP_GET_RECS as string, config)
+            .then(
+                response => {
+                    console.log(response.data)
+                },
+                reason => console.log(reason),
+            );
     }
 
     return (

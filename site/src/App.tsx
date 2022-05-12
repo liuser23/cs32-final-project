@@ -52,7 +52,7 @@ function App() {
                     <Route path={"notificationsettings"} element={<NotificationSettings/>}/>
                     <Route path={"FriendsList"} element={<FriendsList/>}/>
                     <Route path={"signout"} element={<SignOut/>}/>
-                    <Route path={"myrecommendations"} element={<MyRecommendations/>}/>
+                    <Route path={"myrecommendations"} element={<MyRecommendations authentication={authentication}/>}/>
                 </Routes>
             </BrowserRouter>
         )

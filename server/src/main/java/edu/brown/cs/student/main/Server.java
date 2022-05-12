@@ -293,7 +293,7 @@ public class Server {
            return new Gson().toJson(artist);
         });
 
-        Spark.post("storeRecommendationPreferences", (request, response) -> {
+        Spark.post("/storeRecommendationPreferences", (request, response) -> {
             String sessionToken = request.headers("Authentication");
             Optional<String> userId = users.userIdFromSessionToken(sessionToken);
             if (userId.isEmpty()) {
@@ -304,16 +304,23 @@ public class Server {
                 throw new RuntimeException("tokens were not found");
             }
 
-            DataWithoutItemsAssociated data = new Gson().fromJson(request.body(), DataWithoutItemsAssociated.class);
+            System.out.println(request.body());
+
+
+            dwItemsAssoc data = new Gson().fromJson(request.body(), dwItemsAssoc.class);
+
+            System.out.println(data);
+            System.out.println(data.data());
+
             RecommendationData recommendationData = getRecommendationData(tokens.get());
 
             users.initializeRecommendations(userId.get(), Map.of(
-                    "songs", new KnownUsers.Data(data.data().get("songs").matchSame, recommendationData.songs(), data.data().get("songs").matchWeight),
-                    "genres", new KnownUsers.Data(data.data().get("genres").matchSame, recommendationData.genres(), data.data().get("genres").matchWeight),
-                    "artists", new KnownUsers.Data(data.data().get("artists").matchSame, recommendationData.artists(), data.data().get("artists").matchWeight)
+                    "songs", new KnownUsers.Data(data.data().songs.matchSame, recommendationData.songs(), data.data().songs.matchWeight),
+                    "genres", new KnownUsers.Data(data.data().genres.matchSame, recommendationData.genres(), data.data().genres.matchWeight),
+                    "artists", new KnownUsers.Data(data.data().artists.matchSame, recommendationData.artists(), data.data().artists.matchWeight)
             ));
 
-            return null;
+            return "200 OK";
         });
 
         Spark.get("/recommendations", (request, response) -> {
@@ -338,7 +345,29 @@ public class Server {
 
     record DataWithoutItemsAssociated(Map<String, DataWithoutItems> data) {}
 
-    record DataWithoutItems(boolean matchSame, int matchWeight) { }
+
+
+    record DataWithoutItems(Boolean matchSame, int matchWeight) { }
+
+
+
+    private class dwItems {
+        boolean matchSame;
+        int matchWeight;
+    }
+
+    private class dwItemsAssocData {
+        dwItems songs;
+        dwItems genres;
+        dwItems artists;
+    }
+
+    private class dwItemsAssoc {
+        dwItemsAssocData data;
+        public dwItemsAssocData data() {
+            return data;
+        }
+    }
 
     private Tokens tokensFromRequest(Request request) throws SQLException {
         String sessionToken = request.headers("Authentication");

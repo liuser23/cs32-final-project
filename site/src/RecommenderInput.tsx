@@ -28,10 +28,10 @@ function RecommenderInput(props : {title : string, type: number, val : number | 
                     onChange={handleValue}
                     aria-label="recommendation type"
                 >
-                    <ToggleButton value={0} aria-label="similar rec type">
+                    <ToggleButton value={1} aria-label="similar rec type">
                         Similar
                     </ToggleButton>
-                    <ToggleButton value={1} aria-label="different rec type">
+                    <ToggleButton value={0} aria-label="different rec type">
                         Different
                     </ToggleButton>
                     </ToggleButtonGroup>

@@ -49,6 +49,7 @@ public class RecommendationSystem {
 
 
   public static RecommendationSystem fromUserData(Map<String, UserInfo> userData) {
+
     UserFiltersMap userFiltersMap = new UserFiltersMap();
 
     // need to keep track of the maximum-sized list of qualitative attributes, as all other

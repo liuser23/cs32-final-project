@@ -20,8 +20,8 @@ public class KnownUsers {
         connection.prepareStatement("create table if not exists credentials ( id text primary key, accessToken text, refreshToken text, foreign key(id) references users(id) ); );").executeUpdate();
         connection.prepareStatement("create table if not exists users ( id text primary key, displayName text, imageUrl text, followerCount text );").executeUpdate();
         connection.prepareStatement("create table if not exists sessionTokens ( sessionToken text primary key, id text, foreign key(id) references users(id) );").executeUpdate();
-        connection.prepareStatement("create table if not exists recommendation ( id text, dataName text, itemName text, similarity boolean, weight integer, foreign key(id) references users(id)) );").executeUpdate();
-        connection.prepareStatement("create table if not exists suggestions ( id text, songId text, suggestion1 text, suggestion2 text, suggestion3 text, foreign key(id) references users(id)) );").executeUpdate();
+        connection.prepareStatement("create table if not exists recommendation ( id text, dataName text, itemName text, similarity boolean, weight integer, foreign key(id) references users(id)) ;").executeUpdate();
+        connection.prepareStatement("create table if not exists suggestions ( id text, songId text, suggestion1 text, suggestion2 text, suggestion3 text, foreign key(id) references users(id)) ;").executeUpdate();
     }
 
     Map<String, Tokens> getAllCredentials() throws SQLException {
@@ -75,8 +75,20 @@ public class KnownUsers {
             String itemName = result.getString(3);
             boolean matchSame = result.getBoolean(4);
             int weight = result.getInt(5);
-            Map<String, Data> user = ret.getOrDefault(userId, new HashMap<>(0));
-            Data data = user.getOrDefault(dataName, new Data(matchSame, new ArrayList<>(1), weight));
+
+            //Map<String, Data> user = ret.getOrDefault(userId, new HashMap<>(0));
+
+            if (!ret.containsKey(userId)) {
+                ret.put(userId, new HashMap<>());
+            }
+            Map<String, Data> user = ret.get(userId);
+
+            //Data data = user.getOrDefault(dataName, new Data(matchSame, new ArrayList<>(1), weight));
+            if (!user.containsKey(dataName)) {
+                user.put(dataName, new Data(matchSame, new ArrayList<>(), weight));
+            }
+            Data data = user.get(dataName);
+
             data.items.add(itemName);
         }
 
