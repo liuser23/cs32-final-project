@@ -63,12 +63,17 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
     const [playingTrack, setPlayingTrack] = useState()
     const [lyrics, setLyrics] = useState("")
 
-    const [list1, setList1] = useState([{trackName: ""}, {artistName: ""}, {isUsed: false}])
-    const [topSongs, setTopSongs] = useState([
-        [{trackName: "Top Song"}, {artistName: "CS32"}, {isUsed: false}],
-        [{trackName: "Top Song 2"}, {artistName: "CS32"}, {isUsed: false}],
-        [{trackName: "Top Song 3"}, {artistName: "CS32"}, {isUsed: false}]
-    ])
+    // list1 init {trackName: ""}, {artistName: ""}, {isUsed: false}
+    const [list1, setList1] = useState([])
+
+    const [reloadSuggestions, setReloadSuggestions] = useState(0)
+
+    // top songs init:
+            // [{trackName: "Top Song"}, {artistName: "CS32"}, {isUsed: false}],
+        // [{trackName: "Top Song 2"}, {artistName: "CS32"}, {isUsed: false}],
+        // [{trackName: "Top Song 3"}, {artistName: "CS32"}, {isUsed: false}]
+
+    const [topSongs, setTopSongs] = useState([])
 
     function chooseTrack(track) {
         console.log("choosing + ", track)
@@ -78,54 +83,83 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
         setLyrics("")
     }
 
-    const dummySong = {
-        trackName: '',
-        artistName: '',
-        isUsed:  false,
-        albumArt: SpotifyLogo,
-        track: null,
-    }
-
-    const trackToSong = (track) => {
-        return {
-            trackName: track.name,
-            artistName: track.artists[0].name,
-            isUsed: true,
-            albumArt: track.album.images[0].url,
-            track: track,
-        }
-    }
-
     const addRecommendation = (track) => {
+        console.log('running')
         setSearchRecs("")
         if (!track) {
             console.log('undefined track passed to add to rec list', track)
         }
-
-        const songAlreadyPresent = list1.find((a) => a.isUsed && a.trackName === track.name)
-        if (songAlreadyPresent !== undefined) {
-            console.log('cant repeat recommendations')
-            return
+        const data = { songId: playingTrack.id, suggestion: track.id }
+        const config = {
+            headers: {
+                'Authentication': sessionToken,
+                "Content-Type": "application/json",
+                'Access-Control-Allow-Origin': '*',
+            }
         }
-
-        const insertIndex = list1.findIndex(a => !a.isUsed)
-        if (insertIndex !== -1) {
-            list1[insertIndex] = trackToSong(track)
-            setList1([...list1])
-        }
+        axios.post(process.env.REACT_APP_INSERT_SUGGESTIONS, data, config)
+            .then(response => {
+                setReloadSuggestions(Math.random())
+                console.log('insert', response)
+            })
     }
 
-    const deleteRecommendation = (song) => {
-        const deletionIndex = list1.findIndex(a => a.trackName === song.trackName)
-        if (deletionIndex !== -1) {
-            list1[deletionIndex] = dummySong
-            setList1([...list1])
+    const deleteRecommendation = (track) => {
+        const data = { songId: playingTrack.id, suggestion: track.id }
+        const config = {
+            headers: {
+                'Authentication': sessionToken,
+                "Content-Type": "application/json",
+                'Access-Control-Allow-Origin': '*',
+            }
         }
+        axios.post(process.env.REACT_APP_DELETE_SUGGESTIONS, data, config)
+            .then(response => {
+                setReloadSuggestions(Math.random())
+                console.log('delete', response)
+            })
     }
 
     const addToPlaylist = () => {
         console.log("TODO: add playlist endpoint")
     }
+
+    useEffect(() => {
+        if (!playingTrack) return
+        const config = {
+            headers: {
+                'Authentication': sessionToken,
+                "Content-Type": "application/json",
+                'Access-Control-Allow-Origin': '*',
+            },
+            params: {query: playingTrack.id}
+        }
+        axios.get(process.env.REACT_APP_USER_SUGGESTIONS, config)
+            .then(response => {
+                console.log('setting user suggestions', response.data)
+                setList1(response.data)
+            })
+    }, [playingTrack, setList1, reloadSuggestions])
+
+    useEffect(() => {
+        if (!playingTrack) {
+            setTopSongs([])
+            return
+        }
+        const config = {
+            headers: {
+                'Authentication': sessionToken,
+                "Content-Type": "application/json",
+                'Access-Control-Allow-Origin': '*',
+            },
+            params: {query: playingTrack.id}
+        }
+        axios.get(process.env.REACT_APP_TOP_SUGGESTIONS, config)
+            .then(response => {
+                console.log('setting top songs', response.data)
+                setTopSongs(response.data)
+            })
+    }, [playingTrack, setTopSongs, reloadSuggestions])
 
     useEffect(() => {
         if (!playingTrack) return
@@ -166,7 +200,6 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
             },
             params: {query: searchRecs}
         }
-
         axios.get(process.env.REACT_APP_SEARCH_ENDPOINT, config)
             .then(response => {
                 if (cancel) return
@@ -176,8 +209,8 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
         return () => cancel = true
     }, [searchRecs, sessionToken])
 
-    const topSongsList = topSongs.map((song) =>
-        <ListItem key={song.trackName} alignItems="flex-start"
+    const topSongsList = topSongs.map(song =>
+        <ListItem key={song.id} alignItems="flex-start"
                   style={{margin: "8px", padding: "20px", border: '1px solid rgba(0, 0, 0, 0.1)'}}
                   className={classes.customHoverFocus}
                   secondaryAction={
@@ -188,27 +221,27 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
                           <IconButton onClick={() => addToPlaylist()} edge="end" aria-label="Play">
                               <PlaylistAddIcon/>
                           </IconButton>
-                          <IconButton onClick={() => deleteRecommendation(song)} edge="end" aria-label="delete">
+                          <IconButton onClick={() => deleteRecommendation(song.track)} edge="end" aria-label="delete">
                               <DeleteIcon style={{marginRight: "10px"}}/>
                           </IconButton>
                       </React.Fragment>
                   }>
             <ListItemAvatar>
                 <Avatar className="material-icons">
-                    <LooksOne className={classes.icons}/>
+                    <Avatar sx={{ height: '60px', width: '60px', marginRight: "10px" }} alt="Album cover" src={song?.album.images[0].url? song?.album.images[0].url : SpotifyLogo}/>
                 </Avatar>
             </ListItemAvatar>
-            <ListItemText primary={song.trackName? song.trackName : "Song Title"} secondary={song.artistName? song.artistName : "Song Artist"} style={{color: "black"}}/>
+            <ListItemText primary={song?.name? song?.name : "Song Title"} secondary={song?.artists[0].name? song?.artists[0].name : "Song Artist"} style={{color: "black"}}/>
         </ListItem>
     )
 
-    const listRecommendation = list1.map((song) =>
-        <ListItem key={song.trackName} alignItems="flex-start"
+    const listRecommendation = list1.map(song =>
+        <ListItem key={song.id} alignItems="flex-start"
                   style={{margin: "8px", padding: "20px", border: '1px solid rgba(0, 0, 0, 0.1)'}}
                   className={classes.customHoverFocus}
                   secondaryAction={
                       <React.Fragment>
-                          <IconButton onClick={() => chooseTrack(song.track)} edge="end" aria-label="play">
+                          <IconButton onClick={() => chooseTrack(song)} edge="end" aria-label="play">
                               <PlayCircleOutlineIcon style={{margin: "10px"}}/>
                           </IconButton>
                           <IconButton onClick={() => addToPlaylist()} edge="end" aria-label="Play">
@@ -220,9 +253,9 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
                       </React.Fragment>
                   }>
             <ListItemAvatar>
-                <Avatar sx={{ height: '60px', width: '60px', marginRight: "10px" }} alt="Album cover" src={song.albumArt? song.albumArt : SpotifyLogo}/>
+                <Avatar sx={{ height: '60px', width: '60px', marginRight: "10px" }} alt="Album cover" src={song?.album.images[0].url? song?.album.images[0].url : SpotifyLogo}/>
             </ListItemAvatar>
-            <ListItemText primary={song.trackName? song.trackName : "Song Title"} secondary={song.artistName? song.artistName : "Song Artist"} style={{color: "black"}}/>
+            <ListItemText primary={song?.name? song?.name : "Song Title"} secondary={song?.artists[0].name? song?.artists[0].name : "Song Artist"} style={{color: "black"}}/>
         </ListItem>
     )
 
@@ -267,12 +300,12 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
                             </div>
                             <div className="playing-and-top-recs">
                                 <div className="currently-playing">
-                                    <img src={playingTrack?.albumUrl}
+                                    <img src={playingTrack?.album.images[0].url}
                                          style={{height: "300px", width: "300px", border: '10px solid rgb(0, 0, 0)'}}/>
                                     <List sx={{width: '300px'}}>
                                         <ListItem className={classes.customHoverFocusNoMargin}
                                                   style={{border: '1px solid rgba(0, 0, 0, 0.1)'}}>
-                                            <ListItemText primary={playingTrack?.title} secondary={playingTrack?.artist}/>
+                                            <ListItemText primary={playingTrack?.name} secondary={playingTrack?.artists[0].name}/>
                                             <IconButton onClick={() => addRecommendation(playingTrack)} edge="end"
                                                         aria-label="add">
                                                 <Add/>

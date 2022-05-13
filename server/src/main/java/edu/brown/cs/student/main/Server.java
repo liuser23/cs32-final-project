@@ -127,6 +127,10 @@ public class Server {
         return trackPaging.getItems();
     }
 
+    public Track getTrack(String trackId) {
+        return spotifyApi.getTrack(trackId).build().executeAsync().join();
+    }
+
     /**
      *  Get's the lyrics to a song
      */
@@ -341,22 +345,66 @@ public class Server {
             }
            return new Gson().toJson(ret);
         });
+
+        Spark.post("/insertSuggestion", (request, response) -> {
+            String sessionToken = request.headers("Authentication");
+            Optional<String> userId = users.userIdFromSessionToken(sessionToken);
+            if (userId.isEmpty()) {
+                throw new RuntimeException("user was not found");
+            }
+            InsertSuggestionsQuery toInsert = new Gson().fromJson(request.body(), InsertSuggestionsQuery.class);
+            try {
+                users.insertSuggestion(userId.get(), toInsert.songId, toInsert.suggestion);
+                return new Gson().toJson(Map.of());
+            } catch (IllegalArgumentException e) {
+                return new Gson().toJson(Map.of("error", e.getMessage()));
+            }
+        });
+
+        Spark.post("/deleteSuggestion", (request, response) -> {
+            String sessionToken = request.headers("Authentication");
+            Optional<String> userId = users.userIdFromSessionToken(sessionToken);
+            if (userId.isEmpty()) {
+                throw new RuntimeException("user was not found");
+            }
+            InsertSuggestionsQuery toInsert = new Gson().fromJson(request.body(), InsertSuggestionsQuery.class);
+            users.deleteSuggestion(userId.get(), toInsert.songId, toInsert.suggestion);
+            return "200 OK";
+        });
+
+        Spark.get("/usersSuggestionsFor", (request, response) -> {
+            String sessionToken = request.headers("Authentication");
+            Optional<String> userId = users.userIdFromSessionToken(sessionToken);
+            if (userId.isEmpty()) {
+                throw new RuntimeException("user was not found");
+            }
+            String songId = request.queryParams("query");
+            List<Track> songs = users.getUsersSuggestionsFor(userId.get(), songId).stream()
+                    .map(this::getTrack)
+                    .toList();
+            return new Gson().toJson(songs);
+        });
+
+        Spark.get("/topSuggestionsFor", (request, response) -> {
+            String songId = request.queryParams("query");
+            List<Track> songs = users.topSuggestionsFor(songId, 3).stream()
+                    .map(this::getTrack)
+                    .toList();
+            return new Gson().toJson(songs);
+        });
     }
 
-    record DataWithoutItemsAssociated(Map<String, DataWithoutItems> data) {}
+    private static class InsertSuggestionsQuery {
+        String songId;
+        String suggestion;
+    }
 
-
-
-    record DataWithoutItems(Boolean matchSame, int matchWeight) { }
-
-
-
-    private class dwItems {
+    private static class dwItems {
         boolean matchSame;
         int matchWeight;
     }
 
-    private class dwItemsAssocData {
+    private static class dwItemsAssocData {
         dwItems songs;
         dwItems genres;
         dwItems artists;

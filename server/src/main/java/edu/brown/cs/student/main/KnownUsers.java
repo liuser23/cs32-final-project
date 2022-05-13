@@ -10,8 +10,6 @@ import java.util.*;
 public class KnownUsers {
     private final Connection connection;
 
-    // create table if not exists users ( id text primary key, accessToken text, refreshToken text, displayName text, imageUrl text, followerCount text );
-    // create table if not exists sessionTokens ( primary key sessionToken text, id text, foreign key(id) references users(id) );
     KnownUsers(String filename) throws ClassNotFoundException, SQLException {
         Class.forName("org.sqlite.JDBC");
         String urlToDB = "jdbc:sqlite:" + filename;
@@ -21,23 +19,58 @@ public class KnownUsers {
         connection.prepareStatement("create table if not exists users ( id text primary key, displayName text, imageUrl text, followerCount text );").executeUpdate();
         connection.prepareStatement("create table if not exists sessionTokens ( sessionToken text primary key, id text, foreign key(id) references users(id) );").executeUpdate();
         connection.prepareStatement("create table if not exists recommendation ( id text, dataName text, itemName text, similarity boolean, weight integer, foreign key(id) references users(id));").executeUpdate();
-        connection.prepareStatement("create table if not exists suggestions ( id text, songId text, suggestion1 text, suggestion2 text, suggestion3 text, foreign key(id) references users(id));").executeUpdate();
+        connection.prepareStatement("create table if not exists suggestions ( id text, songId text, suggestion text, foreign key(id) references users(id));").executeUpdate();
     }
 
-    Map<String, Tokens> getAllCredentials() throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("select id, accessToken, refreshToken from credentials;");
-        ResultSet result = statement.executeQuery();
-
-        Map<String, Tokens> ret = new HashMap<>();
-        while (result.next()) {
-            String userId = result.getString(1);
-            Tokens tokens = new Tokens(result.getString(2), result.getString(3));
-            ret.put(userId, tokens);
+    void insertSuggestion(String userId, String forSongId, String suggestion) throws SQLException, IllegalArgumentException {
+        // check if valid
+        PreparedStatement find = connection.prepareStatement("select count(*) from suggestions where id = ? and songId = ?");
+        find.setString(1, userId);
+        find.setString(2, forSongId);
+        ResultSet results = find.executeQuery();
+        results.next();
+        int result = results.getInt(1);
+        if (result >= 3) {
+            throw new IllegalArgumentException("too many inserted: " + result);
         }
+        PreparedStatement addNew = connection.prepareStatement("insert into suggestions values ( ?, ?, ? );");
+        addNew.setString(1, userId);
+        addNew.setString(2, forSongId);
+        addNew.setString(3, suggestion);
+        addNew.executeUpdate();
+    }
 
+    void deleteSuggestion(String userId, String forSongId, String suggestion) throws SQLException {
+        PreparedStatement delete = connection.prepareStatement("delete from suggestions where id = ? and songId = ? and suggestion = ?;");
+        delete.setString(1, userId);
+        delete.setString(2, forSongId);
+        delete.setString(3, suggestion);
+        delete.executeUpdate();
+    }
+
+    List<String> getUsersSuggestionsFor(String userId, String forSongId) throws SQLException {
+        PreparedStatement find = connection.prepareStatement("select suggestion from suggestions where id = ? and songId = ?");
+        find.setString(1, userId);
+        find.setString(2, forSongId);
+        ResultSet results = find.executeQuery();
+        List<String> ret = new ArrayList<>();
+        while (results.next()) {
+            ret.add(results.getString(1));
+        }
         return ret;
     }
 
+    List<String> topSuggestionsFor(String songId, int toAccept) throws SQLException {
+        PreparedStatement getMaxs = connection.prepareStatement("select suggestion from suggestions where songId = ? group by suggestion order by count(suggestion) limit 3;");
+        getMaxs.setString(1, songId);
+//        getMaxs.setInt(2, toAccept);
+        ResultSet results = getMaxs.executeQuery();
+        List<String> ret = new ArrayList<>();
+        while (results.next()) {
+            ret.add(results.getString(1));
+        }
+        return ret;
+    }
 
     record Data(boolean matchSame, List<String> items, int weight) {
 
