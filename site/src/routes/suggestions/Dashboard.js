@@ -60,24 +60,13 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
     const [searchRecs, setSearchRecs] = useState("")
     const [searchResults, setSearchResults] = useState([])
     const [searchResultsRecommendation, setSearchResultsRecommendation] = useState([])
-    const [playingTrack, setPlayingTrack] = useState()
     const [lyrics, setLyrics] = useState("")
-
-    // list1 init {trackName: ""}, {artistName: ""}, {isUsed: false}
     const [list1, setList1] = useState([])
-
     const [reloadSuggestions, setReloadSuggestions] = useState(0)
-
-    // top songs init:
-            // [{trackName: "Top Song"}, {artistName: "CS32"}, {isUsed: false}],
-        // [{trackName: "Top Song 2"}, {artistName: "CS32"}, {isUsed: false}],
-        // [{trackName: "Top Song 3"}, {artistName: "CS32"}, {isUsed: false}]
-
     const [topSongs, setTopSongs] = useState([])
 
     function chooseTrack(track) {
         console.log("choosing + ", track)
-        setPlayingTrack(track)
         setNowPlaying(track)
         setSearch("")
         setLyrics("")
@@ -89,7 +78,7 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
         if (!track) {
             console.log('undefined track passed to add to rec list', track)
         }
-        const data = { songId: playingTrack.id, suggestion: track.id }
+        const data = { songId: nowPlaying.id, suggestion: track.id }
         const config = {
             headers: {
                 'Authentication': sessionToken,
@@ -105,7 +94,7 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
     }
 
     const deleteRecommendation = (track) => {
-        const data = { songId: playingTrack.id, suggestion: track.id }
+        const data = { songId: nowPlaying.id, suggestion: track.id }
         const config = {
             headers: {
                 'Authentication': sessionToken,
@@ -125,24 +114,24 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
     }
 
     useEffect(() => {
-        if (!playingTrack) return
+        if (!nowPlaying) return
         const config = {
             headers: {
                 'Authentication': sessionToken,
                 "Content-Type": "application/json",
                 'Access-Control-Allow-Origin': '*',
             },
-            params: {query: playingTrack.id}
+            params: {query: nowPlaying.id}
         }
         axios.get(process.env.REACT_APP_USER_SUGGESTIONS, config)
             .then(response => {
                 console.log('setting user suggestions', response.data)
                 setList1(response.data)
             })
-    }, [playingTrack, setList1, reloadSuggestions])
+    }, [nowPlaying, setList1, reloadSuggestions])
 
     useEffect(() => {
-        if (!playingTrack) {
+        if (!nowPlaying) {
             setTopSongs([])
             return
         }
@@ -152,21 +141,21 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
                 "Content-Type": "application/json",
                 'Access-Control-Allow-Origin': '*',
             },
-            params: {query: playingTrack.id}
+            params: {query: nowPlaying.id}
         }
         axios.get(process.env.REACT_APP_TOP_SUGGESTIONS, config)
             .then(response => {
                 console.log('setting top songs', response.data)
                 setTopSongs(response.data)
             })
-    }, [playingTrack, setTopSongs, reloadSuggestions])
+    }, [nowPlaying, setTopSongs, reloadSuggestions])
 
     useEffect(() => {
-        if (!playingTrack) return
+        if (!nowPlaying) return
         const lyric = 'TODO: lyrics error: The Same Origin Policy disallows reading the remote resource'
-        // const lyric = lyricsFinder(playingTrack.artist, playingTrack.title)
+        // const lyric = lyricsFinder(nowPlaying.artist, nowPlaying.title)
         setLyrics(lyric)
-    }, [playingTrack])
+    }, [nowPlaying])
 
     useEffect(() => {
         if (!search) return setSearchResults([])
@@ -300,13 +289,13 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
                             </div>
                             <div className="playing-and-top-recs">
                                 <div className="currently-playing">
-                                    <img src={playingTrack?.album.images[0].url}
+                                    <img src={nowPlaying?.album.images[0].url}
                                          style={{height: "300px", width: "300px", border: '10px solid rgb(0, 0, 0)'}}/>
                                     <List sx={{width: '300px'}}>
                                         <ListItem className={classes.customHoverFocusNoMargin}
                                                   style={{border: '1px solid rgba(0, 0, 0, 0.1)'}}>
-                                            <ListItemText primary={playingTrack?.name} secondary={playingTrack?.artists[0].name}/>
-                                            <IconButton onClick={() => addRecommendation(playingTrack)} edge="end"
+                                            <ListItemText primary={nowPlaying?.name} secondary={nowPlaying?.artists[0].name}/>
+                                            <IconButton onClick={() => addRecommendation(nowPlaying)} edge="end"
                                                         aria-label="add">
                                                 <Add/>
                                             </IconButton>
