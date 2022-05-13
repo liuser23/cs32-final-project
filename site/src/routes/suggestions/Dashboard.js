@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from 'react'
 import {View, Text} from 'react-native'
-import useAuth from './useAuth'
 import {Container, Form} from 'react-bootstrap'
 import SpotifyWebApi from "spotify-web-api-node"
 import TrackSearchResult from "./TrackSearchResult";
@@ -30,6 +29,7 @@ import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import PlaylistAddCheckRoundedIcon from '@mui/icons-material/PlaylistAddCheckRounded';
 import LooksOneIcon from '@mui/icons-material/LooksOne'
 import LooksTwoIcon from '@mui/icons-material/LooksTwo'
+import lyricsFinder from 'lyrics-finder'
 
 
 import Stack from '@mui/material/Stack';
@@ -50,11 +50,6 @@ import {LooksOne, LooksTwo, Looks3} from "@material-ui/icons";
 //         marginRight: theme.spacing(1),
 //     },
 // }));
-
-const spotifyApi = new SpotifyWebApi({
-    clientId: "786d7d05062645e09e6cc0f9df174325",
-})
-
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -92,51 +87,31 @@ const useStyles = makeStyles((theme) => ({
     }
 }))
 
-export default function Dashboard({code}) {
+export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
     let darkModeOn = false;
 
     function getRandomInt(max) {
         return Math.floor(Math.random() * max);
     }
 
-    function toggleDarkMode() {
-        if (darkModeOn) {
-            darkModeOn = false;
-        } else {
-            darkModeOn = true;
-        }
-
-    }
-
     const classes = useStyles()
-    const accessToken = useAuth(code)
     const [search, setSearch] = useState("")
-    const [searchUser, setSearchUser] = useState("")
     const [searchRecs, setSearchRecs] = useState("")
     const [searchResults, setSearchResults] = useState([])
-    const [searchUserResults, setSearchUserResults] = useState([])
     const [searchResultsRecommendation, setSearchResultsRecommendation] = useState([])
     const [playingTrack, setPlayingTrack] = useState()
     const [lyrics, setLyrics] = useState("")
     const [listRecommendation, setListRecommendations] = useState([])
     let searchArray = [];
     let searchRecsArray = [];
-    let searchUserArray = [];
-
 
     const [list, setList] = useState(["First Recommendation", "Second Recommendation", "Third Recommendation"])
     const [list1, setList1] = useState([{trackName: ""}, {artistName: ""}, {isUsed: false}])
-    //const [listRecs2, setListRecs2] = useState([])
-    // ([defaultString, defaultString, defaultString])
     let topSong1 = [{trackName: "Top Song"}, {artistName: "CS32"}, {isUsed: false}]
     let topSong2 = [{trackName: "Top Song 2"}, {artistName: "CS32"}, {isUsed: false}]
     let topSong3 = [{trackName: "Top Song 3"}, {artistName: "CS32"}, {isUsed: false}]
 
     const[topSongs, setTopSongs] = useState([topSong1, topSong2, topSong3])
-
-    let placeHolderTop3List = [{topSong1, topSong2, topSong3}]
-    //let listRecs = list.map((item) => <ListItem key={getRandomInt(1000000)}> <ListItemText {item} />{item}</ListItem>);
-    // let listRecs1 = list1.map((item) => <li key={getRandomInt(1000000)}>{item.trackName}</li>)
 
     let topSongsList = topSongs.map((song) =>
         <ListItem key={getRandomInt(1000000)} alignItems="flex-start"
@@ -156,7 +131,7 @@ export default function Dashboard({code}) {
                       </React.Fragment>
                   }>
             <ListItemAvatar>
-                <Avatar class="material-icons">
+                <Avatar className="material-icons">
                     <LooksOne className={classes.icons}/>
                 </Avatar>
             </ListItemAvatar>
@@ -213,46 +188,6 @@ export default function Dashboard({code}) {
             </ListItem>
         )
         setListRecommendations(listRecs2)
-    }
-
-
-
-    // setListRecommendations(
-    //     list1.map((song) =>
-    //     <ListItem key={getRandomInt(1000000)} alignItems="flex-start"
-    //               style={{margin: "8px", padding: "20px", border: '1px solid rgba(0, 0, 0, 0.1)'}}
-    //               className={classes.customHoverFocus}
-    //               secondaryAction={
-    //                   <React.Fragment>
-    //                       <IconButton onClick={() => chooseTrack(song.track)} edge="end" aria-label="play">
-    //                           <PlayCircleOutlineIcon style={{margin: "10px"}}/>
-    //                       </IconButton>
-    //                       <IconButton onClick={() => addToPlaylist()} edge="end" aria-label="Play">
-    //                           <PlaylistAddIcon/>
-    //                       </IconButton>
-    //                       <IconButton onClick={() => handleDelete(song.trackName)} edge="end" aria-label="delete">
-    //                           <DeleteIcon style={{margin: "20px"}}/>
-    //                       </IconButton>
-    //                   </React.Fragment>
-    //               }>
-    //         <ListItemAvatar>
-    //             <Avatar sx={{ height: '60px', width: '60px', marginRight: "10px" }} alt="Album cover" src={song.albumArt? song.albumArt : SpotifyLogo}/>
-    //         </ListItemAvatar>
-    //         <ListItemText primary={song.trackName? song.trackName : "Song Title"} secondary={song.artistName? song.artistName : "Song Artist"} style={{color: "black"}}/>
-    //     </ListItem>
-    // ))
-
-
-    function startPlaying(trackName) {
-        console.log("PLAYING + " + trackName.trackName)
-        console.log("PLAYING TRACK B4 + " + playingTrack.title)
-
-        setPlayingTrack(trackName.uri)
-        chooseTrack(trackName)
-        console.log("PLAYING TRACK AFTER + " + playingTrack.title)
-
-        setSearch("")
-        setLyrics("")
     }
 
     function chooseTrack(track) {
@@ -373,99 +308,79 @@ export default function Dashboard({code}) {
         //     console.log("something went wrong!", err);
         // })
 
-        spotifyApi.addTracksToPlaylist('7xrIGuwvonS17zWjYzpUeR?si=665954b6a7874cf8', '["spotify:track:0xcl9XT60Siji6CSG4y6nb?si=9be52965d755468d"]').then(function (data) {
-                console.log('Added tracks to playlist!');
-            }, function (err) {
-                console.log('Something went wrong!', err);
-            });
+        // TODO: add to playlist endpoint
+        // spotifyApi.addTracksToPlaylist('7xrIGuwvonS17zWjYzpUeR?si=665954b6a7874cf8', '["spotify:track:0xcl9XT60Siji6CSG4y6nb?si=9be52965d755468d"]').then(function (data) {
+        //         console.log('Added tracks to playlist!');
+        //     }, function (err) {
+        //         console.log('Something went wrong!', err);
+        //     });
     }
 
 
     useEffect(() => {
         if (!playingTrack) return
-        axios
-            .get("http://localhost:3001/lyrics", {
-                params: {
-                    track: playingTrack.title,
-                    artist: playingTrack.artist,
-                },
-            })
-            .then(res => {
-                setLyrics(res.data.lyrics)
-            })
+        const lyric = 'TODO: lyrics error: The Same Origin Policy disallows reading the remote resource'
+        // const lyric = lyricsFinder(playingTrack.artist, playingTrack.title)
+        setLyrics(lyric)
     }, [playingTrack])
 
     useEffect(() => {
-        if (!accessToken) return
-        spotifyApi.setAccessToken(accessToken)
-    }, [accessToken])
-
-    useEffect(() => {
         if (!search) return setSearchResults([])
-        if (!accessToken) return
         let cancel = false;
-        spotifyApi.searchTracks(search).then(res => {
-            if (cancel) return
-            searchArray = res.body.tracks.items;
-            console.log("search array: " + searchArray)
-            setSearchResults(res.body.tracks.items.map(track => {
-                const smallestAlbumImage = track.album.images[0];
-                // const smallestAlbumImage = track.album.images.reduce((smallest, image) => {
-                //     if (image.height < smallest.height) return image
-                //     return smallest
-                // }, track.album.images[0])
-
-                return {
-                    artist: track.artists[0].name,
-                    title: track.name,
-                    uri: track.uri,
-                    albumUrl: smallestAlbumImage.url
-                }
-            }))
-        })
-
+        const config = {
+            headers: {
+                'Authentication': sessionToken,
+                "Content-Type": "application/json",
+                'Access-Control-Allow-Origin': '*',
+            },
+            params: {query: search}
+        }
+        axios.get(process.env.REACT_APP_SEARCH_ENDPOINT, config)
+            .then(response => {
+                console.log('search returned', response)
+                if (cancel) return
+                setSearchResults(response.data.map(track => {
+                    return {
+                        artist: track.artists[0].name,
+                        title: track.name,
+                        uri: track.uri,
+                        albumUrl: track.album.images[0].url
+                    }
+                }))
+            })
         return () => cancel = true
-    }, [search, accessToken])
-
-    //
-    // useEffect(() => {
-    //     if (!searchUser) return setSearchUserResults([])
-    //     if (!accessToken) return
-    //     let cancel = false;
-    //     spotifyApi.getUser(searchUser).then(res => {
-    //         if (cancel) return
-    //         searchUserArray = res.body
-    //     })
-    // })
-
+    }, [search, sessionToken])
 
     useEffect(() => {
         if (!searchRecs) return setSearchResultsRecommendation([])
-        if (!accessToken) return
         let cancel = false;
-        spotifyApi.searchTracks(searchRecs).then(res => {
-            if (cancel) return
-            searchRecsArray = res.body.tracks.items;
-            console.log("search array: " + searchRecsArray)
-            setSearchResultsRecommendation(res.body.tracks.items.map(track => {
-                // const smallestAlbumImage = track.album.images[0]
-                const smallestAlbumImage = track.album.images.reduce((smallest, image) => {
-                    if (image.height < smallest.height) return image
-                    return smallest
-                }, track.album.images[0])
-                return {
-                    artist: track.artists[0].name,
-                    title: track.name,
-                    uri: track.uri,
-                    albumUrl: smallestAlbumImage.url
-                    // currPlayingSongAlbumURI: smallestAlbumImage.url
-                }
 
-            }))
-        })
+        const config = {
+            headers: {
+                'Authentication': sessionToken,
+                "Content-Type": "application/json",
+                'Access-Control-Allow-Origin': '*',
+            },
+            params: {query: searchRecs}
+        }
 
+        axios.get(process.env.REACT_APP_SEARCH_ENDPOINT, config)
+            .then(response => {
+                if (cancel) return
+                console.log('searchRecs returned', response)
+                setSearchResultsRecommendation(response.data.map(track => {
+                    return {
+                        artist: track.artists[0].name,
+                        title: track.name,
+                        uri: track.uri,
+                        albumUrl: track.album.images[0].url
+                    }
+                }))
+
+
+            })
         return () => cancel = true
-    }, [searchRecs, accessToken])
+    }, [searchRecs, sessionToken])
 
     return (
         // darkModeOn ? 'black' : 'white'
@@ -476,26 +391,7 @@ export default function Dashboard({code}) {
                                 aria-label="Home">
                         <HomeIcon/>
                     </IconButton>
-                    {/*<FormGroup>*/}
-                    {/*    <FormControlLabel control={*/}
-                    {/*            <Switch*/}
-                    {/*                defaultChecked*/}
-                    {/*                onChange={toggleDarkMode}*/}
-                    {/*            />}*/}
-                    {/*         label="Dark Mode" styles={{color: darkModeOn ? 'black' : 'white'}}/>*/}
-                    {/*</FormGroup>*/}
                 </div>
-                    {/*<FormGroup>*/}
-                    {/*    /!*<FormControlLabel*!/*/}
-                    {/*    /!*    control={<CoolSwitch sx={{ m: 1 }} defaultChecked onChange={toggleDarkMode}/>}*!/*/}
-                    {/*    /!*//*/}
-                {/*    <FormControlLabel control={*/}
-                    {/*        <Switch*/}
-                    {/*            defaultChecked*/}
-                    {/*            onChange={toggleDarkMode}*/}
-                    {/*        />*/}
-                    {/*    } label="Dark Mode" styles={{color: darkModeOn ? 'black' : 'white'}}/>*/}
-                    {/*</FormGroup>*/}
                     <Form.Control
                         type="search"
                         placeholder="Search Songs/Albums"
@@ -527,13 +423,11 @@ export default function Dashboard({code}) {
                             </div>
                             <div className="playing-and-top-recs">
                                 <div className="currently-playing">
-                                    {/*style={{height: "250px", width: "250px"}}   */}
                                     <img src={playingTrack?.albumUrl}
                                          style={{height: "300px", width: "300px", border: '10px solid rgb(0, 0, 0)'}}/>
                                     <List sx={{width: '300px'}}>
                                         <ListItem className={classes.customHoverFocusNoMargin}
                                                   style={{border: '1px solid rgba(0, 0, 0, 0.1)'}}>
-                                            {/*<ListItemText primary={playingTrack?.title : "Song Title"} secondary={playingTrack.artist? playingTrack.artist : "Song Artist"} style={{color: "black"}}/>*/}
                                             <ListItemText primary={playingTrack?.title} secondary={playingTrack?.artist}/>
                                             <IconButton onClick={() => addToRecList(playingTrack)} edge="end"
                                                         aria-label="add">
@@ -606,119 +500,7 @@ export default function Dashboard({code}) {
                     )}
 
                 </div>
-                <div>
-                    <Player accessToken={accessToken} trackUri={playingTrack?.uri}/>
-                </div>
             </Container>
         </div>
     )
 }
-
-
-//// Get an artist's top tracks
-// spotifyApi.getArtistTopTracks('0oSGxfWSnnOXhD2fKuz2Gy', 'GB')
-//   .then(function(data) {
-//     console.log(data.body);
-//     }, function(err) {
-//     console.log('Something went wrong!', err);
-//   });
-
-{/*    <div className="top-recs">*/}
-{/*        <List sx={{width: '350px'}}>*/}
-{/*            <ListItem className={classes.customHoverFocus}*/}
-{/*                      style={{border: '1px solid rgba(0, 0, 0, 0.1)', margin: "20px"}}*/}
-{/*                      secondaryAction={*/}
-{/*                          <React.Fragment>*/}
-{/*                              <IconButton onClick={() => addToPlaylist()} edge="end"*/}
-{/*                                          aria-label="Play">*/}
-{/*                                  <PlaylistAddIcon/>*/}
-{/*                              </IconButton>*/}
-{/*                              <IconButton onClick={() => addToRecList()} edge="end"*/}
-{/*                                          aria-label="add">*/}
-{/*                                  <Add/>*/}
-{/*                              </IconButton>*/}
-{/*                          </React.Fragment>}>*/}
-{/*                <ListItemAvatar>*/}
-{/*                    <Avatar class="material-icons">*/}
-{/*                        <LooksOne className={classes.icons}/>*/}
-{/*                    </Avatar>*/}
-{/*                </ListItemAvatar>*/}
-{/*                <ListItemText primary="Song Number 1" secondary="Arist Number 1"/>*/}
-{/*            </ListItem>*/}
-{/*            <ListItem className={classes.customHoverFocus}*/}
-{/*                      style={{border: '1px solid rgba(0, 0, 0, 0.1)', margin: "20px"}}*/}
-{/*                      secondaryAction={*/}
-{/*                          <React.Fragment>*/}
-{/*                              <IconButton onClick={() => addToPlaylist()} edge="end"*/}
-{/*                                          aria-label="Play">*/}
-{/*                                  <PlaylistAddIcon/>*/}
-{/*                              </IconButton>*/}
-{/*                              <IconButton onClick={() => addToRecList()} edge="end" aria-label="add">*/}
-{/*                                  <Add/>*/}
-{/*                              </IconButton>*/}
-{/*                          </React.Fragment>}>*/}
-{/*                <ListItemAvatar>*/}
-{/*                    <Avatar class="material-icons">*/}
-{/*                        <LooksTwo className={classes.icons}/>*/}
-{/*                    </Avatar>*/}
-{/*                </ListItemAvatar>*/}
-{/*                <ListItemText primary="Song Number 2" secondary="Artist Number 2"/>*/}
-{/*            </ListItem>*/}
-{/*            <ListItem className={classes.customHoverFocus}*/}
-{/*                      style={{border: '1px solid rgba(0, 0, 0, 0.1)', margin: "20px"}}*/}
-{/*                      secondaryAction={*/}
-{/*                          <React.Fragment>*/}
-{/*                              <IconButton onClick={() => addToPlaylist()} edge="end"*/}
-{/*                                          aria-label="Play">*/}
-{/*                                  <PlaylistAddIcon/>*/}
-{/*                              </IconButton>*/}
-{/*                              <IconButton onClick={() => addToRecList()} edge="end" aria-label="add">*/}
-{/*                                  <Add/>*/}
-{/*                              </IconButton>*/}
-{/*                          </React.Fragment>}>*/}
-{/*                <ListItemAvatar>*/}
-{/*                    <Avatar class='material-icons'>*/}
-{/*                        <Looks3 className={classes.icons}/>*/}
-{/*                    </Avatar>*/}
-{/*                </ListItemAvatar>*/}
-{/*                <ListItemText primary="Song Number 3" secondary="Artist Number 3"/>*/}
-{/*            </ListItem>*/}
-{/*        </List>*/}
-{/*    </div>*/}
-
-// if ((list1[0].trackName === trackTitle && list1[0].isUsed) || (list1[1].trackName === trackTitle && list1[1].isUsed) || (list1[2].trackName === trackTitle && list1[2].isUsed)) {
-//     console.log("can't repeat recommendations")
-//     console.log("list1[0].trackName: " + list1[0].trackName)
-//     console.log("list1[1].trackName: " + list1[1].trackName)
-//     console.log("list1[2].trackName: " + list1[2].trackName)
-// } else if (list1[0].isUsed != true) {
-//     list1[0].trackName = trackTitle;
-//     list1[0].artistName = artist
-//     list1[0].isUsed = true
-//     list1[0].albumArt = track.albumUrl
-//     list1[0].track = track
-//     console.log("added 1st rec")
-//     console.log("list1[0].isUsed : " + list1[0].isUsed)
-//     console.log("ID" + list1[0].id);
-//     // list1[0].albumURL = albumArt
-// } else if (list1[1].isUsed != true) {
-//     list1[1].trackName = trackTitle;
-//     list1[1].artistName = artist
-//     list1[1].isUsed = true
-//     list1[1].albumArt = track.albumUrl
-//     list1[1].track = track
-//     console.log("added 2nd rec")
-//
-//     // list1[1].albumURL = albumArt
-// } else if (list1[2].isUsed != true) {
-//     list1[2].trackName = trackTitle;
-//     list1[2].artistName = artist
-//     list1[2].isUsed = true
-//     list1[2].albumArt = track.albumUrl
-//     list1[2].track = track
-//     console.log("added 3rd rec")
-//
-//     // list1[2].albumURL =albumArt
-// } else {
-//     console.log("Too many song recs")
-// }
