@@ -4,7 +4,7 @@ import {track} from "./MyTypes";
 import DefaultAlbum from './images/default_album_art.png';
 
 
-function TopSongsBox (props : {topSongs : track[], setNowPlaying : (nowPlaying : track) => void}) {
+function TopSongsBox (props : {topSongs : track[], setNowPlaying : (nowPlaying : track | undefined) => void}) {
 
     const [index, setIndex] = useState<number>(0);
 

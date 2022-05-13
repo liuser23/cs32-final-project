@@ -2,11 +2,6 @@ import React from 'react'
 
 export default function TrackSearchResult({track, chooseTrack, isRec}) {
     function handlePlay() {
-        // if (track != null) {
-        //     chooseTrack(track)
-        // } else {
-        //     addToRe
-        // }
         chooseTrack(track)
     }
     return (

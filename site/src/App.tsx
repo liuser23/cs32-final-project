@@ -47,7 +47,7 @@ function App() {
                 <Routes>
                     <Route path={"/"} element={<Home authentication={authentication} setSidebarConfig={setSidebarConfig} setNowPlaying={setNowPlaying}/>}/>
                     <Route path={"dashboard"} element={<Dashboard
-                        accessToken={authentication.accessToken} code={undefined} nowPlaying={nowPlaying} setNowPlaying={setNowPlaying}/>}/>
+                        sessionToken={authentication.sessionToken} nowPlaying={nowPlaying} setNowPlaying={setNowPlaying}/>}/>
                     <Route path={"privacysettings"} element={<PrivacySettings/>}/>
                     <Route path={"editprofile"} element={<EditProfile/>}/>
                     <Route path={"changepassword"} element={<ChangePassword/> }/>
