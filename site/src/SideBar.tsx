@@ -35,7 +35,6 @@ function SideBar(props: {nowPlaying: track | undefined, authentication: Authenti
                 </div>
                 <AccMenuButton picture={PicHome} picAlt={"house"} txtContent={"Account Overview"} route={"/"}/>
                 <AccMenuButton picture={PicHome} picAlt={"house"} txtContent={"Dashboard"} route={"/dashboard"}/>
-                <AccMenuButton picture={SearchIcon} picAlt={"lock"} txtContent={"Search"} route={"/search"}/>
                 <AccMenuButton picture={PicPencil} picAlt={"pencil"} txtContent={"Edit Profile"} route={"/editprofile"}/>
                 <AccMenuButton picture={PicLock} picAlt={"lock"} txtContent={"Settings"} route={"/changepassword"}/>
                 <AccMenuButton picture={PicFriends} picAlt={"friends"} txtContent={"Friends List"} route={"/friendslist"}/>

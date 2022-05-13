@@ -131,7 +131,7 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
                       </React.Fragment>
                   }>
             <ListItemAvatar>
-                <Avatar class="material-icons">
+                <Avatar className="material-icons">
                     <LooksOne className={classes.icons}/>
                 </Avatar>
             </ListItemAvatar>
@@ -319,7 +319,8 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
 
     useEffect(() => {
         if (!playingTrack) return
-        const lyric = lyricsFinder(playingTrack.artist, playingTrack.title)
+        const lyric = 'TODO: lyrics error: The Same Origin Policy disallows reading the remote resource'
+        // const lyric = lyricsFinder(playingTrack.artist, playingTrack.title)
         setLyrics(lyric)
     }, [playingTrack])
 
