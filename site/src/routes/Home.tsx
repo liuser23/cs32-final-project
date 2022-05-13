@@ -11,7 +11,7 @@ import TopArtistsBox from "../TopArtistsBox";
 import ProfileHeader from "../ProfileHeader";
 
 function Home(props: {authentication: Authentication, setSidebarConfig: Dispatch<SetStateAction<SidebarConfig>>,
-    setNowPlaying: Dispatch<SetStateAction<string | undefined>>}) {
+    setNowPlaying: Dispatch<SetStateAction<track | undefined>>}) {
     const [error, setError] = useState<string>()
     const [curUserName, setCurUserName] = useState<string>();
     const [numFollowers, setNumFollowers] = useState<number>();
