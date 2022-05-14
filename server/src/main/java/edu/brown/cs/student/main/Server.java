@@ -309,6 +309,7 @@ public class Server {
      * @throws SQLException when sql is broken
      */
     private Tokens tokensFromUserId(String userId) throws RuntimeException, SQLException {
+        // TODO: refresh if needed
         Optional<Tokens> tokens = users.getTokens(userId);
         if (tokens.isEmpty()) {
             throw new RuntimeException("tokens were not found");
