@@ -68,6 +68,7 @@ public class UserFilterRecommender {
         new double[] {scoreCalc.artistScore(v), scoreCalc.songScore(v), scoreCalc.genreScore(v)}));
     return resultMap;
   }
+
   private Map<String, Double> createUserSimilarityMap(Map<String, double[]> initMap) {
     Map<String, Double> resultMap = new HashMap<>();
     initMap.forEach((k, v) -> resultMap.put(k, scoreCalc.userScore(v)));
@@ -94,6 +95,9 @@ public class UserFilterRecommender {
   }
 
   private double normalizeValue(double value, double mean, double SD) {
+    if (SD == 0) {
+      SD = 1;
+    }
     return (value - mean) / SD;
   }
 
@@ -128,13 +132,17 @@ public class UserFilterRecommender {
    */
   public List<String> getNeighborIDs() {
     Map<String, UserFilters> copy = userMap.copyMap();
+    System.out.println(userMap);
     copy.remove(id);
     Map<String, double[]> categoryScoresMap = createSimilarityScoreMap(copy);
+    System.out.println(categoryScoresMap);
     normalizeMap(categoryScoresMap);
     Map<String, Double> userScoresMap = createUserSimilarityMap(categoryScoresMap);
+    System.out.println(userScoresMap);
     List<Map.Entry<String, Double>> entries = new ArrayList<>(userScoresMap.entrySet());
+    System.out.println(entries);
     Collections.shuffle(entries);
-    entries.sort(Comparator.comparingDouble(Map.Entry::getValue));
+    entries.sort(Map.Entry.<String, Double>comparingByValue().reversed());
     return entries.stream().map(Map.Entry::getKey).limit(numNeighbors).collect(Collectors.toList());
   }
 
