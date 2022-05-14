@@ -132,17 +132,14 @@ public class UserFilterRecommender {
    */
   public List<String> getNeighborIDs() {
     Map<String, UserFilters> copy = userMap.copyMap();
-    System.out.println(userMap);
     copy.remove(id);
     Map<String, double[]> categoryScoresMap = createSimilarityScoreMap(copy);
-    System.out.println(categoryScoresMap);
     normalizeMap(categoryScoresMap);
     Map<String, Double> userScoresMap = createUserSimilarityMap(categoryScoresMap);
-    System.out.println(userScoresMap);
     List<Map.Entry<String, Double>> entries = new ArrayList<>(userScoresMap.entrySet());
-    System.out.println(entries);
     Collections.shuffle(entries);
     entries.sort(Map.Entry.<String, Double>comparingByValue().reversed());
+    System.out.println(entries);
     return entries.stream().map(Map.Entry::getKey).limit(numNeighbors).collect(Collectors.toList());
   }
 
