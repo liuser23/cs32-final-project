@@ -72,6 +72,19 @@ public class DatabaseDriver {
         if (result >= max) {
             throw new IllegalArgumentException("too many inserted: " + result);
         }
+
+        // check if valid
+        PreparedStatement newFind = connection.prepareStatement("select count(*) from suggestions where id = ? and songId = ? and suggestion = ?");
+        newFind.setString(1, userId);
+        newFind.setString(2, forSongId);
+        newFind.setString(3, suggestion);
+        ResultSet newResults = newFind.executeQuery();
+        newResults.next();
+        int newResult = newResults.getInt(1);
+        if (newResult > 0) {
+            throw new IllegalArgumentException("suggestion already added: " + newResult);
+        }
+
         PreparedStatement addNew = connection.prepareStatement("insert into suggestions values ( ?, ?, ? );");
         addNew.setString(1, userId);
         addNew.setString(2, forSongId);

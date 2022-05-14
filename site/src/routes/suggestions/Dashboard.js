@@ -15,6 +15,7 @@ import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline'
 import SpotifyLogo from './spotify-logo.png'
 import HomeIcon from '@material-ui/icons/Home'
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+import '../../App.css';
 import {LooksOne} from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
@@ -204,13 +205,13 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
                   className={classes.customHoverFocus}
                   secondaryAction={
                       <React.Fragment>
-                          <IconButton onClick={() => chooseTrack(song.track)} edge="end" aria-label="play">
+                          <IconButton onClick={() => chooseTrack(song)} edge="end" aria-label="play">
                               <PlayCircleOutlineIcon style={{marginLeft: "10px"}}/>
                           </IconButton>
                           <IconButton onClick={() => addToPlaylist()} edge="end" aria-label="Play">
                               <PlaylistAddIcon/>
                           </IconButton>
-                          <IconButton onClick={() => deleteRecommendation(song.track)} edge="end" aria-label="delete">
+                          <IconButton onClick={() => deleteRecommendation(song)} edge="end" aria-label="delete">
                               <DeleteIcon style={{marginRight: "10px"}}/>
                           </IconButton>
                       </React.Fragment>
@@ -250,7 +251,7 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
 
     return (
         // darkModeOn ? 'black' : 'white'
-        <div style={{background: darkModeOn ? 'black' : 'white'}}>
+        <div className={"Main-window"} style={{background: darkModeOn ? 'black' : 'white'}}>
             <Container className="d-flex flex-column py-2" style={{height: "100vh"}}>
                 <div className="top-bar">
                     <IconButton style={{ color: "#1DB954"}} edge="end"
@@ -295,10 +296,7 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
                                         <ListItem className={classes.customHoverFocusNoMargin}
                                                   style={{border: '1px solid rgba(0, 0, 0, 0.1)'}}>
                                             <ListItemText primary={nowPlaying?.name} secondary={nowPlaying?.artists[0].name}/>
-                                            <IconButton onClick={() => addRecommendation(nowPlaying)} edge="end"
-                                                        aria-label="add">
-                                                <Add/>
-                                            </IconButton>
+
                                             <IconButton onClick={() => addToPlaylist()} edge="end" aria-label="Play">
                                                 <PlaylistAddIcon/>
                                             </IconButton>
