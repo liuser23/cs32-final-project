@@ -11,7 +11,7 @@ import java.sql.SQLException;
 public final class Main {
     private static final short OUR_PORT = 8888;
     private static final String STATIC_SITE_PATH = "site/build";
-    private static final String OUR_URL = "http://localhost:8888/";
+    static final String OUR_URL = "http://localhost:8888/";
     private static final String STATIC_SITE_URL = "http://localhost:3000/";
     /**
      * Public entrypoint.

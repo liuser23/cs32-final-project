@@ -1,9 +1,10 @@
 package edu.brown.cs.student.main;
 
-import com.github.dockerjava.api.exception.UnauthorizedException;
+import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.SpotifyHttpManager;
 import se.michaelthelin.spotify.enums.ModelObjectType;
+import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
 import se.michaelthelin.spotify.model_objects.specification.*;
 import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeRefreshRequest;
@@ -15,6 +16,7 @@ import se.michaelthelin.spotify.requests.data.personalization.simplified.GetUser
 import se.michaelthelin.spotify.requests.data.search.simplified.SearchTracksRequest;
 import se.michaelthelin.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
 
+import java.io.IOException;
 import java.net.URI;
 import java.time.Instant;
 import java.util.List;
@@ -78,6 +80,29 @@ public class ApiDriver {
 
     }
 
+    public Server.Tokens updateTokens(AuthorizationCodeCredentials credentials, Server.Tokens tokens) {
+        int expiresInSeconds = credentials.getExpiresIn();
+        Instant expires = Instant.now().plusSeconds(expiresInSeconds);
+        return new Server.Tokens(credentials.getAccessToken(), tokens.refreshToken(), expires);
+    }
+
+    private Server.Tokens credentialsToTokens(AuthorizationCodeCredentials credentials) {
+        int expiresInSeconds = credentials.getExpiresIn();
+        Instant expires = Instant.now().plusSeconds(expiresInSeconds);
+        return new Server.Tokens(
+                credentials.getAccessToken(),
+                credentials.getRefreshToken(),
+                expires);
+    }
+
+    public Server.Tokens refreshTokens(Server.Tokens tokens) throws IOException, ParseException, SpotifyWebApiException {
+        AuthorizationCodeCredentials newCredentials = spotifyApi(tokens)
+                .authorizationCodeRefresh()
+                .build()
+                .execute();
+        return updateTokens(newCredentials, tokens);
+    }
+
     /**
      * Get the Authorization Code URI from Spotify.
      * @return the Spotify Authorization Code URI
@@ -104,12 +129,7 @@ public class ApiDriver {
                 .build()
                 .executeAsync()
                 .join();
-        int expiresInSeconds = credentials.getExpiresIn();
-        Instant expires = Instant.now().plusSeconds(expiresInSeconds);
-        return new Server.Tokens(
-                credentials.getAccessToken(),
-                credentials.getRefreshToken(),
-                expires);
+        return credentialsToTokens(credentials);
     }
 
 
@@ -255,6 +275,4 @@ public class ApiDriver {
 
         return new Server.RecommendationData(artists, songs, genres);
     }
-
-
 }

@@ -7,8 +7,9 @@ are present. These must contain the client id and secret given in the Spotify da
 Spotify dashboard. 
 * Add any callback url you intend to use in the Spotify dashboard.
 * Configure the addresses in [site/.env](site/.env) and [server/src/main/java/edu/brown/cs/student/main/Main.java](server/src/main/java/edu/brown/cs/student/main/Main.java)
-* The dynamic server must be started by running Main.java,
-and the static server must be started by running `npm start` in the [site](site) directory.
+* The dynamic server is started by running Main.java and passing in as args the paths to 
+* secret/client_id.txt, secret/client_secret.txt, and secret/known.sqlite3.
+* The static server must be started by running `npm start` in the [site](site) directory.
 
 ## Testing
 * There are unit tests in the dynamic server that may be run with `mvn package`.

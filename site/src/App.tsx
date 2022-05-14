@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import './App.css';
 import {
     BrowserRouter,
@@ -19,6 +19,7 @@ import SideBar from "./SideBar";
 import MyRecommendations from "./routes/MyRecommendations";
 import Dashboard from "./routes/suggestions/Dashboard";
 import {track} from "./MyTypes";
+import axios from "axios";
 
 type SidebarConfig = {
     profilePicturePath: string,
@@ -35,6 +36,28 @@ function App() {
         profilePicturePath: DefaultPfp,
     })
     const [nowPlaying, setNowPlaying] = useState<track | undefined>()
+
+    useEffect(() => {
+        if (!authentication) return
+        const fifteenMinutes = 1000*60*15;
+        const handle = setInterval(async () => {
+            const config = {
+                headers: {
+                    'Authentication': authentication.sessionToken,
+                    "Content-Type": "application/json",
+                    'Access-Control-Allow-Origin': '*',
+                }
+            }
+            await axios.get(process.env.REACT_APP_REFRESH_ENDPOINT as string, config)
+                .then(response => {
+                    console.log('setting authentication')
+                    setAuthentication({ ...authentication, accessToken: response.data })
+                })
+        }, fifteenMinutes)
+
+        return () => clearInterval(handle)
+    }, [authentication, setAuthentication])
+
 
     if (authentication) {
         return (

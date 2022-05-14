@@ -210,12 +210,7 @@ public class DatabaseDriver {
      * @throws SQLException when sql fails
      */
     public void initializeUser(String sessionToken, Server.Tokens tokens, User user) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("replace into credentials values ( ?, ?, ?, ? );");
-        statement.setString(1, user.getId());
-        statement.setString(2, tokens.accessToken());
-        statement.setString(3, tokens.refreshToken());
-        statement.setTimestamp(4, Timestamp.from(tokens.expires()));
-        statement.executeUpdate();
+        storeTokensFor(user.getId(), tokens);
 
         PreparedStatement statement3 = connection.prepareStatement("replace into users values ( ?, ?, ?, ? );");
         statement3.setString(1, user.getId());
@@ -232,6 +227,15 @@ public class DatabaseDriver {
         statement2.setString(1, sessionToken);
         statement2.setString(2, user.getId());
         statement2.executeUpdate();
+    }
+
+    public void storeTokensFor(String userId, Server.Tokens tokens) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("replace into credentials values ( ?, ?, ?, ? );");
+        statement.setString(1, userId);
+        statement.setString(2, tokens.accessToken());
+        statement.setString(3, tokens.refreshToken());
+        statement.setTimestamp(4, Timestamp.from(tokens.expires()));
+        statement.executeUpdate();
     }
 
     /**
