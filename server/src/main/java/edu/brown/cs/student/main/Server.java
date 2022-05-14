@@ -3,10 +3,13 @@ package edu.brown.cs.student.main;
 import com.google.gson.Gson;
 import edu.brown.cs.student.main.FriendRec.RecommendationSystem;
 import edu.brown.cs.student.main.FriendRec.UserInfo;
+import org.apache.hc.core5.http.ParseException;
+import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.specification.*;
 import spark.Request;
 import spark.Spark;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.SecureRandom;
@@ -212,12 +215,42 @@ public class Server {
                     .toList();
             return new Gson().toJson(songs);
         });
+
+        Spark.get("/refresh", (request, response) -> {
+            String userId = userIdFromRequest(request);
+            Tokens tokens = tokensFromUserId(userId);
+            return new Gson().toJson(tokens.accessToken);
+        });
     }
+
+
+//    public class Tokens {
+//        String accessToken;
+//        String refreshToken;
+//        Instant expires;
+//        Tokens(String accessToken, String refreshToken, Instant expires) {
+//            this.accessToken = accessToken;
+//            this.refreshToken = refreshToken;
+//            this.expires = expires;
+//        }
+//        public String accessToken() {
+//            return accessToken;
+//        }
+//        public void accessToken(String newAccessToken) {
+//            this.accessToken = newAccessToken;
+//        }
+//        public String refreshToken() {
+//            return refreshToken;
+//        }
+//        public Instant expires() {
+//            return expires;
+//        }
+//    }
 
     /**
      * Authentication tokens given to us by spotify.
      */
-    public record Tokens(String accessToken, String refreshToken, Instant expires) { }
+    public record Tokens(String accessToken, String refreshToken, Instant expires) {}
 
     /**
      * A single suggestion made by a user.
@@ -280,7 +313,8 @@ public class Server {
      * @return authentication tokens
      * @throws SQLException when sql fails
      */
-    private Tokens tokensFromRequest(Request request) throws SQLException {
+    private Tokens tokensFromRequest(Request request)
+            throws SQLException, IOException, ParseException, SpotifyWebApiException {
         String userId = userIdFromRequest(request);
         return tokensFromUserId(userId);
     }
@@ -305,16 +339,24 @@ public class Server {
      * Gets the tokens associated with a particular spotify user id.
      * @param userId from spotify
      * @return authentication tokens
-     * @throws RuntimeException when its not found
+     * @throws RuntimeException when it's not found
      * @throws SQLException when sql is broken
      */
-    private Tokens tokensFromUserId(String userId) throws RuntimeException, SQLException {
-        // TODO: refresh if needed
+    private Tokens tokensFromUserId(String userId) throws
+            RuntimeException, SQLException, IOException, ParseException, SpotifyWebApiException {
         Optional<Tokens> tokens = users.getTokens(userId);
         if (tokens.isEmpty()) {
             throw new RuntimeException("tokens were not found");
         }
-        return tokens.get();
+        long secondsUntilExpire = tokens.get().expires.getEpochSecond()
+                - Instant.now().getEpochSecond();
+        boolean shouldRefresh = secondsUntilExpire < 2*60;
+        if (!shouldRefresh) {
+            return tokens.get();
+        }
+        Tokens newTokens = api.refreshTokens(tokens.get());
+        users.storeTokensFor(userId, newTokens);
+        return newTokens;
     }
 
     /**
