@@ -452,7 +452,25 @@ export default function Dashboard({code}) {
     console.log("topSongRecsHashmap hashmap size: " + topSongRecsHashmap.size)
     console.log("usersRecsHashmap hashmap size: " + usersRecsHashmap.size)
 
+    const[topSongsMap, setTopSongsMap]= useState(new Map([
+        ["top-starter-songs", topSongStarters],
+        ["traitor", traitorRecs],
+        ["favorite crime", favCrimeRecs],
+        ["Ribs", ribsRecs],
+        ["Heather", heatherRecs],
+        ["Sedona", sedonaRecs],
+        ["Happier Than Ever", happierThanEverRecs]
 
+    ]));
+
+    const[userMap, setUserMap] = useState(new Map([
+        ["recs-starter-songs", starterRecs],
+        ["Heather", heatherRecs],
+        ["Sedona", sedonaRecs],
+        ["Happier Than Ever", happierThanEverRecs]
+    ]));
+
+    console.log("userMap hashmap size: " + userMap.size)
 
     let topSongsList = topSongs.map((song) =>
         <ListItem key={getRandomInt(1000000)} alignItems="flex-start"
@@ -516,7 +534,7 @@ export default function Dashboard({code}) {
                       className={classes.customHoverFocus}
                       secondaryAction={
                           <React.Fragment>
-                              <IconButton onClick={() => chooseTrack(song.track)} edge="end" aria-label="play">
+                              <IconButton onClick={() => chooseTrack(song)} edge="end" aria-label="play">
                                   <PlayCircleOutlineIcon style={{margin: "10px"}}/>
                               </IconButton>
                               <IconButton onClick={() => addToPlaylist()} edge="end" aria-label="Play">
@@ -596,7 +614,7 @@ export default function Dashboard({code}) {
             votes: 0
         }
 
-        if (songs.length > 0) {
+        if (songs?.length > 0) {
             // change ID based on votes for rendering w icons and order
             for (let i = 0; i < songs.length; i++) {
                 let currSong = songs[i]
@@ -657,20 +675,25 @@ export default function Dashboard({code}) {
 
         // handle hashmaps and setting user recs
        // let userRecs = []
-        if (usersRecsHashmap.has(track.title)){
-            console.log("usersRecsHashmap has recommendations for " + track.title)
+        if (userMap.has(track.title)){
+            console.log("userMap has recommendations for " + track.title)
             //userRecs = usersRecsHashmap.get(track.title);
+            setList1(userMap.get(track.title))
         } else {
-            console.log("usersRecsHashmap does not have any user recommendations for " + track.title)
+            console.log("userMap does not have any user recommendations for " + track.title)
+            setList1(starterRecs)
            // userRecs = usersRecsHashmap.get("recs-starter-songs");
         }
        // setList1(userRecs)
 
-        setList1(usersRecsHashmap.has(track.title) ? usersRecsHashmap.get(track.title) : usersRecsHashmap.get("recs-starter-songs"));
+        //setList1(usersRecsHashmap.has(track.title) ? usersRecsHashmap.get(track.title) : usersRecsHashmap.get("recs-starter-songs"));
+        // setList1(userMap.has(track.title) ? userMap.get(track.title) : userMap.get("recs-starter-songs"));
+
+
         // rankTopSongs(topSongsEx.has(track.title) ? topSongsEx.get(track.title) : [])
 
         // if the song has top songs, get them, otherwise use starter
-        rankTopSongs(topSongRecsHashmap.has(track.title) ? topSongRecsHashmap.get(track.title) : [])
+        rankTopSongs(topSongsMap.has(track.title) ? topSongsMap.get(track.title) : [])
 
         // top 3 songs
         // let topSongRecs = []
@@ -724,12 +747,15 @@ export default function Dashboard({code}) {
                 tempList[0].albumArt = track?.albumUrl
                 tempList[0].track = track
                 tempList[0].id = 0;
-                console.log("added 1st rec")
-                console.log("list1[0].isUsed : " + list1[0].isUsed)
-                console.log("ID" + list1[0].id);
+                // console.log("added 1st rec")
+                // console.log("list1[0].isUsed : " + list1[0].isUsed)
+                // console.log("ID" + list1[0].id);
+                setUserMap((prev) => new Map(prev).set(playingTrackTitle, tempList))
+                // console.log("true or false has key  " + playingTrackTitle + ": " + userMap.has(playingTrackTitle) + " and value is " + (userMap.get(playingTrackTitle)[0]).trackName)
+
                 console.log("added " + playingTrackTitle + " as key for usersRecsHashmap")
                 usersRecsHashmap.set(playingTrackTitle, tempList)
-                console.log("true or false has key  " + playingTrackTitle + ": " + usersRecsHashmap.has(playingTrackTitle) + " and value is " + (usersRecsHashmap.get(playingTrackTitle)[0]).trackName)
+                // console.log("true or false has key  " + playingTrackTitle + ": " + usersRecsHashmap.has(playingTrackTitle) + " and value is " + (usersRecsHashmap.get(playingTrackTitle)[0]).trackName)
                 setList1(tempList)
             } else if (tempList[1]?.isUsed !== true) {
                 tempList[1].trackName = trackTitle;
@@ -738,9 +764,11 @@ export default function Dashboard({code}) {
                 tempList[1].albumArt = track?.albumUrl
                 tempList[1].track = track
                 tempList[1].id = 1;
+                setUserMap((prev) => new Map(prev).set(playingTrackTitle, tempList))
+                console.log("true or false has key  " + playingTrackTitle + ": " + userMap.has(playingTrackTitle) + " and value is " + (userMap.get(playingTrackTitle)[1]).trackName)
                 console.log("added " + playingTrackTitle + " as key for usersRecsHashmap")
                 usersRecsHashmap.set(playingTrackTitle, tempList)
-                console.log("true or false has key  " + playingTrackTitle + ": " + usersRecsHashmap.has(playingTrackTitle) + " and value is " + (usersRecsHashmap.get(playingTrackTitle)[1]).trackName)
+                //console.log("true or false has key  " + playingTrackTitle + ": " + usersRecsHashmap.has(playingTrackTitle) + " and value is " + (usersRecsHashmap.get(playingTrackTitle)[1]).trackName)
                 setList1(tempList)
 
                 // list1[1].albumURL = albumArt
@@ -751,9 +779,11 @@ export default function Dashboard({code}) {
                 tempList[2].albumArt = track?.albumUrl
                 tempList[2].track = track
                 tempList[2].id = 2;
+                setUserMap((prev) => new Map(prev).set(playingTrackTitle, tempList))
+                console.log("true or false has key  " + playingTrackTitle + ": " + userMap.has(playingTrackTitle) + " and value is " + (userMap.get(playingTrackTitle)[2]).trackName)
                 console.log("added " + playingTrackTitle + " as key for usersRecsHashmap")
                 usersRecsHashmap.set(playingTrackTitle, tempList)
-                console.log("true or false has key  " + playingTrackTitle + ": " + usersRecsHashmap.has(playingTrackTitle) + " and value is " + (usersRecsHashmap.get(playingTrackTitle)[2]).trackName)
+                //console.log("true or false has key  " + playingTrackTitle + ": " + usersRecsHashmap.has(playingTrackTitle) + " and value is " + (usersRecsHashmap.get(playingTrackTitle)[2]).trackName)
                 setList1(tempList)
 
 
@@ -765,11 +795,40 @@ export default function Dashboard({code}) {
                 console.log("tempList After Adding: Song " + i + ": " + tempList[i].trackName)
             }
 
-            for (let i = 0; i < tempList.length; i++) {
-                console.log("usersRecsHashmap After Adding: Song " + i + " : " + (usersRecsHashmap.get(playingTrackTitle)[i]).trackName);
+            // for (let i = 0; i < tempList.length; i++) {
+            //     console.log("userMap After Adding: Song " + i + " : " + (userMap.get(playingTrackTitle)[i]).trackName);
+            // }
+
+            console.log("userMap hashmap size in ADDTORECLIST: " + userMap.size)
+
+            console.log("updating top songs")
+            // add the rec to the big list of songs, if there are no songs it will be added to list directly
+            if (topSongsMap.has(playingTrackTitle)) {  // THERE ARE SOME RECOMMENDATIONS FOR THIS SONG BY USERS, DONT KNOW IF THIS SONG HAS BEEN ADDED
+                console.log("there are recommendations for " + playingTrackTitle)
+                let topSongsForCurrSong = topSongsMap.get(playingTrackTitle)
+                let newListTopSongs = topSongsForCurrSong.filter((record) => record?.trackName !== trackTitle)
+                if (newListTopSongs.length < topSongsForCurrSong.length ) { // ie the song is in list and we got it correctly
+                    console.log("someone has already recommended " + trackTitle + " for song " + playingTrackTitle + " and it has " + track?.votes + " votes already")
+                    track.votes = 1
+                } else { // song hasnt been added as rec by ANY user
+                    console.log("someone has not recommended " + trackTitle + " for song " + playingTrackTitle)
+                    track.votes = 1
+                    track.trackName = trackTitle
+                }
+                newListTopSongs.push(track)
+                setTopSongsMap((prev) => new Map(prev).set(playingTrackTitle, newListTopSongs))
+            } else { // THERE ARE NO RECOMMENDATIONS FOR THIS SONG BY ANY USER
+                console.log("there are NO recommendations for " + playingTrackTitle)
+                let newListTopSongs = []
+                track.votes = 1
+                track.trackName = trackTitle
+
+                newListTopSongs.push(track)
+                setTopSongsMap((prev) => new Map(prev).set(playingTrackTitle, newListTopSongs))
             }
 
-            console.log("usersRecsHashmap hashmap size in ADDTORECLIST: " + usersRecsHashmap.size)
+            rankTopSongs(topSongsMap.get(playingTrackTitle))
+
 
             // let arrayOfKeys = usersRecsHashmap.keys();
             //
@@ -861,10 +920,48 @@ export default function Dashboard({code}) {
 
 
         // if the templist = 0, there are no more recs so we want to remove the song from the hashmap, otherwise set to updated list
-        tempList.length > 0 ? usersRecsHashmap.set(song?.trackName, tempList) : usersRecsHashmap.delete(song?.trackName);
+        // tempList.length > 0 ? usersRecsHashmap.set(playingTrackTitle, tempList) : usersRecsHashmap.delete(playingTrackTitle.trackName);
+
+        if (tempList.length > 0){
+            setUserMap((prev) => new Map(prev).set(playingTrackTitle, tempList))
+        } else {
+            setUserMap((prev) => {
+                const newState = new Map(prev);
+                newState.delete(playingTrackTitle);
+                return newState;
+            })
+        }
 
 
         setList1(tempList)
+
+        // get list of recs for all users
+        let topSongsForCurrPlayingSong = topSongsMap.get(playingTrackTitle)
+        // get data on song we are deleting for users recs
+        let songToDelete = topSongsForCurrPlayingSong.filter((record) => record.trackName === song.trackName)
+        console.log("song we are deleting from top songs list: " + song.trackName)
+        // remove from list
+        let newListTopSongs = topSongsForCurrPlayingSong.filter((record) => record.trackName !== song.trackName)
+
+        if (song.votes === 1){
+            console.log(song.trackName + "only had " + song.votes)
+            song.votes = -1
+        } else {
+            console.log(song.trackName + " had " + song.votes)
+            song.votes -= 1;
+            newListTopSongs.push(song)
+        }
+        setTopSongsMap((prev) => new Map(prev).set(playingTrackTitle, newListTopSongs))
+        rankTopSongs(topSongsMap.get(playingTrackTitle))
+
+
+        // if (topSongsMap.has(playingTrackTitle)) {
+        //     let topSongsForCurrSong = topSongsMap.get(playingTrackTitle)
+        //     topSongsForCurrSong.push(song)
+        //     setTopSongsMap((prev) => new Map(prev).set(playingTrackTitle, topSongsForCurrSong))
+        // } else {
+        //     setTopSongsMap((prev) => new Map(prev).set(playingTrackTitle, track))
+        // }
         printList1()
         // for (let i = 0; i < list1.length; i++) {
         //     console.log("List1 After Deletion: Song " + i + ": " + list1[i].trackName)
