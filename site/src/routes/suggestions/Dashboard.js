@@ -15,8 +15,11 @@ import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline'
 import SpotifyLogo from './spotify-logo.png'
 import HomeIcon from '@material-ui/icons/Home'
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import '../../App.css';
-import {LooksOne} from "@material-ui/icons";
+import {LooksOne, LooksTwo, Looks3} from "@material-ui/icons";
+
+
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -147,15 +150,33 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
         axios.get(process.env.REACT_APP_TOP_SUGGESTIONS, config)
             .then(response => {
                 console.log('setting top songs', response.data)
-                setTopSongs(response.data)
+                setTopSongsIcon(response.data)
+                // setTopSongs(response.data)
             })
     }, [nowPlaying, setTopSongs, reloadSuggestions])
 
+    function setTopSongsIcon(songs) {
+        for (let i = 0; i < songs.length; i++){
+            songs[i].place = i;
+        }
+        setTopSongs(songs)
+    }
+
     useEffect(() => {
         if (!nowPlaying) return
-        const lyric = 'TODO: lyrics error: The Same Origin Policy disallows reading the remote resource'
-        // const lyric = lyricsFinder(nowPlaying.artist, nowPlaying.title)
-        setLyrics(lyric)
+        // const lyric = 'TODO: lyrics error: The Same Origin Policy disallows reading the remote resource'
+        // // const lyric = lyricsFinder(nowPlaying.artist, nowPlaying.title)
+        // setLyrics(lyric)
+        axios
+            .get("http://localhost:3000/lyrics", {
+                params: {
+                    track: nowPlaying.title,
+                    artist: nowPlaying.artist,
+                },
+            })
+            .then(res => {
+                setLyrics(res.data.lyrics)
+            })
     }, [nowPlaying])
 
     useEffect(() => {
@@ -217,8 +238,13 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
                       </React.Fragment>
                   }>
             <ListItemAvatar>
-                <Avatar className="material-icons">
-                    <Avatar sx={{ height: '60px', width: '60px', marginRight: "10px" }} alt="Album cover" src={song?.album.images[0].url? song?.album.images[0].url : SpotifyLogo}/>
+                <Avatar class="material-icons">
+                    {song?.place === 0 &&  <LooksOne className={classes.icons}/>}
+                    {song?.place === 1 &&  <LooksTwo className={classes.icons}/>}
+                    {song?.place === 2 &&  <Looks3 className={classes.icons}/>}
+                    {song?.place === -1 && <HelpOutlineIcon className={classes.icons}/>}
+                    {song?.place > 3 && <HelpOutlineIcon className={classes.icons}/>}
+
                 </Avatar>
             </ListItemAvatar>
             <ListItemText primary={song?.name? song?.name : "Song Title"} secondary={song?.artists[0].name? song?.artists[0].name : "Song Artist"} style={{color: "black"}}/>
