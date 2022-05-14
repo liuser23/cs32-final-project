@@ -39,11 +39,9 @@ function MyRecommendations(props: {authentication: Authentication}) {
         }
 
         const postData = {
-            data: {
-                "songs": {matchSame : mSame, matchWeight : songWeight},
-                "genres": {matchSame : mSame, matchWeight : genreWeight},
-                "artists": {matchSame : mSame, matchWeight : artistWeight},
-            }
+            songs: {matchSame : mSame, matchWeight : songWeight},
+            genres: {matchSame : mSame, matchWeight : genreWeight},
+            artists: {matchSame : mSame, matchWeight : artistWeight},
         }
 
         await axios.post(process.env.REACT_APP_POST_CREATE_RECS as string, postData, config).then(

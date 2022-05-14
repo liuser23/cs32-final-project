@@ -16,8 +16,9 @@ import Home from "./routes/Home";
 import NewSession from "./routes/NewSession";
 import Unauthenticated from "./routes/Unauthenticated";
 import SideBar from "./SideBar";
-import Search from "./routes/Search";
 import MyRecommendations from "./routes/MyRecommendations";
+import Dashboard from "./routes/suggestions/Dashboard";
+import {track} from "./MyTypes";
 
 type SidebarConfig = {
     profilePicturePath: string,
@@ -33,7 +34,7 @@ function App() {
     const [sidebarConfig, setSidebarConfig] = useState<SidebarConfig>({
         profilePicturePath: DefaultPfp,
     })
-    const [nowPlaying, setNowPlaying] = useState<string | undefined>()
+    const [nowPlaying, setNowPlaying] = useState<track | undefined>()
 
     if (authentication) {
         return (
@@ -45,7 +46,8 @@ function App() {
                 />
                 <Routes>
                     <Route path={"/"} element={<Home authentication={authentication} setSidebarConfig={setSidebarConfig} setNowPlaying={setNowPlaying}/>}/>
-                    <Route path={"search"} element={<Search authentication={authentication} setNowPlaying={setNowPlaying}/>}/>
+                    <Route path={"dashboard"} element={<Dashboard
+                        sessionToken={authentication.sessionToken} nowPlaying={nowPlaying} setNowPlaying={setNowPlaying}/>}/>
                     <Route path={"privacysettings"} element={<PrivacySettings/>}/>
                     <Route path={"editprofile"} element={<EditProfile/>}/>
                     <Route path={"changepassword"} element={<ChangePassword/> }/>

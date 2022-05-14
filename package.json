@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "axios": "^0.27.2",
-    "sqlite3": "^5.0.7"
-  }
-}
