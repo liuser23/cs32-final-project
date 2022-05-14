@@ -285,7 +285,7 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
                         <HomeIcon/>
                     </IconButton>
                 </div>
-                    <Form.Control
+                    <Form.Control style={{width: "400px"}}
                         type="search"
                         placeholder="Search Songs/Albums"
                         value={search}
