@@ -1,16 +1,15 @@
 package edu.brown.cs.student.main;
 
 import com.google.gson.Gson;
-import edu.brown.cs.student.main.BloomFilter.SimilarityMetrics.SimilarXNOR;
 import se.michaelthelin.spotify.model_objects.specification.User;
 
 import java.sql.*;
 import java.util.*;
 
-public class KnownUsers {
+public class DatabaseDriver {
     private final Connection connection;
 
-    KnownUsers(String filename) throws ClassNotFoundException, SQLException {
+    DatabaseDriver(String filename) throws ClassNotFoundException, SQLException {
         Class.forName("org.sqlite.JDBC");
         String urlToDB = "jdbc:sqlite:" + filename;
         connection = DriverManager.getConnection(urlToDB);
@@ -63,7 +62,6 @@ public class KnownUsers {
     List<String> topSuggestionsFor(String songId, int toAccept) throws SQLException {
         PreparedStatement getMaxs = connection.prepareStatement("select suggestion from suggestions where songId = ? group by suggestion order by count(suggestion) limit 3;");
         getMaxs.setString(1, songId);
-//        getMaxs.setInt(2, toAccept);
         ResultSet results = getMaxs.executeQuery();
         List<String> ret = new ArrayList<>();
         while (results.next()) {
@@ -128,7 +126,7 @@ public class KnownUsers {
         return ret;
     }
 
-    void initializeUser(String sessionToken, Tokens tokens, User user) throws SQLException {
+    void initializeUser(String sessionToken, Server.Tokens tokens, User user) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("replace into credentials values ( ?, ?, ? );");
         statement.setString(1, user.getId());
         statement.setString(2, tokens.accessToken());
@@ -152,14 +150,14 @@ public class KnownUsers {
         statement2.executeUpdate();
     }
 
-    Optional<Tokens> getTokens(String id) throws SQLException {
+    Optional<Server.Tokens> getTokens(String id) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("select accessToken, refreshToken from credentials where id = ?;");
         statement.setString(1, id);
         ResultSet result = statement.executeQuery();
         if (!result.next()) {
             return Optional.empty();
         }
-        return Optional.of(new Tokens(result.getString(1), result.getString(2)));
+        return Optional.of(new Server.Tokens(result.getString(1), result.getString(2)));
     }
 
     Optional<String> userIdFromSessionToken(String sessionToken) throws SQLException {

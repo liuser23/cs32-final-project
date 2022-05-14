@@ -6,8 +6,7 @@ import java.nio.file.Path;
 import java.sql.SQLException;
 
 /**
- * The Main class of our project. This is where execution begins.
- *
+ * Execution and configuration of the server start here.
  */
 public final class Main {
     private static final short OUR_PORT = 8888;
@@ -15,7 +14,6 @@ public final class Main {
     private static final String OUR_URL = "http://localhost:8888/";
     private static final String STATIC_SITE_URL = "http://localhost:3000/";
     /**
-     *
      * Public entrypoint.
      * @param args from command line
      */
@@ -32,23 +30,29 @@ public final class Main {
             return;
         }
 
-        KnownUsers users;
+        DatabaseDriver users;
         try {
-            users = new KnownUsers("secret/known.sqlite3");
+            users = new DatabaseDriver("secret/known.sqlite3");
         } catch (ClassNotFoundException | SQLException e) {
             System.out.println("Could not open user database" + e.getMessage());
             e.printStackTrace();
             return;
         }
 
+        ApiDriver api = new ApiDriver(
+            OUR_URL,
+            "callback",
+            clientId,
+            clientSecret
+        );
+
         Server server = new Server(
                 users,
+                api,
                 STATIC_SITE_URL,
-                OUR_URL,
                 OUR_PORT,
-                clientId,
-                clientSecret,
                 STATIC_SITE_PATH);
+
         server.start();
     }
 }
