@@ -35,7 +35,7 @@ public class UITest extends TestCase {
     // Stores the web driver
     WebDriver driver;
     // Tracks whether the initial setup has been done
-    private static boolean is_setup_done = false;;
+    private static boolean is_setup_done = false;
     static String BASE_URI = "http://localhost:";
     static int FRONTEND_PORT = 3000;
     static String PAGE_URL = BASE_URI + FRONTEND_PORT;
@@ -50,7 +50,7 @@ public class UITest extends TestCase {
         backendServerHelper();
         try {
             LOGIN_EMAIL = Files.readString(Path.of("../secret/spotify_email.txt"));
-            LOGIN_PASSWORD = Files.readString(Path.of("../secret/spotify_email.txt"));
+            LOGIN_PASSWORD = Files.readString(Path.of("../secret/spotify_password.txt"));
         } catch (IOException e) {
             System.out.println("Could not read config files");
             e.printStackTrace();
@@ -120,12 +120,46 @@ public class UITest extends TestCase {
     public void testLandingPageHeader() {
         setupHelper();
 
-
         WebElement root = driver.findElement(By.id("root"));
-        WebElement header = root.findElement(By.tagName("h1"));
+        WebElement divForFullScreen = root.findElement(By.id("full-screen"));
+        WebElement divForHeader = divForFullScreen.findElement(By.id("welcome-line"));
+        WebElement header = divForHeader.findElement(By.tagName("h1"));
+
 
         System.out.println(header.getText());
-        assertTrue(header.getText().equals("Welcome to the best Spotify social media platform"));
+        assertTrue(header.getText().equals("Welcome to"));
+
+
+
+        WebElement form = root.findElement(By.tagName("form"));
+        WebElement button = form.findElement(By.tagName("button"));
+        button.click();
+
+
+        teardownHelper();
+    }
+
+    public void testAllOfLandingPageHeader() {
+        setupHelper();
+
+
+        WebElement root = driver.findElement(By.id("root"));
+        WebElement divForFullScreen = root.findElement(By.id("full-screen"));
+        WebElement divForHeader = divForFullScreen.findElement(By.id("welcome-line"));
+        WebElement header = divForHeader.findElement(By.tagName("h1"));
+        WebElement header2 = divForFullScreen.findElement(By.tagName("h1"));
+        WebElement appName = root.findElement(By.tagName("h4"));
+
+
+        System.out.println(header.getText());
+        assertTrue(header.getText().equals("Welcome to"));
+
+        System.out.println(appName.getText());
+        assertTrue(appName.getText().equals("Friendify"));
+
+        System.out.println(header2.getText());
+        assertTrue(header2.getText().equals("the best Spotify social media platform"));
+
 
         WebElement form = root.findElement(By.tagName("form"));
         WebElement button = form.findElement(By.tagName("button"));
@@ -143,5 +177,63 @@ public class UITest extends TestCase {
 
         teardownHelper();
     }
+
+//    public void testFindFriends() {
+//        setupHelper();
+//
+//        WebElement root = driver.findElement(By.id("root"));
+//        WebElement menuOptions = root.findElement(By.id("menu-options"));
+//
+//        WebElement sideBar = root.findElement(By.id("sideBar"));
+//        WebElement profilePic = root.findElement(By.id("hwai"));
+//
+//        WebElement menu = sideBar.findElement(By.id("accountMenu"));
+//        WebElement menuOptions = menu.findElement(By.id("menu-options"));
+//
+//        System.out.println(header.getText());
+//        assertTrue(header.getText().equals("Welcome to the best Spotify social media platform"));
+//
+//        WebElement form = root.findElement(By.tagName("form"));
+//        WebElement button = form.findElement(By.tagName("button"));
+//        button.click();
+//
+//        teardownHelper();
+//    }
+//
+//    public void testFriendsList() {
+//        setupHelper();
+//
+//        WebElement root = driver.findElement(By.id("root"));
+//        WebElement sideBar = root.findElement(By.id("sideBar"));
+//        WebElement menu = sideBar.findElement(By.id("accountMenu"));
+//        WebElement menuOptions = menu.findElement(By.id("menu-options"));
+//        // get Find Friends button
+//
+//        WebElement friendsButton = menu.findElement(By.id("findFriends"));
+//
+//        System.out.println(friendsButton.getText());
+//        assertTrue(friendsButton.getText().equals("My Friends"));
+//
+//
+//        teardownHelper();
+//    }
+//
+//    public void testSettingsButton() {
+//        setupHelper();
+//
+//        WebElement root = driver.findElement(By.id("root"));
+//        WebElement sideBar = root.findElement(By.id("sideBar"));
+//        WebElement menu = sideBar.findElement(By.id("accountMenu"));
+//        WebElement menuOptions = menu.findElement(By.id("menu-options"));
+//        // get Find Settings button
+//
+//        WebElement settingsButton = menu.findElement(By.id("settingsButton"));
+//
+//        System.out.println(settingsButton.getText());
+//        assertTrue(settingsButton.getText().equals("Settings"));
+//
+//
+//        teardownHelper();
+//    }
 
 }
