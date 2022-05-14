@@ -9,6 +9,7 @@ import PicLock from './images/basebuttons/lock 1.png'
 import PicPencil from './images/basebuttons/pencil 1.png'
 import PicFriends from './images/basebuttons/friends 1.png'
 import PicRecList from './images/basebuttons/list-format 1.png'
+
 import PicBell from './images/basebuttons/notifications 1.png'
 import ProfilePhoto from "./ProfilePhoto";
 import {Authentication, SidebarConfig} from "./App";
@@ -19,11 +20,11 @@ import {track} from "./MyTypes";
 function SideBar(props: {nowPlaying: track | undefined, authentication: Authentication, sidebarConfig: SidebarConfig}) {
     console.log("now playing", props.nowPlaying)
     return (
-        <div className={"Side-bar"}>
+        <div id="sideBar" className={"Side-bar"}>
             <ProfilePhoto image={props.sidebarConfig.profilePicturePath ?? DefaultPfp}/>
 
 
-            <div className={"Account-menu"}>
+            <div id="accountMenu" className={"Account-menu"}>
                 <div className={"Player-box"}>
                     {props.nowPlaying !== undefined ?
                         <SpotifyPlayer
@@ -33,13 +34,15 @@ function SideBar(props: {nowPlaying: track | undefined, authentication: Authenti
                         : <></>
                     }
                 </div>
+                <div id="menu-options">
                 <AccMenuButton picture={PicHome} picAlt={"house"} txtContent={"Account Overview"} route={"/"}/>
-                <AccMenuButton picture={PicHome} picAlt={"house"} txtContent={"Dashboard"} route={"/dashboard"}/>
-                <AccMenuButton picture={PicPencil} picAlt={"pencil"} txtContent={"Edit Profile"} route={"/editprofile"}/>
-                <AccMenuButton picture={PicLock} picAlt={"lock"} txtContent={"Settings"} route={"/changepassword"}/>
+                <AccMenuButton picture={SearchIcon} picAlt={"search icon"} txtContent={"Search Songs"} route={"/dashboard"}/>
+                <AccMenuButton picture={PicRecList} picAlt={"list icon"} txtContent={"My Recommendations"} route={"/editprofile"}/>
+                <AccMenuButton picture={SearchIcon} picAlt={"search icon"} txtContent={"Find Friends"} route={"/myrecommendations"}/>
                 <AccMenuButton picture={PicFriends} picAlt={"friends"} txtContent={"Friends List"} route={"/friendslist"}/>
-                <AccMenuButton picture={PicRecList} picAlt={"list"} txtContent={"My Recommendations"} route={"/myrecommendations"}/>
+                <AccMenuButton picture={PicLock} picAlt={"lock"} txtContent={"Settings"} route={"/changepassword"}/>
                 <AccMenuButton picture={PicSignOut} picAlt={"exit"} txtContent={"Sign Out"} route={"/signout"}/>
+                </div>
             </div>
         </div>
     )
