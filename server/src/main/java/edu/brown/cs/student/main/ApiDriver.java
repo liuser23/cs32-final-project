@@ -60,6 +60,10 @@ public class ApiDriver {
                 .build();
     }
 
+    /**
+     * Gets an API handle that doesnt provide tokens to the endpoint
+     * @return api handle
+     */
     private SpotifyApi noTokens() {
         URI redirectUri = SpotifyHttpManager.makeUri(ourUrl + callbackLocation);
         return new SpotifyApi.Builder()

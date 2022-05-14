@@ -15,7 +15,7 @@ public class DatabaseDriver {
      * @throws ClassNotFoundException when we don't have sql installed
      * @throws SQLException coding error
      */
-    DatabaseDriver(String filename) throws ClassNotFoundException, SQLException {
+    public DatabaseDriver(String filename) throws ClassNotFoundException, SQLException {
         Class.forName("org.sqlite.JDBC");
         String urlToDB = "jdbc:sqlite:" + filename;
         connection = DriverManager.getConnection(urlToDB);
@@ -31,12 +31,20 @@ public class DatabaseDriver {
      * Empties the sql tables for testing purposes.
      * @throws SQLException when the update fails
      */
-    void clearTables() throws SQLException {
+    public void clearTables() throws SQLException {
         connection.prepareStatement("delete from credentials;").executeUpdate();
         connection.prepareStatement("delete from users;").executeUpdate();
         connection.prepareStatement("delete from sessionTokens;").executeUpdate();
         connection.prepareStatement("delete from recommendation;").executeUpdate();
         connection.prepareStatement("delete from suggestions;").executeUpdate();
+    }
+
+    /**
+     * Close the connection.
+     * @throws SQLException when the update fails
+     */
+    public void close() throws SQLException {
+        connection.close();
     }
 
     /**
@@ -48,7 +56,7 @@ public class DatabaseDriver {
      * @throws SQLException sql failed
      * @throws IllegalArgumentException when we make too many suggestions
      */
-    void insertSuggestion(
+    public void insertSuggestion(
             String userId,
             String forSongId,
             String suggestion,
@@ -78,7 +86,7 @@ public class DatabaseDriver {
      * @param suggestion what to delete
      * @throws SQLException when sql fails
      */
-    void deleteSuggestion(String userId, String forSongId, String suggestion) throws SQLException {
+    public void deleteSuggestion(String userId, String forSongId, String suggestion) throws SQLException {
         PreparedStatement delete = connection.prepareStatement("delete from suggestions where id = ? and songId = ? and suggestion = ?;");
         delete.setString(1, userId);
         delete.setString(2, forSongId);
@@ -92,7 +100,7 @@ public class DatabaseDriver {
      * @param forSongId being listened to
      * @throws SQLException when sql fails
      */
-    List<String> getUsersSuggestionsFor(String userId, String forSongId) throws SQLException {
+    public List<String> getUsersSuggestionsFor(String userId, String forSongId) throws SQLException {
         PreparedStatement find = connection.prepareStatement("select suggestion from suggestions where id = ? and songId = ?");
         find.setString(1, userId);
         find.setString(2, forSongId);
@@ -110,9 +118,10 @@ public class DatabaseDriver {
      * @param toAccept how many suggestions should be returned
      * @throws SQLException when sql fails
      */
-    List<String> topSuggestionsFor(String songId, int toAccept) throws SQLException {
-        PreparedStatement getMaxs = connection.prepareStatement("select suggestion from suggestions where songId = ? group by suggestion order by count(suggestion) limit 3;");
+    public List<String> topSuggestionsFor(String songId, int toAccept) throws SQLException {
+        PreparedStatement getMaxs = connection.prepareStatement("select suggestion from suggestions where songId = ? group by suggestion order by count(suggestion) desc limit ?;");
         getMaxs.setString(1, songId);
+        getMaxs.setInt(2, toAccept);
         ResultSet results = getMaxs.executeQuery();
         List<String> ret = new ArrayList<>();
         while (results.next()) {
@@ -127,7 +136,7 @@ public class DatabaseDriver {
      * @param data are their preferences
      * @throws SQLException when sql fails
      */
-    void initializeRecommendations(
+    public void initializeRecommendations(
             String userId, Map<String, Server.MatchData> data) throws SQLException {
         // let's delete everything in the recommendations table that matches userId
         PreparedStatement statement = connection.prepareStatement("delete from recommendation where id = ?;");
@@ -152,7 +161,7 @@ public class DatabaseDriver {
      * Gets the recommendations in the table.
      * @throws SQLException when sql fails
      */
-    Map<String, Map<String, Server.MatchData>> getRecommendations() throws SQLException {
+    public Map<String, Map<String, Server.MatchData>> getRecommendations() throws SQLException {
         Map<String, Map<String, Server.MatchData>> ret = new HashMap<>();
 
         PreparedStatement statement = connection.prepareStatement("select id, dataName, itemName, similarity, weight from recommendation;");
@@ -187,7 +196,7 @@ public class DatabaseDriver {
      * @param user user class representing spotify user
      * @throws SQLException when sql fails
      */
-    void initializeUser(String sessionToken, Server.Tokens tokens, User user) throws SQLException {
+    public void initializeUser(String sessionToken, Server.Tokens tokens, User user) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("replace into credentials values ( ?, ?, ?, ? );");
         statement.setString(1, user.getId());
         statement.setString(2, tokens.accessToken());
@@ -217,7 +226,7 @@ public class DatabaseDriver {
      * @param id user id from spotify
      * @throws SQLException when sql fails
      */
-    Optional<Server.Tokens> getTokens(String id) throws SQLException {
+    public Optional<Server.Tokens> getTokens(String id) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("select accessToken, refreshToken, expires from credentials where id = ?;");
         statement.setString(1, id);
         ResultSet result = statement.executeQuery();
@@ -234,7 +243,7 @@ public class DatabaseDriver {
      * @param sessionToken token from spotify
      * @throws SQLException when sql fails
      */
-    Optional<String> userIdFromSessionToken(String sessionToken) throws SQLException {
+    public Optional<String> userIdFromSessionToken(String sessionToken) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("select id from sessionTokens where sessionToken = ?;");
         statement.setString(1, sessionToken);
         ResultSet result = statement.executeQuery();
