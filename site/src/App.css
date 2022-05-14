@@ -275,3 +275,25 @@
   padding-bottom: 5px;
   position: absolute;
 }
+
+.Empty-Background {
+  background: linear-gradient(
+          90deg,
+          rgb(255, 255, 255) 0%,
+          rgb(30, 215, 96) 100%
+  );
+}
+
+.Empty-Button {
+  display: flex;
+  align-content: center;
+
+  justify-content: center;
+  flex-direction: column;
+  flex-wrap: wrap;
+  /*padding-right: 200px;*/
+  position: absolute;
+  left: 60%;
+  margin-left: -150px;
+
+}
