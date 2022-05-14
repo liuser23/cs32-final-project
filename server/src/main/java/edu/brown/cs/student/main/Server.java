@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.SecureRandom;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,12 +27,21 @@ public class Server {
 
     /**
      * Constructor, sets local variables for site URL, port, ID and Secret codes, and static files.
-     * Builds redirect URI and Spotify API
+     * Builds redirect URI and Spotify API.
      *
-     * @param ourPort
-     * @param staticFiles
+     * @param users the database that contains and manages all user info
+     * @param api manages the connection to the spotify api
+     * @param staticSiteUrl what is actually serving the html pages
+     * @param ourPort to host this server on
+     * @param staticFiles host additional static files here
      */
-    Server(DatabaseDriver users, ApiDriver api, String staticSiteUrl, short ourPort, String staticFiles) {
+    Server(
+            DatabaseDriver users,
+            ApiDriver api,
+            String staticSiteUrl,
+            short ourPort,
+            String staticFiles)
+    {
         this.api = api;
         this.staticSiteUrl = staticSiteUrl;
         this.ourPort = ourPort;
@@ -39,6 +49,9 @@ public class Server {
         this.users = users;
     }
 
+    /**
+     * Starts the server and sets up routes.
+     */
     public void start() {
         Spark.port(ourPort);
         Spark.externalStaticFileLocation(staticFiles);
@@ -58,7 +71,8 @@ public class Server {
             return "OK";
         });
 
-        Spark.before((request, response) -> response.header("Access-Control-Allow-Origin", "*"));
+        Spark.before((request, response) ->
+                response.header("Access-Control-Allow-Origin", "*"));
 
         Spark.exception(Exception.class, (exception, request, response) -> {
             response.status(500);
@@ -135,9 +149,12 @@ public class Server {
             RecommendationData recommendationData = api.getRecommendationData(tokens);
 
             users.initializeRecommendations(userId, Map.of(
-                    "songs", new DatabaseDriver.Data(data.songs.matchSame, recommendationData.songs(), data.songs.matchWeight),
-                    "genres", new DatabaseDriver.Data(data.genres.matchSame, recommendationData.genres(), data.genres.matchWeight),
-                    "artists", new DatabaseDriver.Data(data.artists.matchSame, recommendationData.artists(), data.artists.matchWeight)
+                    "songs", new MatchData(data.songs.matchSame,
+                            recommendationData.songs(), data.songs.matchWeight),
+                    "genres", new MatchData(data.genres.matchSame,
+                            recommendationData.genres(), data.genres.matchWeight),
+                    "artists", new MatchData(data.artists.matchSame,
+                            recommendationData.artists(), data.artists.matchWeight)
             ));
 
             return "200 OK";
@@ -160,9 +177,9 @@ public class Server {
 
         Spark.post("/insertSuggestion", (request, response) -> {
             String userId = userIdFromRequest(request);
-            InsertSuggestionsQuery toInsert = new Gson().fromJson(request.body(), InsertSuggestionsQuery.class);
+            SongSuggestion toInsert = new Gson().fromJson(request.body(), SongSuggestion.class);
             try {
-                users.insertSuggestion(userId, toInsert.songId, toInsert.suggestion);
+                users.insertSuggestion(userId, toInsert.songId, toInsert.suggestion, 3);
                 return new Gson().toJson(Map.of());
             } catch (IllegalArgumentException e) {
                 return new Gson().toJson(Map.of("error", e.getMessage()));
@@ -171,7 +188,7 @@ public class Server {
 
         Spark.post("/deleteSuggestion", (request, response) -> {
             String userId = userIdFromRequest(request);
-            InsertSuggestionsQuery toInsert = new Gson().fromJson(request.body(), InsertSuggestionsQuery.class);
+            SongSuggestion toInsert = new Gson().fromJson(request.body(), SongSuggestion.class);
             users.deleteSuggestion(userId, toInsert.songId, toInsert.suggestion);
             return "200 OK";
         });
@@ -197,31 +214,84 @@ public class Server {
         });
     }
 
-    public record Tokens(String accessToken, String refreshToken) { }
+    /**
+     * Authentication tokens given to us by spotify.
+     */
+    public record Tokens(String accessToken, String refreshToken, Instant expires) { }
 
-    private static class InsertSuggestionsQuery {
+    /**
+     * A single suggestion made by a user.
+     */
+    private static class SongSuggestion {
         String songId;
         String suggestion;
     }
 
+    /**
+     * What a user would like to do with a particular piece of data.
+     */
     private static class MatchPreference {
         boolean matchSame;
         int matchWeight;
     }
 
+    /**
+     * Preferences for different categories.
+     */
     private static class AllPreferences {
         MatchPreference songs;
         MatchPreference genres;
         MatchPreference artists;
     }
 
+    /**
+     * Contains all the data used to make user matches.
+     */
     public record RecommendationData(
             List<String> artists,
             List<String> songs,
             List<String> genres
     ) {}
 
+    /**
+     * Match data associated with match preferences.
+     */
+    public record MatchData(boolean matchSame, List<String> items, int weight) {
+        @Override
+        public boolean matchSame() {
+            return matchSame;
+        }
 
+        @Override
+        public int weight() {
+            return weight;
+        }
+
+        @Override
+        public List<String> items() {
+            return items;
+        }
+    }
+
+
+    /**
+     * Gets the authentication tokens from a particular request
+     * @param request from spark
+     * @return authentication tokens
+     * @throws SQLException when sql fails
+     */
+    private Tokens tokensFromRequest(Request request) throws SQLException {
+        String userId = userIdFromRequest(request);
+        return tokensFromUserId(userId);
+    }
+
+    /**
+     * Gets the user associated with a particular spotify request.
+     * @param request from spark
+     * @return user id
+     * @throws RuntimeException when its not found
+     * @throws SQLException when sql is broken
+     */
     private String userIdFromRequest(Request request) throws RuntimeException, SQLException {
         String sessionToken = request.headers("Authentication");
         Optional<String> userId = users.userIdFromSessionToken(sessionToken);
@@ -231,6 +301,13 @@ public class Server {
         return userId.get();
     }
 
+    /**
+     * Gets the tokens associated with a particular spotify user id.
+     * @param userId from spotify
+     * @return authentication tokens
+     * @throws RuntimeException when its not found
+     * @throws SQLException when sql is broken
+     */
     private Tokens tokensFromUserId(String userId) throws RuntimeException, SQLException {
         Optional<Tokens> tokens = users.getTokens(userId);
         if (tokens.isEmpty()) {
@@ -239,10 +316,17 @@ public class Server {
         return tokens.get();
     }
 
+    /**
+     * Gets the tokens associated with a particular spotify user id.
+     * @param userId from spotify
+     * @return authentication tokens
+     * @throws RuntimeException when its not found
+     * @throws SQLException when sql is broken
+     */
     public List<String> recommendations(String userId, int numRecs) throws SQLException {
         Map<String, UserInfo> data = users.getRecommendations().entrySet().stream()
                 .map(e -> {
-                    Map<String, DatabaseDriver.Data> t = e.getValue();
+                    Map<String, MatchData> t = e.getValue();
 
                     List<String> artists = t.get("artists").items();
                     List<String> songs = t.get("songs").items();
@@ -262,25 +346,18 @@ public class Server {
 
                     return new AbstractMap.SimpleEntry<>(e.getKey(), info);
                 })
-                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+                .collect(Collectors.toMap(
+                        AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
 
         RecommendationSystem system = RecommendationSystem.fromUserData(data);
         return system.getRecsFor(userId, numRecs);
     }
 
-    private Tokens tokensFromRequest(Request request) throws SQLException {
-        String sessionToken = request.headers("Authentication");
-        Optional<String> userId = users.userIdFromSessionToken(sessionToken);
-        if (userId.isEmpty()) {
-            throw new RuntimeException("user was not found");
-        }
-        Optional<Tokens> tokens = users.getTokens(userId.get());
-        if (tokens.isEmpty()) {
-            throw new RuntimeException("tokens were not found");
-        }
-        return tokens.get();
-    }
-
+    /**
+     * Gets a randomly generated string that should be pretty secure.
+     * @param len how long should it be
+     * @return the random string
+     */
     private static String randomString(int len) {
         char[] hex = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
         StringBuilder ret = new StringBuilder(len);
