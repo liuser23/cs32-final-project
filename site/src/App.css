@@ -39,26 +39,32 @@
 
 .Side-bar {
   background-color: #282828;
+  min-height: 200px;
   height: 100vh;
+  min-width: 250px;
   width: 25vw;
   position: fixed;
   align-content: center;
   align-items: center;
+  z-index: 2;
 }
 
 .Main-window {
   background-color: white;
   height: 100vh;
+  min-width: 1100px;
   width: 75vw;
   display: flex;
   position: relative;
   float: right;
   align-items: center;
   flex-direction: column;
+  z-index: 1;
 }
 
 .Account-menu {
   background-color: #282828;
+  min-width: 250px;
   width: 25vw;
   float: left;
   text-align: right;
@@ -67,8 +73,11 @@
 }
 
 .Accmenu-button {
+  min-height: 35px;
   height: 7vmin;
+  min-width: 150px;
   width: 25vw;
+  min-font-size: 30px;
   left: 0px;
   display: flex;
   overflow: hidden;
@@ -76,6 +85,8 @@
 }
 
 .Button-img {
+  min-height: 30px;
+  min-width: 30px;
   height: 3vmin;
   width: 3vmin;
   position: relative;
@@ -89,6 +100,7 @@
   position: absolute;
   right: 10px;
   overflow: hidden;
+  min-font-size: 30px;
   font-size: 2.5vmin;
 }
 

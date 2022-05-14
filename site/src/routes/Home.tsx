@@ -67,7 +67,6 @@ function Home(props: {authentication: Authentication, setSidebarConfig: Dispatch
     }, [])
 
     return (
-        <div>
             <div className={"Main-window"}>
                 { curUserName !== undefined && numFollowers !== undefined ?
                     <ProfileHeader username={curUserName}/> :
@@ -88,7 +87,6 @@ function Home(props: {authentication: Authentication, setSidebarConfig: Dispatch
                 <br/>
                 <br/>
             </div>
-        </div>
     )
 }
 
