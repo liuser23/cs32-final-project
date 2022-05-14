@@ -21,7 +21,7 @@ function TopArtistsBox(props : {topArtists : artist[]}) {
 
     return (
         <div className={"Topsongs-box"}>
-            <p className={"Top-title"}>Top Artists</p>
+            <p style={{paddingTop: "15px"}} className={"Top-title"}>Top Artists</p>
                 <button className={"Top-navbutton-left"} onClick={decrementIndex}></button>
                 <div className={"Top-items-list"}>
                     {props.topArtists.slice(index,index+4).map(x => <div className={"Song-box"}>

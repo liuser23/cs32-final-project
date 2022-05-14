@@ -25,6 +25,7 @@
     "react-spotify-web-playback": "^0.8.1",
     "spotify-web-api-node": "^5.0.2",
     "typescript": "^4.6.4",
+    "typewriter-effect": "^2.18.2",
     "uuid": "^8.3.2",
     "web-vitals": "^2.1.4"
   },
