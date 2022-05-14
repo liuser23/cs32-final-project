@@ -22,7 +22,7 @@ function TopSongsBox (props : {topSongs : track[], setNowPlaying : (nowPlaying :
 
     return (
         <div className={"Topsongs-box"}>
-            <p className={"Top-title"}>Top Songs</p>
+            <p style={{paddingTop: "15px"}}className={"Top-title"}>Top Songs</p>
             <button className={"Top-navbutton-left"} onClick={decrementIndex}></button>
             <div className={"Top-items-list"}>
                 {props.topSongs.slice(index,index+4).map(x => <div key={x.uri} className={"Song-box"}>

@@ -122,6 +122,18 @@ label {
     flex-wrap: wrap;
     padding-top: 30px;
 }
+
+.login-button {
+    font-family: "Helvetica", "Arial", sans-serif;
+    font-weight: bold;
+}
+
+.typewriter-style  {
+    font-family: "Helvetica", "Arial", sans-serif;
+    font-size: 20px;
+    padding: 20px;
+    color: black;
+}
 /*.login-button {*/
 /*    padding: 16px;*/
 /*    border: none;*/
