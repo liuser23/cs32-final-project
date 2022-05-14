@@ -1,10 +1,12 @@
 package edu.brown.cs.student.main;
 
+import com.github.dockerjava.api.exception.UnauthorizedException;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.SpotifyHttpManager;
 import se.michaelthelin.spotify.enums.ModelObjectType;
 import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
 import se.michaelthelin.spotify.model_objects.specification.*;
+import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeRefreshRequest;
 import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeUriRequest;
 import se.michaelthelin.spotify.requests.data.artists.GetArtistRequest;
 import se.michaelthelin.spotify.requests.data.follow.GetUsersFollowedArtistsRequest;
@@ -16,7 +18,9 @@ import se.michaelthelin.spotify.requests.data.users_profile.GetCurrentUsersProfi
 import java.net.URI;
 import java.time.Instant;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.stream.Stream;
 
 /**
@@ -108,6 +112,30 @@ public class ApiDriver {
                 expires);
     }
 
+
+    public Server.Tokens authorizationCodeRefresh(Server.Tokens tokens) {
+            SpotifyApi api = spotifyApi(tokens);
+            AuthorizationCodeRefreshRequest authorizationCodeRefreshRequest = api.authorizationCodeRefresh()
+                    .build();
+            final CompletableFuture<AuthorizationCodeCredentials> authorizationCodeCredentialsFuture = authorizationCodeRefreshRequest.executeAsync();
+            // Thread free to do other tasks...
+            // Example Only. Never block in production code.
+            final AuthorizationCodeCredentials authorizationCodeCredentials = authorizationCodeCredentialsFuture.join();
+            // Set access token for further "spotifyApi" object usage
+            //spotifyApi.setAccessToken(authorizationCodeCredentials.getAccessToken());
+            System.out.println("Expires in: " + authorizationCodeCredentials.getExpiresIn());
+            int expiresInSeconds = authorizationCodeCredentials.getExpiresIn();
+            Instant expires = Instant.now().plusSeconds(expiresInSeconds);
+            return new Server.Tokens(
+                    authorizationCodeCredentials.getAccessToken(),
+                    authorizationCodeCredentials.getRefreshToken(),
+                    expires);
+
+    }
+
+
+
+
     /**
      * Get the current user's profile from Spotify.
      * @param tokens to authenticate
@@ -118,6 +146,7 @@ public class ApiDriver {
                 .build();
         final CompletableFuture<User> userFuture = getCurrentUsersProfileRequest.executeAsync();
         return userFuture.join();
+
     }
 
     /**

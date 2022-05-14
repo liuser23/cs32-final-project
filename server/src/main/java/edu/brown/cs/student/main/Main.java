@@ -22,8 +22,8 @@ public final class Main {
 
         String clientId, clientSecret;
         try {
-            clientId = Files.readString(Path.of("secret/client_id.txt"));
-            clientSecret = Files.readString(Path.of("secret/client_secret.txt"));
+            clientId = Files.readString(Path.of(args[0]));
+            clientSecret = Files.readString(Path.of(args[1]));
         } catch (IOException e) {
             System.out.println("Could not read config files");
             e.printStackTrace();
@@ -32,7 +32,7 @@ public final class Main {
 
         DatabaseDriver users;
         try {
-            users = new DatabaseDriver("secret/known.sqlite3");
+            users = new DatabaseDriver(args[2]);
         } catch (ClassNotFoundException | SQLException e) {
             System.out.println("Could not open user database" + e.getMessage());
             e.printStackTrace();
