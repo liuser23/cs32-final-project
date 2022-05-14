@@ -113,6 +113,8 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
             })
     }
 
+
+
     const addToPlaylist = () => {
         console.log("TODO: add playlist endpoint")
     }
@@ -231,9 +233,6 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
                           </IconButton>
                           <IconButton onClick={() => addToPlaylist()} edge="end" aria-label="Play">
                               <PlaylistAddIcon/>
-                          </IconButton>
-                          <IconButton onClick={() => deleteRecommendation(song)} edge="end" aria-label="delete">
-                              <DeleteIcon style={{marginRight: "10px"}}/>
                           </IconButton>
                       </React.Fragment>
                   }>

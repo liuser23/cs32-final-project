@@ -14,7 +14,12 @@ function Unauthenticated() {
         <>
             <div className="full-screen" style={{flex: 1, padding: '120px'}}>
                 <Container className="log-in-screen">
-                    <h1 style={{padding: "20px", fontSize: "50px"}}>Welcome to the best Spotify social media
+                    <div className="welcome-line" id="welcomeLine">
+                        <h1 style={{padding: "10px", fontSize: "50px"}}>Welcome to </h1>
+                        <h4 className="neonText">Friendify</h4>
+                    </div>
+
+                    <h1 style={{padding: "10px", fontSize: "50px"}}>the best Spotify social media
                         platform</h1>
                     {/*<p style={{padding: "20px", fontSize: "25px"}}>Take your first step toward making new friends by signing in with your existing Spotify account</p>*/}
                     <div className={"typewriter-style "}>
@@ -29,16 +34,6 @@ function Unauthenticated() {
                         />
                     </div>
                     <div className="button-gif">
-                        <div className="button-log" style={{margin: '40px'}}>
-                            <form style={{padding: "40px"}} action={process.env.REACT_APP_LOGIN_REDIRECT}>
-                                <Button variant="outlined" color="success" size="large" className="login-button"
-                                        type='submit' style={{
-                                    width: "120px",
-                                    height: "50px",
-                                    fontSize: '20px'
-                                }}>Log in</Button>
-                            </form>
-                        </div>
                         <div>
                             <img src={AppGif} alt="gif" style={{
                                 height: '270px',
@@ -47,6 +42,19 @@ function Unauthenticated() {
                                 border: '5px solid rgb(0, 0, 0)'
                             }}/>
                         </div>
+                        <div className="button-log" style={{margin: '40px'}}>
+                            <form style={{padding: "40px"}} action={process.env.REACT_APP_LOGIN_REDIRECT}>
+                                <Button variant="outlined" color="success" size="large" className="login-button"
+                                        type='submit' style={{
+                                    width: "120px",
+                                    height: "50px",
+                                    fontSize: '20px',
+                                    fontWeight: 'bold',
+                                    border: '5x solid'
+                                }}>Log in</Button>
+                            </form>
+                        </div>
+
                     </div>
 
                 </Container>

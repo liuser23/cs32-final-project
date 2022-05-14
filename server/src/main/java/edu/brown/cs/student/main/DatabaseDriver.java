@@ -108,7 +108,7 @@ public class DatabaseDriver {
     }
 
     /**
-     * Gets all the suggestions user made.
+     * Gets all the suggestions user made for specific song.
      * @param userId the user whos making the suggestions
      * @param forSongId being listened to
      * @throws SQLException when sql fails
@@ -121,6 +121,24 @@ public class DatabaseDriver {
         List<String> ret = new ArrayList<>();
         while (results.next()) {
             ret.add(results.getString(1));
+        }
+        return ret;
+    }
+
+    /**
+     * Gets all the suggestions user has made.
+     * @param userId the user whos making the suggestions
+     * @throws SQLException when sql fails
+     */
+    public List<String> getAllUsersSuggestions(String userId) throws SQLException {
+        PreparedStatement find = connection.prepareStatement("select suggestion from suggestions where id = ?");
+        find.setString(1, userId);
+//        find.setString(2, ?);
+        ResultSet results = find.executeQuery();
+        List<String> ret = new ArrayList<>();
+        while (results.next()) {
+            ret.add(results.getString(1));
+//            ret.add(results.getString(2));
         }
         return ret;
     }
