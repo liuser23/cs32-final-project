@@ -6,6 +6,7 @@ import Paper from '@mui/material/Paper';
 import {Button, Card, CardActions, CardContent, Typography} from "@mui/material";
 import {Authentication} from "../App";
 import axios from "axios";
+import {currentUser} from "../MyTypes"
 
 function MyRecommendations(props: {authentication: Authentication}) {
 
@@ -14,9 +15,8 @@ function MyRecommendations(props: {authentication: Authentication}) {
     const [songWeight, setSongWeight] = useState<number | number[]>(50);
     const [artistWeight, setArtistWeight] = useState<number | number[]>(50);
     const [genreWeight, setGenreWeight] = useState<number | number[]>(50);
-    const [results, setResults] = useState<JSX.Element>(<></>);
 
-
+    const [recOutput, setRecOutput] = useState<currentUser[]>([]);
 
     async function getRecommendations() {
         setIsClicked(true)
@@ -26,7 +26,6 @@ function MyRecommendations(props: {authentication: Authentication}) {
         console.log("Song weight: " + songWeight)
         console.log("Artist weight: " + artistWeight)
         console.log("Genre weight: " + genreWeight)
-        setResults(<div>nice, results! rt: {recType} sw: {songWeight} aw: {artistWeight} gw: {genreWeight}</div>)
         let mSame : boolean = true;
         if (recType === 0) {
             mSame = false;
@@ -38,11 +37,7 @@ function MyRecommendations(props: {authentication: Authentication}) {
                 'Access-Control-Allow-Origin': '*',
             }
         }
-        type mappedData = {matchSame : boolean, matchWeight : number | number[]}
-        let dataMap : Map<string, mappedData> = new Map<string, mappedData>()
-        dataMap.set("songs", {matchSame : mSame, matchWeight: songWeight})
-        dataMap.set("genres", {matchSame : mSame, matchWeight: genreWeight})
-        dataMap.set("artists", {matchSame : mSame, matchWeight: artistWeight})
+
         const postData = {
             data: {
                 "songs": {matchSame : mSame, matchWeight : songWeight},
@@ -50,13 +45,16 @@ function MyRecommendations(props: {authentication: Authentication}) {
                 "artists": {matchSame : mSame, matchWeight : artistWeight},
             }
         }
+
         await axios.post(process.env.REACT_APP_POST_CREATE_RECS as string, postData, config).then(
             response => {console.log(response)}
         );
+
         await axios.get(process.env.REACT_APP_GET_RECS as string, config)
             .then(
                 response => {
                     console.log(response.data)
+                    setRecOutput(response.data)
                 },
                 reason => console.log(reason),
             );
@@ -77,7 +75,8 @@ function MyRecommendations(props: {authentication: Authentication}) {
             <RecommenderInput title={"Importance of genres: "} type={1} val={genreWeight} updateValue={setGenreWeight}/>
             <hr className = {"Recommender-divider"}/>
             <Button variant="outlined" color={"secondary"} onClick={getRecommendations}>Get recommendations</Button>
-            {results}
+            <br/>
+            {recOutput.map(x => <div>Display Name: {x.displayName} User ID: {x.id}</div>)}
         </div>
     )
 }

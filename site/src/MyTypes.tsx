@@ -64,7 +64,7 @@ type track = {
 
 type currentUser = {
     country : string;
-    display_name : string;
+    displayName : string;
     email : string;
     externalUrls : { externalUrls : {spotify : string} };
     followers : {total : number};
@@ -76,4 +76,4 @@ type currentUser = {
     uri : string;
 }
 
-export type {image, artistBySong, artist, albumBySong, track};
+export type {image, artistBySong, artist, albumBySong, track, currentUser};
