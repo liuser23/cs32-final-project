@@ -67,18 +67,19 @@ function Home(props: {authentication: Authentication, setSidebarConfig: Dispatch
     }, [])
 
     return (
-            <div className={"Main-window"}>
+            <div className={"Main-window"} style={{top:'40px'}}>
+                <div style={{paddingBottom: '30px'}}>
                 { curUserName !== undefined && numFollowers !== undefined ?
                     <ProfileHeader username={curUserName}/> :
                     <p>Loading Loading Profile Info</p>
                 }
+                </div>
                 <hr className = {"Profile-horizontal-line"}/>
                 { error !== undefined ? <p>Error: {error}</p> : <></> }
                 { (topArtists !== undefined && topArtists.length !== 0) ?
                     <><TopArtistsBox topArtists={topArtists}/></> :
                     <></>
                 }
-                <br/>
                 <br/>
                 { topSongs !== undefined && topSongs.length !== 0 ?
                     <><TopSongsBox topSongs={topSongs} setNowPlaying={props.setNowPlaying}/></> :

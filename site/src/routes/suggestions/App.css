@@ -16,6 +16,23 @@
 
 }
 
+.log-in-screen {
+    display: flex;
+    align-content: center;
+    flex-direction: column;
+    flex-wrap: wrap;
+    padding: 10px;
+
+}
+
+.full-screen {
+    background: linear-gradient(
+            90deg,
+            rgb(255, 255, 255) 0%,
+            rgb(30, 215, 96) 100%
+    );
+}
+
 .recsList {
     display: flex;
     align-content: center;
@@ -88,7 +105,50 @@ label {
     flex-wrap: wrap;
     padding: 10px;
     margin: 20px;
+
 }
+
+.button-log {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+}
+
+.button-gif {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding-top: 30px;
+}
+
+.login-button {
+    font-family: "Helvetica", "Arial", sans-serif;
+    font-weight: bold;
+}
+
+.typewriter-style  {
+    font-family: "Helvetica", "Arial", sans-serif;
+    font-size: 20px;
+    padding: 20px;
+    color: black;
+}
+/*.login-button {*/
+/*    padding: 16px;*/
+/*    border: none;*/
+/*    border-radius: 0 4px 4px 0;*/
+/*    cursor: pointer;*/
+/*    outline: none;*/
+/*    background: linear-gradient(*/
+/*            90deg,*/
+/*            rgb(255, 255, 255) 0%,*/
+/*            rgb(30, 215, 96) 100%*/
+/*    );*/
+/*    color: #fff;*/
+/*    text-transform: capitalize;*/
+/*    color: black;*/
+/*}*/
 
 .form-rec {
     padding: 10px;
@@ -157,6 +217,7 @@ label {
 }
 
 .todo-button {
+
     padding: 16px;
     border: none;
     border-radius: 0 4px 4px 0;

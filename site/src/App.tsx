@@ -58,8 +58,8 @@ function App() {
         return () => clearInterval(handle)
     }, [authentication, setAuthentication])
 
-
     if (authentication) {
+        console.log('access token', authentication.accessToken)
         return (
             <BrowserRouter>
                 <SideBar
