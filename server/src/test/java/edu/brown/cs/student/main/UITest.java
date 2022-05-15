@@ -142,13 +142,14 @@ public class UITest extends TestCase {
     public void testAllOfLandingPageHeader() {
         setupHelper();
 
-
+        // get web elements
         WebElement root = driver.findElement(By.id("root"));
         WebElement divForFullScreen = root.findElement(By.id("full-screen"));
-        WebElement divForHeader = divForFullScreen.findElement(By.id("welcome-line"));
+        WebElement divForLoginScreen = divForFullScreen.findElement(By.id("log-in-screen"));
+        WebElement divForHeader = divForLoginScreen.findElement(By.id("welcomeLine"));
         WebElement header = divForHeader.findElement(By.tagName("h1"));
-        WebElement header2 = divForFullScreen.findElement(By.tagName("h1"));
-        WebElement appName = root.findElement(By.tagName("h4"));
+        WebElement header2 = divForLoginScreen.findElement(By.id("theBest"));
+        WebElement appName = divForHeader.findElement(By.tagName("h4"));
 
 
         System.out.println(header.getText());
