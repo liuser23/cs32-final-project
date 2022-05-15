@@ -33,7 +33,7 @@ function Unauthenticated() {
                             }}
                         />
                     </div>
-                    <div className="button-gif">
+                    <div id="buttonGif" className="button-gif">
                         <div>
                             <img src={AppGif} alt="gif of app" style={{
                                 height: '270px',
@@ -42,7 +42,7 @@ function Unauthenticated() {
                                 border: '5px solid rgb(0, 0, 0)'
                             }}/>
                         </div>
-                        <div className="button-log" style={{margin: '40px'}}>
+                        <div id="buttonDiv" className="button-log" style={{margin: '40px'}}>
                             <form style={{padding: "40px"}} action={process.env.REACT_APP_LOGIN_REDIRECT}>
                                 <Button variant="outlined" color="success" size="large" className="login-button"
                                         type='submit' style={{

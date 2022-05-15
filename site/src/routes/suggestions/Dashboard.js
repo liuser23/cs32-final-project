@@ -276,22 +276,36 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
 
     return (
         // darkModeOn ? 'black' : 'white'
-        <div className={"Main-window"} style={{background: darkModeOn ? 'black' : 'white'}}>
+        <div id="mainWindow" className={"Main-window"} style={{background: darkModeOn ? 'black' : 'white'}}>
             <Container className="d-flex flex-column py-2" style={{height: "100vh"}}>
-                <div className="top-bar">
-                    <IconButton style={{ color: "#1DB954"}} edge="end"
-                                aria-label="Home">
-                        <HomeIcon/>
-                    </IconButton>
+                {/*<div className="top-bar">*/}
+                {/*    <IconButton style={{ color: "#1DB954"}} edge="end"*/}
+                {/*                aria-label="Home">*/}
+                {/*        <HomeIcon/>*/}
+                {/*    </IconButton>*/}
+                {/*</div>*/}
+                <div
+                    style={{display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: "30px"}}
+                >
+                    <div style={{flex: 1, height: '1px', backgroundColor: "#1DB954"}}/>
+
+                    <div>
+                        <h3 style={{textAlign: 'center', color: "#1DB954"}}>Find Song Recommendations</h3>
+                    </div>
+
+                    <div style={{flex: 1, height: '1px', backgroundColor: "#1DB954"}}/>
                 </div>
-                    <Form.Control style={{width: "400px"}}
-                        type="search"
+                <div id="searchBarDiv" className={'adding-song'} >
+                    <Form.Control className={'adding-song'}
+                        size='lg'
+                        type="text"
                         placeholder="Search Songs/Albums"
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                     />
 
-                <div className="flex-grow-1 my-2" style={{overflowY: "auto"}}>
+                </div>
+                <div className="flex-grow-1 my-2" style={{overflowY: "auto", width: '100%'}}>
                     {searchResults.map(track => (
                         <TrackSearchResult
                             track={track}
@@ -303,7 +317,7 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
                     {searchResults.length === 0 && (
                         <React.Fragment>
                             <div
-                                style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}
+                                style={{display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: "30px"}}
                             >
                                 <div style={{flex: 1, height: '1px', backgroundColor: "#1DB954"}}/>
 
@@ -341,15 +355,16 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
                                     <div style={{flex: 1, height: '1px', backgroundColor: "#1DB954"}}/>
 
                                     <div>
-                                        <h3 style={{textAlign: 'center', color: "#1DB954"}}>My Recommendations</h3>
+                                        <h3 style={{textAlign: 'center', color: "#1DB954"}}>Make Recommendations</h3>
                                     </div>
 
                                     <div style={{flex: 1, height: '1px', backgroundColor: "#1DB954"}}/>
                                 </div>
                                 <div className="adding-song">
                                     {/*className={classes.root}*/}
-                                    <Form.Control
-                                        type="search"
+                                    <Form.Control className={'adding-song'}
+                                        size="lg"
+                                        type="text"
                                         placeholder="Search Songs"
                                         value={searchRecs}
                                         onChange={e => setSearchRecs(e.target.value)}
