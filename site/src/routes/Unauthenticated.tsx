@@ -12,17 +12,17 @@ function Unauthenticated() {
 
     return (
         <>
-            <div className="full-screen" style={{flex: 1, padding: '120px'}}>
-                <Container className="log-in-screen">
-                    <div className="welcome-line" id="welcomeLine">
+            <div id="full-screen" className="full-screen" style={{flex: 1, padding: '120px'}}>
+                <div id="log-in-screen" className="log-in-screen">
+                    <div id="welcomeLine" className="welcome-line" >
                         <h1 style={{padding: "10px", fontSize: "50px"}}>Welcome to </h1>
                         <h4 className="neonText">Friendify</h4>
                     </div>
 
-                    <h1 style={{padding: "10px", fontSize: "50px"}}>the best Spotify social media
+                    <h1 id="theBest" style={{padding: "10px", fontSize: "50px"}}>the best Spotify social media
                         platform</h1>
                     {/*<p style={{padding: "20px", fontSize: "25px"}}>Take your first step toward making new friends by signing in with your existing Spotify account</p>*/}
-                    <div className={"typewriter-style "}>
+                    <div id="typewriter-div" className={"typewriter-style "}>
                         <Typewriter
                             onInit={(typewriter) => {
                                 typewriter.typeString('Take your first step toward making new friends by signing in with your existing Spotify account')
@@ -35,7 +35,7 @@ function Unauthenticated() {
                     </div>
                     <div className="button-gif">
                         <div>
-                            <img src={AppGif} alt="gif" style={{
+                            <img src={AppGif} alt="gif of app" style={{
                                 height: '270px',
                                 margin: '20px',
                                 marginLeft: '40px',
@@ -57,7 +57,7 @@ function Unauthenticated() {
 
                     </div>
 
-                </Container>
+                </div>
             </div>
         </>
     )
