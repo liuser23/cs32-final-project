@@ -20,9 +20,8 @@ import {track} from "./MyTypes";
 function SideBar(props: {nowPlaying: track | undefined, authentication: Authentication, sidebarConfig: SidebarConfig}) {
     console.log("now playing", props.nowPlaying)
     return (
-        <div id="sideBar" className={"Side-bar"}>
+        <div id="sideNavBar" className={"Side-bar"}>
             <ProfilePhoto image={props.sidebarConfig.profilePicturePath ?? DefaultPfp}/>
-
 
             <div id="accountMenu" className={"Account-menu"}>
                 <div className={"Player-box"}>
