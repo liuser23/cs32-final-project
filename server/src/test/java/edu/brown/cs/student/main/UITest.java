@@ -1032,12 +1032,13 @@ public class UITest extends TestCase {
 
         // check top song #3 name and artist
         System.out.println("thirdTopSongName: " + thirdTopSongName.getText());
-        assertTrue(thirdTopSongName.getText().equals("The Way Life Goes (feat. Oh Wonder)"));
+        assertTrue(thirdTopSongName.getText().equals("Congratulations"));
 
         System.out.println("thirdTopSongArtist: " + thirdTopSongArtist.getText());
-        assertTrue(thirdTopSongArtist.getText().equals("Lil Uzi Vert"));
+        assertTrue(thirdTopSongArtist.getText().equals("Post Malone"));
 
-        searchRecsInput2.sendKeys("first class");
+        // add congratulations as one of your recs
+        searchRecsInput2.sendKeys("congratu");
         List<WebElement> songRecResults = findSongsDiv.findElements(By.id("songResult"));
         WebElement firstSongRecResult = songRecResults.get(0).findElement(By.id("songInfo"));
         WebElement firstSongRecName = firstSongRecResult.findElement(By.id("songName"));
@@ -1045,17 +1046,17 @@ public class UITest extends TestCase {
 
         // check that the first song result is "First Class" by "Jack Harlow"
         System.out.println("first song result name: " + firstSongRecName.getText());
-        assertTrue(firstSongRecName.getText().equals("First Class"));
+        assertTrue(firstSongRecName.getText().equals("Congratulations"));
 
         System.out.println("first song result artist: " + firstSongRecArtist.getText());
-        assertTrue(firstSongRecArtist.getText().equals("Jack Harlow"));
+        assertTrue(firstSongRecArtist.getText().equals("Post Malone"));
 
         // press on First Class to add to your recommendations
         firstSongRecResult.click();
 
         Thread.sleep(5000);
 
-        searchRecsInput2.sendKeys("summertime sadness born");
+        searchRecsInput2.sendKeys("first class");
         List<WebElement> songRecResults2 = findSongsDiv.findElements(By.id("songResult"));
         WebElement firstSongRecResult2 = songRecResults2.get(0).findElement(By.id("songInfo"));
         WebElement firstSongRecName2 = firstSongRecResult2.findElement(By.id("songName"));
@@ -1063,15 +1064,74 @@ public class UITest extends TestCase {
 
         // check that the first song result is "First Class" by "Jack Harlow"
         System.out.println("first song result name: " + firstSongRecName2.getText());
-        assertTrue(firstSongRecName2.getText().equals("Summertime Sadness"));
+        assertTrue(firstSongRecName2.getText().equals("First Class"));
 
         System.out.println("first song result artist: " + firstSongRecArtist2.getText());
-        assertTrue(firstSongRecArtist2.getText().equals("Lana Del Rey"));
+        assertTrue(firstSongRecArtist2.getText().equals("Jack Harlow"));
 
         // press on Summertime Sadness to add to your recommendations
         firstSongRecResult2.click();
 
+//        WebElement root5 = driver.findElement(By.id("root"));
+//        WebElement mainWindow3 = root4.findElement(By.id("mainWindow"));
+//        WebElement mainDiv3 = mainWindow3.findElement(By.id("mainDiv"));
+//        WebElement findSongsDiv2 = mainDiv3.findElement(By.id("searchResultsFindSongDiv"));
+//        WebElement topSongsAndSearchDiv2 = findSongsDiv2.findElement(By.id("topRecsAndSearchBarDiv"));
+
+
         Thread.sleep(5000);
+
+        // check rankings changed
+        WebElement topSongsListDiv2 = playingAndTopRecs.findElement(By.id("topSongsList"));
+        WebElement topSongsList2 = topSongsListDiv2.findElement(By.tagName("ul"));
+
+
+        // get list of song items
+        List<WebElement> threeTopSongs2 = topSongsList2.findElements(By.tagName("li"));
+
+        // get song # 1 info (in list for, first div = play icon, second div = number icon, third div = name and artist
+        List<WebElement> firstTopSong2 = threeTopSongs2.get(0).findElements(By.tagName("div"));
+
+        // get 2nd element, song name and artist info
+        WebElement firstTopSongName2 = firstTopSong2.get(2).findElement(By.tagName("span"));
+        WebElement firstTopSongArtist2 = firstTopSong2.get(2).findElement(By.tagName("p"));
+
+        // check top song #1 name and artist
+        System.out.println("firstTopSongName2: " + firstTopSongName2.getText());
+        assertTrue(firstTopSongName2.getText().equals("I Love It (feat. Charli XCX)"));
+
+        System.out.println("firstTopSongArtist2: " + firstTopSongArtist2.getText());
+        assertTrue(firstTopSongArtist2.getText().equals("Icona Pop"));
+
+        // get song # 2 info (in list for, first div = play icon, second div = number icon, third div = name and artist
+        List<WebElement> secondTopSong2 = threeTopSongs2.get(1).findElements(By.tagName("div"));
+
+        // get 2nd element, song name and artist info
+        WebElement secondTopSongName2 = secondTopSong2.get(2).findElement(By.tagName("span"));
+        WebElement secondTopSongArtist2 = secondTopSong2.get(2).findElement(By.tagName("p"));
+
+        // check top song #1 name and artist
+        System.out.println("secondTopSongName2: " + secondTopSongName2.getText());
+        assertTrue(secondTopSongName2.getText().equals("Congratulations"));
+
+        System.out.println("secondTopSongArtist2: " + secondTopSongArtist2.getText());
+        assertTrue(secondTopSongArtist2.getText().equals("Post Malone"));
+
+        // get song # 3 info (in list for, first div = play icon, second div = number icon, third div = name and artist
+        List<WebElement> thirdTopSong2 = threeTopSongs2.get(2).findElements(By.tagName("div"));
+
+        // get 2nd element, song name and artist info
+        WebElement thirdTopSongName2 = thirdTopSong2.get(2).findElement(By.tagName("span"));
+        WebElement thirdTopSongArtist2 = thirdTopSong2.get(2).findElement(By.tagName("p"));
+
+        // check top song #1 name and artist
+        System.out.println("thirdTopSongName2: " + thirdTopSongName2.getText());
+        assertTrue(thirdTopSongName2.getText().equals("First Class"));
+
+        System.out.println("thirdTopSongArtist2: " + thirdTopSongArtist2.getText());
+        assertTrue(thirdTopSongArtist2.getText().equals("Jack Harlow"));
+
+
 
         // check to see rankings changed from I Love It, Cool For the Summer, and The Way Life Goes
         // to I Love It, Summertime Sadness, and First Class
@@ -1090,10 +1150,10 @@ public class UITest extends TestCase {
 
         // first rec should be I Love It (feat. Charli XCX)
         System.out.println("firstRecSongName: " + firstRecSongName.getText());
-        assertTrue(firstRecSongName.getText().equals("I Love It (feat. Charli XCX)"));
+        assertTrue(firstRecSongName.getText().equals("Congratulations"));
 
         System.out.println("firstRecSongArtist: " + firstRecSongArtist.getText());
-        assertTrue(firstRecSongArtist.getText().equals("Icona Pop"));
+        assertTrue(firstRecSongArtist.getText().equals("Post Malone"));
 
         // get song # 2 Summertime Sadness info (in list for, first div = play icon, second div = number icon, third div = name and artist
         List<WebElement> secondRecSong = threeRecSongs.get(1).findElements(By.tagName("div"));
@@ -1109,27 +1169,13 @@ public class UITest extends TestCase {
         System.out.println("secondRecSongArtist: " + secondRecSongArtist.getText());
         assertTrue(secondRecSongArtist.getText().equals("Jack Harlow"));
 
-        // get song # 3 First Class info (in list for, first div = play icon, second div = number icon, third div = name and artist
-        List<WebElement> thirdRecSong = threeRecSongs.get(1).findElements(By.tagName("div"));
-
-        // get 2nd element, song name and artist info
-        WebElement thirdRecSongName = thirdRecSong.get(2).findElement(By.tagName("span"));
-        WebElement thirdRecSongArtist = thirdRecSong.get(2).findElement(By.tagName("p"));
-
-        // third rec should be First Class
-        System.out.println("thirdRecSongName: " + thirdRecSongName.getText());
-        assertTrue(thirdRecSongName.getText().equals("Summertime Sadness"));
-
-        System.out.println("thirdRecSongArtist: " + thirdRecSongArtist.getText());
-        assertTrue(thirdRecSongArtist.getText().equals("Lana Del Rey"));
-
         // ****** Check you can Delete Recommendation ******
-        // delete summertime sadness song from your recommendations
+        // delete First Class from your recommendations
         // need to get icons, first is play song, second is add to playlist
         WebElement songRecsButtonsDiv = threeRecSongs.get(1).findElement(By.id("songRecsButtons"));
         WebElement deleteRecButton = songRecsButtonsDiv.findElement(By.id("deleteRecButton"));
 
-        // delete EARFQUAKE song from your recommendations
+        // delete Congratulations song from your recommendations
         // need to get icons, first is play song, second is add to playlist
         WebElement songRecsButtonsDiv2 = threeRecSongs.get(0).findElement(By.id("songRecsButtons"));
         WebElement deleteRecButton2 = songRecsButtonsDiv2.findElement(By.id("deleteRecButton"));
@@ -1138,6 +1184,62 @@ public class UITest extends TestCase {
         deleteRecButton.click();
         deleteRecButton2.click();
 
+        Thread.sleep(3000);
+
+        // check rankings changed after deletion: should go back to -->
+        // 1: I love it, 2: cool for the summer, 3: congratulations
+        WebElement topSongsListDiv3 = playingAndTopRecs.findElement(By.id("topSongsList"));
+        WebElement topSongsList3 = topSongsListDiv3.findElement(By.tagName("ul"));
+
+
+        // get list of song items
+        List<WebElement> threeTopSongs3 = topSongsList3.findElements(By.tagName("li"));
+
+        // get song # 1 info (in list for, first div = play icon, second div = number icon, third div = name and artist
+        List<WebElement> firstTopSong3 = threeTopSongs3.get(0).findElements(By.tagName("div"));
+
+        // get 2nd element, song name and artist info
+        WebElement firstTopSongName3 = firstTopSong3.get(2).findElement(By.tagName("span"));
+        WebElement firstTopSongArtist3 = firstTopSong3.get(2).findElement(By.tagName("p"));
+
+        // check top song #1 name and artist
+        System.out.println("firstTopSongName3: " + firstTopSongName3.getText());
+        assertTrue(firstTopSongName3.getText().equals("I Love It (feat. Charli XCX)"));
+
+        System.out.println("firstTopSongArtist3: " + firstTopSongArtist3.getText());
+        assertTrue(firstTopSongArtist3.getText().equals("Icona Pop"));
+
+        // get song # 2 info (in list for, first div = play icon, second div = number icon, third div = name and artist
+        List<WebElement> secondTopSong3 = threeTopSongs3.get(1).findElements(By.tagName("div"));
+
+        // get 2nd element, song name and artist info
+        WebElement secondTopSongName3 = secondTopSong3.get(2).findElement(By.tagName("span"));
+        WebElement secondTopSongArtist3 = secondTopSong3.get(2).findElement(By.tagName("p"));
+
+        // check top song #1 name and artist
+        System.out.println("secondTopSongName3: " + secondTopSongName3.getText());
+        assertTrue(secondTopSongName3.getText().equals("Cool for the Summer"));
+
+        System.out.println("secondTopSongArtist3: " + secondTopSongArtist3.getText());
+        assertTrue(secondTopSongArtist3.getText().equals("Demi Lovato"));
+
+        // get song # 3 info (in list for, first div = play icon, second div = number icon, third div = name and artist
+        List<WebElement> thirdTopSong3 = threeTopSongs3.get(2).findElements(By.tagName("div"));
+
+        // get 2nd element, song name and artist info
+        WebElement thirdTopSongName3 = thirdTopSong3.get(2).findElement(By.tagName("span"));
+        WebElement thirdTopSongArtist3 = thirdTopSong3.get(2).findElement(By.tagName("p"));
+
+        // check top song #1 name and artist
+        System.out.println("thirdTopSongName3: " + thirdTopSongName3.getText());
+        assertTrue(thirdTopSongName3.getText().equals("Congratulations"));
+
+        System.out.println("thirdTopSongArtist3: " + thirdTopSongArtist3.getText());
+        assertTrue(thirdTopSongArtist3.getText().equals("Post Malone"));
+
+        Thread.sleep(3000);
+
+        teardownHelper();
     }
 
     /**
