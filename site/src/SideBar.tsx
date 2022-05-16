@@ -24,11 +24,12 @@ function SideBar(props: {nowPlaying: track | undefined, authentication: Authenti
             <ProfilePhoto image={props.sidebarConfig.profilePicturePath ?? DefaultPfp}/>
 
             <div id="accountMenu" className={"Account-menu"}>
-                <div className={"Player-box"}>
+                <div id="Player-box" className={"Player-box"}>
                     {props.nowPlaying !== undefined ?
                         <SpotifyPlayer
                             uris={[props.nowPlaying.uri]}
                             token={props.authentication.accessToken}
+                            magnifySliderOnHover={true}
                         />
                         : <></>
                     }
@@ -38,9 +39,9 @@ function SideBar(props: {nowPlaying: track | undefined, authentication: Authenti
                 <AccMenuButton picture={SearchIcon} picAlt={"search icon"} txtContent={"Search Songs"} route={"/dashboard"}/>
                 <AccMenuButton picture={PicRecList} picAlt={"list icon"} txtContent={"My Recommendations"} route={"/editprofile"}/>
                 <AccMenuButton picture={SearchIcon} picAlt={"search icon"} txtContent={"Find Friends"} route={"/myrecommendations"}/>
-                <AccMenuButton picture={PicFriends} picAlt={"friends"} txtContent={"Friends List"} route={"/friendslist"}/>
-                <AccMenuButton picture={PicLock} picAlt={"lock"} txtContent={"Settings"} route={"/changepassword"}/>
-                <AccMenuButton picture={PicSignOut} picAlt={"exit"} txtContent={"Sign Out"} route={"/signout"}/>
+                <AccMenuButton picture={PicFriends} picAlt={"friends icon"} txtContent={"Friends List"} route={"/friendslist"}/>
+                <AccMenuButton picture={PicLock} picAlt={"lock icon"} txtContent={"Settings"} route={"/changepassword"}/>
+                <AccMenuButton picture={PicSignOut} picAlt={"exit icon"} txtContent={"Sign Out"} route={"/signout"}/>
                 </div>
             </div>
         </div>

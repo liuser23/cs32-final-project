@@ -49,8 +49,8 @@ function RecommenderInput(props : {title : string, type: number, val : number | 
     }
 
     return (
-        <div className={"Recommender-input"}>
-            <div className={"Recommender-input-title"}>{props.title}</div>
+        <div id="recInput" className={"Recommender-input"}>
+            <div id="recInputTitle" className={"Recommender-input-title"}>{props.title}</div>
             {inputSwitch}
         </div>
     )

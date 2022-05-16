@@ -67,11 +67,11 @@ function Home(props: {authentication: Authentication, setSidebarConfig: Dispatch
     }, [])
 
     return (
-            <div className={"Main-window"} style={{top:'40px'}}>
-                <div style={{paddingBottom: '30px'}}>
+            <div id={"mainWindow"} className={"Main-window"} style={{top:'40px'}}>
+                <div id={"profileDiv"} style={{paddingBottom: '30px'}}>
                 { curUserName !== undefined && numFollowers !== undefined ?
                     <ProfileHeader username={curUserName}/> :
-                    <p>Loading Loading Profile Info</p>
+                    <p id="userNameText">Loading Profile Info</p>
                 }
                 </div>
                 <hr className = {"Profile-horizontal-line"}/>

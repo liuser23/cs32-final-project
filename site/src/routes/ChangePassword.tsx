@@ -8,9 +8,9 @@ import Button from "@mui/material/Button";
 
 function ChangePassword() {
     return (
-        <div className={"Empty-Background"} style={{flex: 1, padding: '370px'}}>
+        <div id="emptyBackground" className={"Empty-Background"} style={{flex: 1, padding: '370px'}}>
             <div >
-                <Button variant="outlined" color="success" size="large" className="Empty-Button" type='submit' >Settings</Button>
+                <Button id="settingsButton"variant="outlined" color="success" size="large" className="Empty-Button" type='submit' >SETTINGS</Button>
             </div>
         </div>
     )
