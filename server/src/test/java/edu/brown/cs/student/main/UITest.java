@@ -787,10 +787,53 @@ public class UITest extends TestCase {
         assertFalse(songTwelve.getText().equals(songOneName));
         assertFalse(songTwelve.getText().equals(songTwoName));
         assertFalse(songTwelve.getText().equals(songThreeName));
-//
+
+        // play song 12: Deja Vu to check new songs play function works
+        songTwelve.click();
+        Thread.sleep(5000); // use sleep to prevent stale elements
+
+        // test opposite direction
+        // press the left sidebar button 4  times, the new four should be
+        // the same as the first four
+        topSongsButtonLeft.click();
+        topSongsButtonLeft.click();
+        topSongsButtonLeft.click();
+        topSongsButtonLeft.click();
+
+        Thread.sleep(10000); // use sleep to prevent stale elements
+
+        // get new list of Songs
+        List<WebElement> topSongsListLeftFour = topSongsItemsList.findElements(By.id("songBox"));
+
+        WebElement songOneLeft = topSongsListLeftFour.get(0);
+        String songOneNameLeft = songOneLeft.getText();
+        System.out.println("songOneNameLeft: " + songOneNameLeft);
+        assertTrue(songOneNameLeft.equals("As It Was"));
+        // check it is the same as first song one
+        assertTrue(songOneNameLeft.equals(songOneName));
+
+        WebElement songTwoLeft = topSongsListLeftFour.get(1);
+        String songTwoNameLeft = songTwoLeft.getText();
+        System.out.println("songTwoNameLeft: " + songTwoNameLeft);
+        assertTrue(songTwoNameLeft.equals("Nothing New (feat. Phoebe Bridgers) (Taylor’s Version) (From The Vault)"));
+        // check it is the same as first song two
+        assertTrue(songTwoLeft.equals(songTwoName));
+
+        WebElement songThreeLeft = topSongsListLeftFour.get(2);
+        String songThreeNameLeft = songThreeLeft.getText();
+        System.out.println("songThreeNameLeft: " + songThreeNameLeft);
+        assertTrue(songThreeNameLeft.equals("It Never Rains in Southern California"));
+        // check it is the same as first song three
+        assertTrue(songThreeNameLeft.equals(songThreeName));
+
+        WebElement songFourLeft = topSongsListLeftFour.get(3);
+        String songFourNameLeft = songFourLeft.getText();
+        System.out.println("songFourNameLeft: " + songFourNameLeft);
+        assertTrue(songFourNameLeft.equals("Dead of Night"));
+        // check it is the same as first song four
+        assertTrue(songFourNameLeft.equals(songFourName));
 
         teardownHelper();
-
     }
 
     /**
