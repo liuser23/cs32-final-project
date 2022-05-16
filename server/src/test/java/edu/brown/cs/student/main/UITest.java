@@ -633,10 +633,10 @@ public class UITest extends TestCase {
         WebElement playingAndTopRecs3 = findSongsDiv3.findElement(By.id("playing-and-top-recs"));
         WebElement currentlyPlaying3 = playingAndTopRecs3.findElement(By.id("currently-playing"));
 
-        // check image source, should be https://i.scdn.co/image/ab67616d0000b27360ec4df52c2d724bc53ffec5
+        // check image source, should be https://i.scdn.co/image/ab67616d0000b273c5649add07ed3720be9d5526
         WebElement playingTrackImage3 = currentlyPlaying3.findElement(By.tagName("img"));
-//        System.out.println("new playing song img src: " + playingTrackImage3.getAttribute("src"));
-//        assertTrue(playingTrackImage3.getAttribute("src").equals("https://i.scdn.co/image/ab67616d0000b27360ec4df52c2d724bc53ffec5"));
+        System.out.println("new playing song img src: " + playingTrackImage3.getAttribute("src"));
+        assertTrue(playingTrackImage3.getAttribute("src").equals("https://i.scdn.co/image/ab67616d0000b273c5649add07ed3720be9d5526"));
 
         // get name and artist
         WebElement playingTrackInfoList3 = currentlyPlaying3.findElement(By.tagName("ul"));
@@ -655,6 +655,16 @@ public class UITest extends TestCase {
     }
 
 
+    /**
+     * This tests the functionality of the song player on the homepage
+     * It tests that the right top songs for the user are displayed,
+     * that clicking a song will play it, and using the right and left side-bars displays
+     * new songs and goes back to old ones.
+     *
+     * NOTE: run this test in full screen, or the left side-bar for top songs can't be clicked as it
+     * is too close to the side nav bar when the screen is compressed
+     * @throws InterruptedException
+     */
     public void testHomePagePlayer() throws InterruptedException {
         setupHelper();
         loginHelper();
@@ -664,8 +674,6 @@ public class UITest extends TestCase {
         WebElement sideNavBar = root2.findElement(By.id("sideNavBar"));
 
         WebElement mainWindow = root2.findElement(By.id("mainWindow"));
-//        WebElement mainDiv = mainWindow.findElement(By.id("mainDiv"));
-//        WebElement findSongsDiv = mainDiv.findElement(By.id("searchResultsFindSongDiv"));
 
         WebElement topSongsBox = mainWindow.findElement(By.id("topSongsBox"));
         WebElement topSongsText = topSongsBox.findElement(By.tagName("p"));
@@ -817,7 +825,7 @@ public class UITest extends TestCase {
         System.out.println("songTwoNameLeft: " + songTwoNameLeft);
         assertTrue(songTwoNameLeft.equals("Nothing New (feat. Phoebe Bridgers) (Taylor’s Version) (From The Vault)"));
         // check it is the same as first song two
-        assertTrue(songTwoLeft.equals(songTwoName));
+        assertTrue(songTwoNameLeft.equals(songTwoName));
 
         WebElement songThreeLeft = topSongsListLeftFour.get(2);
         String songThreeNameLeft = songThreeLeft.getText();
@@ -836,19 +844,299 @@ public class UITest extends TestCase {
         teardownHelper();
     }
 
+
     /**
-     * Test the UI of Dashboard sections appeared
+     * Test the UI of Dashboard sections
      */
-    public void testDashboard(){
-//        setupHelper();
-//        loginHelper();
-//        driver.manage().timeouts().implicitlyWait(Duration.ofMillis(10000));
-//        String newUrl = PAGE_URL + "/dashboard";
-//        driver.get(newUrl);
-//        WebElement root2 = driver.findElement(By.id("root"));
-//        WebElement mainWindow = root2.findElement(By.id("mainWindow"));
-//
-//        teardownHelper();
+    public void testDashboard() throws InterruptedException {
+        setupHelper();
+        loginHelper();
+        Thread.sleep(10000); // use sleep to prevent stale elements
+
+        WebElement root2 = driver.findElement(By.id("root"));
+        WebElement sideBar = root2.findElement(By.id("sideNavBar"));
+        WebElement menu = sideBar.findElement(By.id("accountMenu"));
+        WebElement menuOptions = menu.findElement(By.id("menu-options"));
+
+        // navigate to dashboard from home page
+        WebElement searchSongButton = menuOptions.findElements(By.tagName("a")).get(1);
+        searchSongButton.click();
+        Thread.sleep(10000); // use sleep to prevent stale elements
+
+        // find some recommendations
+        WebElement root3 = driver.findElement(By.id("root"));
+        WebElement mainWindow = root3.findElement(By.id("mainWindow"));
+        WebElement mainDiv = mainWindow.findElement(By.id("mainDiv"));
+        WebElement songRecsBar = mainDiv.findElement(By.id("findSongRecsBar"));
+        WebElement findSongRecBarPart = songRecsBar.findElement(By.id("findSongRecsBarHeader"));
+        WebElement findSongRecBarPartText = findSongRecBarPart.findElement(By.tagName("h3"));
+        System.out.println("findSongRecBarPartText.getText(): " + findSongRecBarPartText.getText());
+        assertTrue(findSongRecBarPartText.getText().equals("Find Song Recommendations"));
+
+        // top recommendations
+        WebElement searchResultsFindSongDiv = mainDiv.findElement(By.id("searchResultsFindSongDiv"));
+        WebElement topRecsBar = searchResultsFindSongDiv.findElement(By.id("topRecsBar"));
+        WebElement topRecsBarHeader = topRecsBar.findElement(By.id("topRecsBarHeader"));
+        WebElement topRecsBarPartText = topRecsBarHeader.findElement(By.tagName("h3"));
+        System.out.println("topRecsBarPartText.getText(): " + topRecsBarPartText.getText());
+        assertTrue(topRecsBarPartText.getText().equals("Top Recommendations"));
+
+        // make recommendations
+        WebElement topRecsAndSearchBarDiv = searchResultsFindSongDiv.findElement(By.id("topRecsAndSearchBarDiv"));
+        WebElement makeRecsBar = topRecsAndSearchBarDiv.findElement(By.id("makeRecsBar"));
+        WebElement makeRecsBarHeader = makeRecsBar.findElement(By.id("makeRecsBarHeader"));
+        WebElement makeRecsBarHeaderText = makeRecsBarHeader.findElement(By.tagName("h3"));
+        System.out.println("makeRecsBarHeaderText.getText(): " + makeRecsBarHeaderText.getText());
+        assertTrue(makeRecsBarHeaderText.getText().equals("Make Recommendations"));
+
+        // lyrics
+        WebElement lyricsBarDiv = searchResultsFindSongDiv.findElement(By.id("lyricsBarDiv"));
+        WebElement lyricsBar = lyricsBarDiv.findElement(By.id("lyricsBar"));
+        WebElement lyricsBarHeader = lyricsBar.findElement(By.id("lyricsBarHeader"));
+        WebElement lyricsBarHeaderText = lyricsBarHeader.findElement(By.tagName("h3"));
+        System.out.println("lyricsBarHeaderText.getText(): " + lyricsBarHeaderText.getText());
+        assertTrue(lyricsBarHeaderText.getText().equals("Lyrics"));
+
+        teardownHelper();
+
+    }
+
+    /**
+     * Tests that the order of recs changes when user adds recs to song that has top recs
+     * @throws InterruptedException
+     */
+    public void testSongRecRankings() throws InterruptedException {
+        setupHelper();
+        loginHelper();
+        Thread.sleep(10000); // use sleep to prevent stale elements
+
+        WebElement root2 = driver.findElement(By.id("root"));
+        WebElement sideBar = root2.findElement(By.id("sideNavBar"));
+        WebElement menu = sideBar.findElement(By.id("accountMenu"));
+        WebElement menuOptions = menu.findElement(By.id("menu-options"));
+
+        // navigate to dashboard from home page
+        WebElement searchSongButton = menuOptions.findElements(By.tagName("a")).get(1);
+        searchSongButton.click();
+        Thread.sleep(10000); // use sleep to prevent stale elements
+
+        WebElement root3 = driver.findElement(By.id("root"));
+        WebElement mainWindow = root3.findElement(By.id("mainWindow"));
+        WebElement mainDiv = mainWindow.findElement(By.id("mainDiv"));
+        WebElement searchBarDiv = mainDiv.findElement(By.id("searchBarDiv"));
+        WebElement searchBarInput = searchBarDiv.findElement(By.tagName("input"));
+        WebElement findSongsDiv = mainDiv.findElement(By.id("searchResultsFindSongDiv"));
+
+        WebElement topSongsAndSearchDiv = findSongsDiv.findElement(By.id("topRecsAndSearchBarDiv"));
+        WebElement addingSongDiv = topSongsAndSearchDiv.findElement(By.id("addingSong"));
+        WebElement searchRecsInput = addingSongDiv.findElement(By.tagName("input"));
+
+
+        // search for song using "feel so close"
+        searchBarInput.sendKeys("feel so close");
+        List<WebElement> songResults = findSongsDiv.findElements(By.id("songResult"));
+        WebElement firstSongResult = songResults.get(0).findElement(By.id("songInfo"));
+        WebElement firstSongName = firstSongResult.findElement(By.id("songName"));
+        WebElement firstSongArtist = firstSongResult.findElement(By.id("songArtist"));
+
+        // check that the first song result is "Feel So Close" by "Calvin Harris"
+        System.out.println("first song result name: " + firstSongName.getText());
+        assertTrue(firstSongName.getText().equals("Feel So Close - Radio Edit"));
+
+        System.out.println("first song result artist: " +firstSongArtist.getText());
+        assertTrue(firstSongArtist.getText().equals("Calvin Harris"));
+
+        // press on Feel So Close song to start playing
+        firstSongResult.click();
+        WebElement playerBox = sideBar.findElement(By.id("Player-box"));
+        WebElement playerPlayButton = playerBox.findElement(By.tagName("button"));
+        playerPlayButton.click(); // start player
+        Thread.sleep(3000); // use sleep to prevent stale elements
+
+        WebElement root4 = driver.findElement(By.id("root"));
+        WebElement mainWindow2 = root4.findElement(By.id("mainWindow"));
+        WebElement mainDiv2 = mainWindow2.findElement(By.id("mainDiv"));
+        WebElement findSongsDiv2 = mainDiv2.findElement(By.id("searchResultsFindSongDiv"));
+        WebElement topSongsAndSearchDiv2 = findSongsDiv2.findElement(By.id("topRecsAndSearchBarDiv"));
+        WebElement addingSongDiv2 = topSongsAndSearchDiv2.findElement(By.id("addingSong"));
+        WebElement searchRecsInput2 = addingSongDiv2.findElement(By.tagName("input"));
+
+
+        // check that Feel So Close - Radio Edit started playing and screen is updated with top songs and recs
+
+        // get the name and artist of what is currently playing (As it Was)
+        WebElement playingAndTopRecs = findSongsDiv.findElement(By.id("playing-and-top-recs"));
+        WebElement currentlyPlaying = playingAndTopRecs.findElement(By.id("currently-playing"));
+
+        // check image source, should be 	https://i.scdn.co/image/ab67616d0000b273dcef905cb144d4867119850b
+        WebElement playingTrackImage = currentlyPlaying.findElement(By.tagName("img"));
+        System.out.println("playing song img src: " + playingTrackImage.getAttribute("src"));
+        assertTrue(playingTrackImage.getAttribute("src").equals("https://i.scdn.co/image/ab67616d0000b273dcef905cb144d4867119850b"));
+
+        // get name and artist
+        WebElement playingTrackInfoList = currentlyPlaying.findElement(By.tagName("ul"));
+        WebElement playingTrackInfoListItem = playingTrackInfoList.findElement(By.tagName("li"));
+        WebElement playingTrackInfoListItemTextDiv = playingTrackInfoListItem.findElement(By.tagName("div"));
+        WebElement playingTrackSongName = playingTrackInfoListItemTextDiv.findElement(By.tagName("span"));
+        WebElement playingTrackSongArtist = playingTrackInfoListItemTextDiv.findElement(By.tagName("p"));
+
+        // check song name is correct
+        System.out.println("playing track song name: "+ playingTrackSongName.getText());
+        assertTrue(playingTrackSongName.getText().equals("Feel So Close - Radio Edit"));
+
+        // check song artist is correct
+        System.out.println("playing track artist: " + playingTrackSongArtist.getText());
+        assertTrue(playingTrackSongArtist.getText().equals("Calvin Harris"));
+
+        // now check top three songs: should be I Love It, Cool For the Summer, and The Way Life Goes
+        WebElement topSongsListDiv = playingAndTopRecs.findElement(By.id("topSongsList"));
+        WebElement topSongsList = topSongsListDiv.findElement(By.tagName("ul"));
+
+        // get list of song items
+        List<WebElement> threeTopSongs = topSongsList.findElements(By.tagName("li"));
+
+        // get song # 1 info (in list for, first div = play icon, second div = number icon, third div = name and artist
+        List<WebElement> firstTopSong = threeTopSongs.get(0).findElements(By.tagName("div"));
+
+        // get 2nd element, song name and artist info
+        WebElement firstTopSongName = firstTopSong.get(2).findElement(By.tagName("span"));
+        WebElement firstTopSongArtist = firstTopSong.get(2).findElement(By.tagName("p"));
+
+        // check top song #1 name and artist
+        System.out.println("firstTopSongName: " + firstTopSongName.getText());
+        assertTrue(firstTopSongName.getText().equals("I Love It (feat. Charli XCX)"));
+
+        System.out.println("firstTopSongArtist: " + firstTopSongArtist.getText());
+        assertTrue(firstTopSongArtist.getText().equals("Icona Pop"));
+
+        // get song # 2  info (in list for, first div = play icon, second div = number icon, third div = name and artist
+        List<WebElement> secondTopSong = threeTopSongs.get(1).findElements(By.tagName("div"));
+
+        // get 2nd element, song name and artist info
+        WebElement secondTopSongName = secondTopSong.get(2).findElement(By.tagName("span"));
+        WebElement secondTopSongArtist = secondTopSong.get(2).findElement(By.tagName("p"));
+
+        // check top song #2 name and artist
+        System.out.println("secondTopSongName: " + secondTopSongName.getText());
+        assertTrue(secondTopSongName.getText().equals("Cool for the Summer"));
+
+        System.out.println("secondTopSongArtist: " + secondTopSongArtist.getText());
+        assertTrue(secondTopSongArtist.getText().equals("Demi Lovato"));
+
+        // get song # 3 Hello info (in list for, first div = play icon, second div = number icon, third div = name and artist
+        List<WebElement> thirdTopSong = threeTopSongs.get(2).findElements(By.tagName("div"));
+
+        // get 2nd element, song name and artist info
+        WebElement thirdTopSongName = thirdTopSong.get(2).findElement(By.tagName("span"));
+        WebElement thirdTopSongArtist = thirdTopSong.get(2).findElement(By.tagName("p"));
+
+        // check top song #3 name and artist
+        System.out.println("thirdTopSongName: " + thirdTopSongName.getText());
+        assertTrue(thirdTopSongName.getText().equals("The Way Life Goes (feat. Oh Wonder)"));
+
+        System.out.println("thirdTopSongArtist: " + thirdTopSongArtist.getText());
+        assertTrue(thirdTopSongArtist.getText().equals("Lil Uzi Vert"));
+
+        searchRecsInput2.sendKeys("first class");
+        List<WebElement> songRecResults = findSongsDiv.findElements(By.id("songResult"));
+        WebElement firstSongRecResult = songRecResults.get(0).findElement(By.id("songInfo"));
+        WebElement firstSongRecName = firstSongRecResult.findElement(By.id("songName"));
+        WebElement firstSongRecArtist = firstSongRecResult.findElement(By.id("songArtist"));
+
+        // check that the first song result is "First Class" by "Jack Harlow"
+        System.out.println("first song result name: " + firstSongRecName.getText());
+        assertTrue(firstSongRecName.getText().equals("First Class"));
+
+        System.out.println("first song result artist: " + firstSongRecArtist.getText());
+        assertTrue(firstSongRecArtist.getText().equals("Jack Harlow"));
+
+        // press on First Class to add to your recommendations
+        firstSongRecResult.click();
+
+        Thread.sleep(5000);
+
+        searchRecsInput2.sendKeys("summertime sadness born");
+        List<WebElement> songRecResults2 = findSongsDiv.findElements(By.id("songResult"));
+        WebElement firstSongRecResult2 = songRecResults2.get(0).findElement(By.id("songInfo"));
+        WebElement firstSongRecName2 = firstSongRecResult2.findElement(By.id("songName"));
+        WebElement firstSongRecArtist2 = firstSongRecResult2.findElement(By.id("songArtist"));
+
+        // check that the first song result is "First Class" by "Jack Harlow"
+        System.out.println("first song result name: " + firstSongRecName2.getText());
+        assertTrue(firstSongRecName2.getText().equals("Summertime Sadness"));
+
+        System.out.println("first song result artist: " + firstSongRecArtist2.getText());
+        assertTrue(firstSongRecArtist2.getText().equals("Lana Del Rey"));
+
+        // press on Summertime Sadness to add to your recommendations
+        firstSongRecResult2.click();
+
+        Thread.sleep(5000);
+
+        // check to see rankings changed from I Love It, Cool For the Summer, and The Way Life Goes
+        // to I Love It, Summertime Sadness, and First Class
+        WebElement recsList = topSongsAndSearchDiv2.findElement(By.id("recsList"));
+        WebElement songRecsList = recsList.findElement(By.tagName("ul"));
+
+        // get list of top song items
+        List<WebElement> threeRecSongs = songRecsList.findElements(By.tagName("li"));
+
+        // get song # 1 info (in list for, first div = play icon, second div = number icon, third div = name and artist
+        List<WebElement> firstRecSong = threeRecSongs.get(0).findElements(By.tagName("div"));
+
+        // get 2nd element, song name and artist info
+        WebElement firstRecSongName = firstRecSong.get(2).findElement(By.tagName("span"));
+        WebElement firstRecSongArtist = firstRecSong.get(2).findElement(By.tagName("p"));
+
+        // first rec should be I Love It (feat. Charli XCX)
+        System.out.println("firstRecSongName: " + firstRecSongName.getText());
+        assertTrue(firstRecSongName.getText().equals("I Love It (feat. Charli XCX)"));
+
+        System.out.println("firstRecSongArtist: " + firstRecSongArtist.getText());
+        assertTrue(firstRecSongArtist.getText().equals("Icona Pop"));
+
+        // get song # 2 Summertime Sadness info (in list for, first div = play icon, second div = number icon, third div = name and artist
+        List<WebElement> secondRecSong = threeRecSongs.get(1).findElements(By.tagName("div"));
+
+        // get 2nd element, song name and artist info
+        WebElement secondRecSongName = secondRecSong.get(2).findElement(By.tagName("span"));
+        WebElement secondRecSongArtist = secondRecSong.get(2).findElement(By.tagName("p"));
+
+        // second rec should be Summertime Sadness
+        System.out.println("secondRecSongName: " + secondRecSongName.getText());
+        assertTrue(secondRecSongName.getText().equals("First Class"));
+
+        System.out.println("secondRecSongArtist: " + secondRecSongArtist.getText());
+        assertTrue(secondRecSongArtist.getText().equals("Jack Harlow"));
+
+        // get song # 3 First Class info (in list for, first div = play icon, second div = number icon, third div = name and artist
+        List<WebElement> thirdRecSong = threeRecSongs.get(1).findElements(By.tagName("div"));
+
+        // get 2nd element, song name and artist info
+        WebElement thirdRecSongName = thirdRecSong.get(2).findElement(By.tagName("span"));
+        WebElement thirdRecSongArtist = thirdRecSong.get(2).findElement(By.tagName("p"));
+
+        // third rec should be First Class
+        System.out.println("thirdRecSongName: " + thirdRecSongName.getText());
+        assertTrue(thirdRecSongName.getText().equals("Summertime Sadness"));
+
+        System.out.println("thirdRecSongArtist: " + thirdRecSongArtist.getText());
+        assertTrue(thirdRecSongArtist.getText().equals("Lana Del Rey"));
+
+        // ****** Check you can Delete Recommendation ******
+        // delete summertime sadness song from your recommendations
+        // need to get icons, first is play song, second is add to playlist
+        WebElement songRecsButtonsDiv = threeRecSongs.get(1).findElement(By.id("songRecsButtons"));
+        WebElement deleteRecButton = songRecsButtonsDiv.findElement(By.id("deleteRecButton"));
+
+        // delete EARFQUAKE song from your recommendations
+        // need to get icons, first is play song, second is add to playlist
+        WebElement songRecsButtonsDiv2 = threeRecSongs.get(0).findElement(By.id("songRecsButtons"));
+        WebElement deleteRecButton2 = songRecsButtonsDiv2.findElement(By.id("deleteRecButton"));
+
+        // delete song
+        deleteRecButton.click();
+        deleteRecButton2.click();
 
     }
 
@@ -896,6 +1184,183 @@ public class UITest extends TestCase {
         System.out.println(fourthInput.findElement(By.id("recInputTitle")).getText());
         assertTrue(fourthInput.findElement(By.id("recInputTitle")).getText().equals("Importance of genres:"));
 
+
+        teardownHelper();
+    }
+
+    /**
+     * This tests the functionality of the top artists bar on the homepage
+     * It tests that the right top artists for the user are displayed,
+     * and using the right and left side-bars displays
+     * new artists and goes back to old ones.
+     *
+     * NOTE: run this test in full screen, or the left side-bar for top artists can't be clicked as it
+     * is too close to the side nav bar when the screen is compressed
+     * @throws InterruptedException
+     */
+    public void testHomePageTopArtists() throws InterruptedException {
+        setupHelper();
+        loginHelper();
+        Thread.sleep(10000); // use sleep to prevent stale elements
+
+        WebElement root2 = driver.findElement(By.id("root"));
+        WebElement sideNavBar = root2.findElement(By.id("sideNavBar"));
+
+        WebElement mainWindow = root2.findElement(By.id("mainWindow"));
+
+        WebElement topArtistsBox = mainWindow.findElement(By.id("topArtistsBox"));
+        WebElement topArtistsHeaderText = topArtistsBox.findElement(By.tagName("p"));
+
+        System.out.println(topArtistsHeaderText.getText());
+        assertTrue(topArtistsHeaderText.getText().equals("Top Artists"));
+
+        WebElement topArtistsButtonRight = topArtistsBox.findElement(By.id("songNavButtonRight"));
+        WebElement topArtistsButtonLeft = topArtistsBox.findElement(By.id("songNavButtonLeft"));
+        WebElement topArtistsItemsList = topArtistsBox.findElement(By.id("topArtistsList"));
+        List<WebElement> topArtistsList = topArtistsItemsList.findElements(By.id("artistBox"));
+
+        WebElement artistOne = topArtistsList.get(0);
+        String artistOneName = artistOne.getText();
+        System.out.println("artistOneName: " + artistOneName);
+        assertTrue(artistOneName.equals("Taylor Swift"));
+
+        WebElement artistTwo = topArtistsList.get(1);
+        String artistTwoName = artistTwo.getText();
+        System.out.println("artistTwoName: " + artistTwo);
+        assertTrue(artistTwoName.equals("Jack Johnson"));
+
+        WebElement artistThree = topArtistsList.get(2);
+        String artistThreeName = artistThree.getText();
+        System.out.println("artistThreeName: " + artistThreeName);
+        assertTrue(artistThreeName.equals("Billie Eilish"));
+
+        WebElement artistFour = topArtistsList.get(3);
+        String artistFourName = artistFour.getText();
+        System.out.println("artistFourName: " + artistFourName);
+        assertTrue(artistFourName.equals("Lorde"));
+
+
+        // press the right side bar button to see new artist
+        topArtistsButtonRight.click();
+
+        // get new list of artists
+        List<WebElement> topArtistsListRightOne = topArtistsItemsList.findElements(By.id("artistBox"));
+
+        // check artists have been shifted one and there is a new artist
+        WebElement artistFive = topArtistsListRightOne.get(0);
+        System.out.println("artistFiveName: " + artistFive.getText());
+        assertTrue(artistFive.getText().equals("Jack Johnson"));
+
+        WebElement artistSix = topArtistsListRightOne.get(1);
+        System.out.println("artistSixName: " + artistSix.getText());
+        assertTrue(artistSix.getText().equals("Billie Eilish"));
+
+        WebElement artistSeven = topArtistsListRightOne.get(2);
+        System.out.println("artistSevenName: " + artistSeven.getText());
+        assertTrue(artistSeven.getText().equals("Lorde"));
+
+        WebElement artistEight = topArtistsListRightOne.get(3);
+        System.out.println("artistEightName: " + artistEight.getText());
+        assertTrue(artistEight.getText().equals("Olivia Rodrigo"));
+
+        // press the right sidebar button 3 more times, the new four should be
+        // completely different then first four and there should have been 8 artists total
+        topArtistsButtonRight.click();
+        topArtistsButtonRight.click();
+        topArtistsButtonRight.click();
+
+        Thread.sleep(3000); // use sleep to prevent stale elements
+
+        // get new list of artists
+        List<WebElement> topArtistsListRightFour = topArtistsItemsList.findElements(By.id("artistBox"));
+
+        // check artists have been shifted one and there is a new artist
+        WebElement artistNine = topArtistsListRightFour.get(0);
+        System.out.println("artistNineName: " + artistNine.getText());
+        assertTrue(artistNine.getText().equals("Olivia Rodrigo"));
+
+        // artist in the first slot, should not equal the first artist in first slot
+        assertFalse(artistNine.getText().equals(artistOneName));
+
+        WebElement artistTen = topArtistsListRightFour.get(1);
+        System.out.println("artistTenName: " + artistTen.getText());
+        assertTrue(artistTen.getText().equals("Lana Del Rey"));
+
+        // artist in the second slot, should not equal the first artist in second slot
+        assertFalse(artistTen.getText().equals(artistTwoName));
+
+        WebElement artistEleven = topArtistsListRightFour.get(2);
+        System.out.println("artistElevenName: " + artistEleven.getText());
+        assertTrue(artistEleven.getText().equals("Minnz Piano"));
+
+        // artist in the third slot, should not equal the first artist in third slot
+        assertFalse(artistEleven.getText().equals(artistThreeName));
+
+        WebElement artistTwelve = topArtistsListRightFour.get(3);
+        System.out.println("artistTwelveName: " + artistTwelve.getText());
+        assertTrue(artistTwelve.getText().equals("Norah Jones"));
+
+        // artist in the fourth slot, should not equal the first artist in fourth slot
+        assertFalse(artistTwelve.getText().equals(artistFourName));
+
+        // now check that none of the artists from first four are equal to last four
+        assertFalse(artistNine.getText().equals(artistTwoName));
+        assertFalse(artistNine.getText().equals(artistThreeName));
+        assertFalse(artistNine.getText().equals(artistFourName));
+
+        assertFalse(artistTen.getText().equals(artistThreeName));
+        assertFalse(artistTen.getText().equals(artistFourName));
+        assertFalse(artistTen.getText().equals(artistOneName));
+
+        assertFalse(artistEleven.getText().equals(artistFourName));
+        assertFalse(artistEleven.getText().equals(artistOneName));
+        assertFalse(artistEleven.getText().equals(artistTwoName));
+
+        assertFalse(artistTwelve.getText().equals(artistOneName));
+        assertFalse(artistTwelve.getText().equals(artistTwoName));
+        assertFalse(artistTwelve.getText().equals(artistThreeName));
+
+
+        // test opposite direction
+        // press the left sidebar button 4  times, the new four should be
+        // the same as the first four
+        topArtistsButtonLeft.click();
+        topArtistsButtonLeft.click();
+        topArtistsButtonLeft.click();
+        topArtistsButtonLeft.click();
+
+        Thread.sleep(3000); // use sleep to prevent stale elements
+
+        // get new list of artists
+        List<WebElement> topArtistsListLeftFour = topArtistsItemsList.findElements(By.id("artistBox"));
+
+        WebElement artistOneLeft = topArtistsListLeftFour.get(0);
+        String artistOneNameLeft = artistOneLeft.getText();
+        System.out.println("artistOneNameLeft: " + artistOneNameLeft);
+        assertTrue(artistOneNameLeft.equals("Taylor Swift"));
+        // check it is the same as first artist one
+        assertTrue(artistOneNameLeft.equals(artistOneName));
+
+        WebElement artistTwoLeft = topArtistsListLeftFour.get(1);
+        String artistTwoNameLeft = artistTwoLeft.getText();
+        System.out.println("artistTwoNameLeft: " + artistTwoNameLeft);
+        assertTrue(artistTwoNameLeft.equals("Jack Johnson"));
+        // check it is the same as first artist two
+        assertTrue(artistTwoNameLeft.equals(artistTwoName));
+
+        WebElement artistThreeLeft = topArtistsListLeftFour.get(2);
+        String artistThreeNameLeft = artistThreeLeft.getText();
+        System.out.println("artistThreeNameLeft: " + artistThreeNameLeft);
+        assertTrue(artistThreeNameLeft.equals("Billie Eilish"));
+        // check it is the same as first artist three
+        assertTrue(artistThreeNameLeft.equals(artistThreeName));
+
+        WebElement artistFourLeft = topArtistsListLeftFour.get(3);
+        String artistFourNameLeft = artistFourLeft.getText();
+        System.out.println("artistFourNameLeft: " + artistFourNameLeft);
+        assertTrue(artistFourNameLeft.equals("Lorde"));
+        // check it is the same as first artist four
+        assertTrue(artistFourNameLeft.equals(artistFourName));
 
         teardownHelper();
     }
@@ -980,7 +1445,360 @@ public class UITest extends TestCase {
         assertTrue(settingsHomeButton.getText().equals("MY FRIENDS"));
         teardownHelper();
     }
+
+    // testing without specific song / artist names
+
+    /**
+     * *** THIS IS DIFFERENT FROM testHomePagePlayer()
+     *
+     * This test doesn't check the values of the data, because top songs can change
+     * over time for a user. This just checks that the songs stay the same
+     * after using the left and right buttons and that the songs can be played.
+     *
+     * Ideal for testing in the future.
+     *
+     * This tests the functionality of the song player on the homepage
+     * It tests that clicking a song will play it, and using the right and left side-bars
+     * displays new songs and goes back to old ones.
+     *
+     *
+     * NOTE: run this test in full screen, or the left side-bar for top songs can't be clicked as it
+     * is too close to the side nav bar when the screen is compressed
+     * @throws InterruptedException
+     */
+    public void testHomePagePlayerNoNames() throws InterruptedException {
+        setupHelper();
+        loginHelper();
+        Thread.sleep(10000); // use sleep to prevent stale elements
+
+        WebElement root2 = driver.findElement(By.id("root"));
+        WebElement sideNavBar = root2.findElement(By.id("sideNavBar"));
+
+        WebElement mainWindow = root2.findElement(By.id("mainWindow"));
+
+        WebElement topSongsBox = mainWindow.findElement(By.id("topSongsBox"));
+        WebElement topSongsText = topSongsBox.findElement(By.tagName("p"));
+
+        System.out.println(topSongsText.getText());
+        assertTrue(topSongsText.getText().equals("Top Songs"));
+
+        WebElement topSongsButtonRight = topSongsBox.findElement(By.id("songNavButtonRight"));
+        WebElement topSongsButtonLeft = topSongsBox.findElement(By.id("songNavButtonLeft"));
+        WebElement topSongsItemsList = topSongsBox.findElement(By.id("topSongsList"));
+        List<WebElement> topSongsList = topSongsItemsList.findElements(By.id("songBox"));
+
+        WebElement songOne = topSongsList.get(0);
+        String songOneName = songOne.getText();
+        System.out.println("songOneName: " + songOneName);
+
+        WebElement songTwo = topSongsList.get(1);
+        String songTwoName = songTwo.getText();
+        System.out.println("songTwoName: " + songTwoName);
+
+        WebElement songThree = topSongsList.get(2);
+        String songThreeName = songThree.getText();
+        System.out.println("songThreeName: " + songThreeName);
+
+        WebElement songFour = topSongsList.get(3);
+        String songFourName = songFour.getText();
+        System.out.println("songFourName: " + songFourName);
+
+        // play song 3: ?
+        songThree.click();
+        Thread.sleep(5000); // use sleep to prevent stale elements
+
+        WebElement menu = sideNavBar.findElement(By.id("accountMenu"));
+        WebElement playerBox = menu.findElement(By.id("Player-box"));
+        WebElement playerPlayButton = playerBox.findElement(By.tagName("button"));
+        playerPlayButton.click(); // start player
+        Thread.sleep(5000); // use sleep to prevent stale elements
+
+        // press the right side bar button to see new song
+        topSongsButtonRight.click();
+
+        // get new list of Songs
+        List<WebElement> topSongsListRightOne = topSongsItemsList.findElements(By.id("songBox"));
+
+        // check songs have been shifted one and there is a new song
+        WebElement songFive = topSongsListRightOne.get(0);
+        System.out.println("songFive.getText(): " + songFive.getText());
+
+        WebElement songSix = topSongsListRightOne.get(1);
+        System.out.println("songSix.getText(): " + songSix.getText());
+
+        WebElement songSeven = topSongsListRightOne.get(2);
+        System.out.println("songSeven.getText(): " + songSeven.getText());
+
+        WebElement songEight = topSongsListRightOne.get(3);
+        System.out.println("songEight.getText(): " + songEight.getText());
+
+        // press the right sidebar button 3 more times, the new four should be
+        // completely different then first four and there should have been 8 songs total
+        topSongsButtonRight.click();
+        topSongsButtonRight.click();
+        topSongsButtonRight.click();
+
+        Thread.sleep(10000); // use sleep to prevent stale elements
+
+        // get new list of Songs
+        List<WebElement> topSongsListRightFour = topSongsItemsList.findElements(By.id("songBox"));
+
+        // check songs have been shifted one and there is a new song
+        WebElement songNine = topSongsListRightFour.get(0);
+        System.out.println("songNine.getText(): " + songNine.getText());
+
+        // song in the first slot, should not equal the first song in first slot
+        assertFalse(songNine.getText().equals(songOneName));
+
+        WebElement songTen = topSongsListRightFour.get(1);
+        System.out.println("songTen.getText(): " + songTen.getText());
+
+        // song in the second slot, should not equal the first song in second slot
+        assertFalse(songTen.getText().equals(songTwoName));
+
+        WebElement songEleven = topSongsListRightFour.get(2);
+        System.out.println("songEleven.getText(): " + songEleven.getText());
+
+        // song in the third slot, should not equal the first song in third slot
+        assertFalse(songEleven.getText().equals(songThreeName));
+
+        WebElement songTwelve = topSongsListRightFour.get(3);
+        System.out.println("songTwelve.getText(): " + songTwelve.getText());
+
+        // song in the fourth slot, should not equal the first song in fourth slot
+        assertFalse(songTwelve.getText().equals(songFourName));
+
+        // now check that none of the songs from first four are equal to last four
+        assertFalse(songNine.getText().equals(songTwoName));
+        assertFalse(songNine.getText().equals(songThreeName));
+        assertFalse(songNine.getText().equals(songFourName));
+
+        assertFalse(songTen.getText().equals(songThreeName));
+        assertFalse(songTen.getText().equals(songFourName));
+        assertFalse(songTen.getText().equals(songOneName));
+
+        assertFalse(songEleven.getText().equals(songFourName));
+        assertFalse(songEleven.getText().equals(songOneName));
+        assertFalse(songEleven.getText().equals(songTwoName));
+
+        assertFalse(songTwelve.getText().equals(songOneName));
+        assertFalse(songTwelve.getText().equals(songTwoName));
+        assertFalse(songTwelve.getText().equals(songThreeName));
+
+        // play song 12: ?  to check new songs play function works
+        songTwelve.click();
+        Thread.sleep(5000); // use sleep to prevent stale elements
+
+        // test opposite direction
+        // press the left sidebar button 4  times, the new four should be
+        // the same as the first four
+        topSongsButtonLeft.click();
+        topSongsButtonLeft.click();
+        topSongsButtonLeft.click();
+        topSongsButtonLeft.click();
+
+        Thread.sleep(10000); // use sleep to prevent stale elements
+
+        // get new list of Songs
+        List<WebElement> topSongsListLeftFour = topSongsItemsList.findElements(By.id("songBox"));
+
+        WebElement songOneLeft = topSongsListLeftFour.get(0);
+        String songOneNameLeft = songOneLeft.getText();
+        System.out.println("songOneNameLeft: " + songOneNameLeft);
+        // check it is the same as first song one
+        assertTrue(songOneNameLeft.equals(songOneName));
+
+        WebElement songTwoLeft = topSongsListLeftFour.get(1);
+        String songTwoNameLeft = songTwoLeft.getText();
+        System.out.println("songTwoNameLeft: " + songTwoNameLeft);
+        // check it is the same as first song two
+        assertTrue(songTwoNameLeft.equals(songTwoName));
+
+        WebElement songThreeLeft = topSongsListLeftFour.get(2);
+        String songThreeNameLeft = songThreeLeft.getText();
+        System.out.println("songThreeNameLeft: " + songThreeNameLeft);
+        // check it is the same as first song three
+        assertTrue(songThreeNameLeft.equals(songThreeName));
+
+        WebElement songFourLeft = topSongsListLeftFour.get(3);
+        String songFourNameLeft = songFourLeft.getText();
+        System.out.println("songFourNameLeft: " + songFourNameLeft);
+        // check it is the same as first song four
+        assertTrue(songFourNameLeft.equals(songFourName));
+
+        teardownHelper();
+    }
+
+    /**
+     * *** THIS IS DIFFERENT FROM testHomePageTopArtists()
+     *      *
+     *      * This test doesn't check the values of the data, because top artists can change
+     *      * over time for a user. This just checks that the artists stay the same
+     *      * after using the left and right buttons and that the artists can be seen
+     *      *
+     *      * Ideal for testing in the future.
+     *
+     * This tests the functionality of the top artists bar on the homepage
+     * It tests that the top artists for the user are displayed,
+     * and using the right and left side-bars displays
+     * new artists and goes back to old ones.
+     *
+     * NOTE: run this test in full screen, or the left side-bar for top artists can't be clicked as it
+     * is too close to the side nav bar when the screen is compressed
+     * @throws InterruptedException
+     */
+    public void testHomePageTopArtistsNoNames() throws InterruptedException {
+        setupHelper();
+        loginHelper();
+        Thread.sleep(10000); // use sleep to prevent stale elements
+
+        WebElement root2 = driver.findElement(By.id("root"));
+        WebElement sideNavBar = root2.findElement(By.id("sideNavBar"));
+
+        WebElement mainWindow = root2.findElement(By.id("mainWindow"));
+
+        WebElement topArtistsBox = mainWindow.findElement(By.id("topArtistsBox"));
+        WebElement topArtistsHeaderText = topArtistsBox.findElement(By.tagName("p"));
+
+        System.out.println(topArtistsHeaderText.getText());
+        assertTrue(topArtistsHeaderText.getText().equals("Top Artists"));
+
+        WebElement topArtistsButtonRight = topArtistsBox.findElement(By.id("songNavButtonRight"));
+        WebElement topArtistsButtonLeft = topArtistsBox.findElement(By.id("songNavButtonLeft"));
+        WebElement topArtistsItemsList = topArtistsBox.findElement(By.id("topArtistsList"));
+        List<WebElement> topArtistsList = topArtistsItemsList.findElements(By.id("artistBox"));
+
+        WebElement artistOne = topArtistsList.get(0);
+        String artistOneName = artistOne.getText();
+        System.out.println("artistOneName: " + artistOneName);
+
+        WebElement artistTwo = topArtistsList.get(1);
+        String artistTwoName = artistTwo.getText();
+        System.out.println("artistTwoName: " + artistTwo);
+
+        WebElement artistThree = topArtistsList.get(2);
+        String artistThreeName = artistThree.getText();
+        System.out.println("artistThreeName: " + artistThreeName);
+
+        WebElement artistFour = topArtistsList.get(3);
+        String artistFourName = artistFour.getText();
+        System.out.println("artistFourName: " + artistFourName);
+
+        // press the right side bar button to see new artist
+        topArtistsButtonRight.click();
+
+        // get new list of artists
+        List<WebElement> topArtistsListRightOne = topArtistsItemsList.findElements(By.id("artistBox"));
+
+        // check artists have been shifted one and there is a new artist
+        WebElement artistFive = topArtistsListRightOne.get(0);
+        System.out.println("artistFiveName: " + artistFive.getText());
+
+        WebElement artistSix = topArtistsListRightOne.get(1);
+        System.out.println("artistSixName: " + artistSix.getText());
+
+        WebElement artistSeven = topArtistsListRightOne.get(2);
+        System.out.println("artistSevenName: " + artistSeven.getText());
+
+        WebElement artistEight = topArtistsListRightOne.get(3);
+        System.out.println("artistEightName: " + artistEight.getText());
+
+        // press the right sidebar button 3 more times, the new four should be
+        // completely different then first four and there should have been 8 artists total
+        topArtistsButtonRight.click();
+        topArtistsButtonRight.click();
+        topArtistsButtonRight.click();
+
+        Thread.sleep(3000); // use sleep to prevent stale elements
+
+        // get new list of artists
+        List<WebElement> topArtistsListRightFour = topArtistsItemsList.findElements(By.id("artistBox"));
+
+        // check artists have been shifted one and there is a new artist
+        WebElement artistNine = topArtistsListRightFour.get(0);
+        System.out.println("artistNineName: " + artistNine.getText());
+
+        // artist in the first slot, should not equal the first artist in first slot
+        assertFalse(artistNine.getText().equals(artistOneName));
+
+        WebElement artistTen = topArtistsListRightFour.get(1);
+        System.out.println("artistTenName: " + artistTen.getText());
+
+        // artist in the second slot, should not equal the first artist in second slot
+        assertFalse(artistTen.getText().equals(artistTwoName));
+
+        WebElement artistEleven = topArtistsListRightFour.get(2);
+        System.out.println("artistElevenName: " + artistEleven.getText());
+
+        // artist in the third slot, should not equal the first artist in third slot
+        assertFalse(artistEleven.getText().equals(artistThreeName));
+
+        WebElement artistTwelve = topArtistsListRightFour.get(3);
+        System.out.println("artistTwelveName: " + artistTwelve.getText());
+
+        // artist in the fourth slot, should not equal the first artist in fourth slot
+        assertFalse(artistTwelve.getText().equals(artistFourName));
+
+        // now check that none of the artists from first four are equal to last four
+        assertFalse(artistNine.getText().equals(artistTwoName));
+        assertFalse(artistNine.getText().equals(artistThreeName));
+        assertFalse(artistNine.getText().equals(artistFourName));
+
+        assertFalse(artistTen.getText().equals(artistThreeName));
+        assertFalse(artistTen.getText().equals(artistFourName));
+        assertFalse(artistTen.getText().equals(artistOneName));
+
+        assertFalse(artistEleven.getText().equals(artistFourName));
+        assertFalse(artistEleven.getText().equals(artistOneName));
+        assertFalse(artistEleven.getText().equals(artistTwoName));
+
+        assertFalse(artistTwelve.getText().equals(artistOneName));
+        assertFalse(artistTwelve.getText().equals(artistTwoName));
+        assertFalse(artistTwelve.getText().equals(artistThreeName));
+
+
+        // test opposite direction
+        // press the left sidebar button 4  times, the new four should be
+        // the same as the first four
+        topArtistsButtonLeft.click();
+        topArtistsButtonLeft.click();
+        topArtistsButtonLeft.click();
+        topArtistsButtonLeft.click();
+
+        Thread.sleep(3000); // use sleep to prevent stale elements
+
+        // get new list of artists
+        List<WebElement> topArtistsListLeftFour = topArtistsItemsList.findElements(By.id("artistBox"));
+
+        WebElement artistOneLeft = topArtistsListLeftFour.get(0);
+        String artistOneNameLeft = artistOneLeft.getText();
+        System.out.println("artistOneNameLeft: " + artistOneNameLeft);
+        // check it is the same as first artist one
+        assertTrue(artistOneNameLeft.equals(artistOneName));
+
+        WebElement artistTwoLeft = topArtistsListLeftFour.get(1);
+        String artistTwoNameLeft = artistTwoLeft.getText();
+        System.out.println("artistTwoNameLeft: " + artistTwoNameLeft);
+        // check it is the same as first artist two
+        assertTrue(artistTwoNameLeft.equals(artistTwoName));
+
+        WebElement artistThreeLeft = topArtistsListLeftFour.get(2);
+        String artistThreeNameLeft = artistThreeLeft.getText();
+        System.out.println("artistThreeNameLeft: " + artistThreeNameLeft);
+        // check it is the same as first artist three
+        assertTrue(artistThreeNameLeft.equals(artistThreeName));
+
+        WebElement artistFourLeft = topArtistsListLeftFour.get(3);
+        String artistFourNameLeft = artistFourLeft.getText();
+        System.out.println("artistFourNameLeft: " + artistFourNameLeft);
+        // check it is the same as first artist four
+        assertTrue(artistFourNameLeft.equals(artistFourName));
+
+        teardownHelper();
+    }
 }
+
+
 
 // can't get test to work
 // inaccesible data bc of nest divs w no ids from spotify player
