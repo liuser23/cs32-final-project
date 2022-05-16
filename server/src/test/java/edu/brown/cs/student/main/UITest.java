@@ -1,5 +1,4 @@
 package edu.brown.cs.student.main;
-
 //import edu.brown.cs.student.commands.LoadTable;
 import edu.brown.cs.student.main.Main;
 //import edu.brown.cs.student.proj1.database.Database;
@@ -30,6 +29,29 @@ import java.util.concurrent.TimeUnit;
  * FOR DEV: to type in a WebElement input field, call element.sendKeys("text here")
  * FOR DEV: At beginning of each test, call setupHelper() [and loginHelper() to navigate through the authentication]
  * FOR DEV: At the end of each test, call teardownHelper()
+ * FOR DEV: When testing all tests at once, make sure screen is in full screen, or else certain elements
+ * are unable to be clicked because they overlap with side bar
+ * Some of these songs may fail in future when user data has changed (top songs, top artist etc). Check tests
+ * with "NoNames" tag for solution.
+ *
+ * Tests and lines they start on:
+ * testLandingPageHeader (start line 152)
+ * testAllOfLandingPageHeader (start line 173)
+ * testLoginBasic (start line 204)
+ * testHomeScreen (start line 217)
+ * testHomeScreenButtons (start line 255)
+ * testSearchSongsPage (start line 343)
+ * testHomePagePlayer (start line 692)
+ * testDashboard (start line 875)
+ * testSongRecRankings (start line 943)
+ * testMyRecsButton (start line 1277)
+ * testHomePageTopArtists (start line 1330)
+ * testSettingsButton (start line 1550)
+ * testSignOutButton (start line 1527)
+ * testFriendsListButton (start line 1554)
+ * testHomePagePlayerNoNames (start line 1598)
+ * testHomePageTopArtistsNoNames (start line 1779)
+ *
  */
 public class UITest extends TestCase {
 
@@ -146,7 +168,7 @@ public class UITest extends TestCase {
     }
 
     /**
-     * Tests all of the first page of website before you log in
+     * Tests all the first page elements of website before you log in
      */
     public void testAllOfLandingPageHeader() {
         setupHelper();
@@ -159,7 +181,6 @@ public class UITest extends TestCase {
         WebElement header = divForHeader.findElement(By.tagName("h1"));
         WebElement header2 = divForLoginScreen.findElement(By.id("theBest"));
         WebElement appName = divForHeader.findElement(By.tagName("h4"));
-
 
         System.out.println(header.getText());
         assertTrue(header.getText().equals("Welcome to"));
@@ -195,13 +216,15 @@ public class UITest extends TestCase {
      */
     public void testHomeScreen() throws InterruptedException {
         setupHelper();
-//        driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
-        loginHelper();
-//        driver.manage().timeouts().implicitlyWait(Duration.ofMillis(10000));
-        Thread.sleep(10000); // use sleep to prevent stale elements
-        //driver.manage().timeouts().setScriptTimeout(10,TimeUnit.SECONDS);
 
-//        driver.manage().timeouts().implicitlyWait(Duration.ofMillis(10000));
+        loginHelper();
+
+        // these dont work, use Thread.sleep()
+        // driver.manage().timeouts().implicitlyWait(Duration.ofMillis(10000));
+        //driver.manage().timeouts().setScriptTimeout(10,TimeUnit.SECONDS);
+        // driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
+        Thread.sleep(10000); // use sleep to prevent stale elements
+
 
         WebElement root2 = driver.findElement(By.id("root"));
         WebElement sideBar = root2.findElement(By.id("sideNavBar"));
@@ -608,7 +631,7 @@ public class UITest extends TestCase {
         WebElement songRecsButtonsDiv = threeRecSongs.get(1).findElement(By.id("songRecsButtons"));
         WebElement deleteRecButton = songRecsButtonsDiv.findElement(By.id("deleteRecButton"));
 
-        // delete EARFQUAKE song from your recommendations
+        // play Nights song from your recommendations
         // need to get icons, first is play song, second is add to playlist
         WebElement songRecsButtonsDiv2 = threeRecSongs.get(0).findElement(By.id("songRecsButtons"));
         WebElement playSongButton2 = songRecsButtonsDiv2.findElement(By.id("playSongButton"));
@@ -617,6 +640,7 @@ public class UITest extends TestCase {
         deleteRecButton.click();
 
         // check if play button for songs under my recommendations list works
+        // play 'Nights'
         playSongButton2.click();
         Thread.sleep(5000); // use sleep to prevent stale elements
 
@@ -902,7 +926,18 @@ public class UITest extends TestCase {
     }
 
     /**
-     * Tests that the order of recs changes when user adds recs to song that has top recs
+     * TEST TOP SONGS RANKINGS AND THAT THEY CHANGE
+     * Tests that the order of top songs changes when user adds recs to song that has top recs.
+     * Song being tested: Feel So Close - Radio Edit by Calvin Harris
+     * At start: user has no recs, the top songs are 1) I love it, 2) Cool for Summer, 3) Congratulations
+     * User recommends a) Congratulations and b) First Class
+     * Top Songs should update to be --> 1) I love it, 2) Congratulations, 3) First Class
+     * User deletes their recommendations, top songs should update again
+     * Top songs should go back to 1) I love it, 2) Cool for Summer, 3) Congratulations
+     * It is important to delete songs also because test cannot be run again without manually
+     * logging into account and deleting the recs if the recommendations that
+     * the users starts with are not the same as it ends with .
+     *
      * @throws InterruptedException
      */
     public void testSongRecRankings() throws InterruptedException {
@@ -988,11 +1023,11 @@ public class UITest extends TestCase {
         System.out.println("playing track artist: " + playingTrackSongArtist.getText());
         assertTrue(playingTrackSongArtist.getText().equals("Calvin Harris"));
 
-        // now check top three songs: should be I Love It, Cool For the Summer, and The Way Life Goes
+        // now check top three songs: should be I Love It, Cool For the Summer, and Congratulations
         WebElement topSongsListDiv = playingAndTopRecs.findElement(By.id("topSongsList"));
         WebElement topSongsList = topSongsListDiv.findElement(By.tagName("ul"));
 
-        // get list of song items
+        // get list of top song items
         List<WebElement> threeTopSongs = topSongsList.findElements(By.tagName("li"));
 
         // get song # 1 info (in list for, first div = play icon, second div = number icon, third div = name and artist
@@ -1023,7 +1058,7 @@ public class UITest extends TestCase {
         System.out.println("secondTopSongArtist: " + secondTopSongArtist.getText());
         assertTrue(secondTopSongArtist.getText().equals("Demi Lovato"));
 
-        // get song # 3 Hello info (in list for, first div = play icon, second div = number icon, third div = name and artist
+        // get song # 3 info (in list for, first div = play icon, second div = number icon, third div = name and artist
         List<WebElement> thirdTopSong = threeTopSongs.get(2).findElements(By.tagName("div"));
 
         // get 2nd element, song name and artist info
@@ -1044,18 +1079,19 @@ public class UITest extends TestCase {
         WebElement firstSongRecName = firstSongRecResult.findElement(By.id("songName"));
         WebElement firstSongRecArtist = firstSongRecResult.findElement(By.id("songArtist"));
 
-        // check that the first song result is "First Class" by "Jack Harlow"
+        // check that the first song result is "Congratulations" by "Post Maloen"
         System.out.println("first song result name: " + firstSongRecName.getText());
         assertTrue(firstSongRecName.getText().equals("Congratulations"));
 
         System.out.println("first song result artist: " + firstSongRecArtist.getText());
         assertTrue(firstSongRecArtist.getText().equals("Post Malone"));
 
-        // press on First Class to add to your recommendations
+        // press on Congratulations to add to your recommendations
         firstSongRecResult.click();
 
         Thread.sleep(5000);
 
+        // search for "First Class"
         searchRecsInput2.sendKeys("first class");
         List<WebElement> songRecResults2 = findSongsDiv.findElements(By.id("songResult"));
         WebElement firstSongRecResult2 = songRecResults2.get(0).findElement(By.id("songInfo"));
@@ -1069,24 +1105,18 @@ public class UITest extends TestCase {
         System.out.println("first song result artist: " + firstSongRecArtist2.getText());
         assertTrue(firstSongRecArtist2.getText().equals("Jack Harlow"));
 
-        // press on Summertime Sadness to add to your recommendations
+        // press on First Class to add to your recommendations
         firstSongRecResult2.click();
-
-//        WebElement root5 = driver.findElement(By.id("root"));
-//        WebElement mainWindow3 = root4.findElement(By.id("mainWindow"));
-//        WebElement mainDiv3 = mainWindow3.findElement(By.id("mainDiv"));
-//        WebElement findSongsDiv2 = mainDiv3.findElement(By.id("searchResultsFindSongDiv"));
-//        WebElement topSongsAndSearchDiv2 = findSongsDiv2.findElement(By.id("topRecsAndSearchBarDiv"));
-
 
         Thread.sleep(5000);
 
-        // check rankings changed
+        // check to see rankings changed from I Love It, Cool For the Summer, and Congratulations
+        // to I Love It, Congratulations, and First Class
+        // need to get top songs list
         WebElement topSongsListDiv2 = playingAndTopRecs.findElement(By.id("topSongsList"));
         WebElement topSongsList2 = topSongsListDiv2.findElement(By.tagName("ul"));
 
-
-        // get list of song items
+        // get list of top song items
         List<WebElement> threeTopSongs2 = topSongsList2.findElements(By.tagName("li"));
 
         // get song # 1 info (in list for, first div = play icon, second div = number icon, third div = name and artist
@@ -1110,7 +1140,7 @@ public class UITest extends TestCase {
         WebElement secondTopSongName2 = secondTopSong2.get(2).findElement(By.tagName("span"));
         WebElement secondTopSongArtist2 = secondTopSong2.get(2).findElement(By.tagName("p"));
 
-        // check top song #1 name and artist
+        // check top song #2 name and artist
         System.out.println("secondTopSongName2: " + secondTopSongName2.getText());
         assertTrue(secondTopSongName2.getText().equals("Congratulations"));
 
@@ -1124,45 +1154,43 @@ public class UITest extends TestCase {
         WebElement thirdTopSongName2 = thirdTopSong2.get(2).findElement(By.tagName("span"));
         WebElement thirdTopSongArtist2 = thirdTopSong2.get(2).findElement(By.tagName("p"));
 
-        // check top song #1 name and artist
+        // check top song #3 name and artist
         System.out.println("thirdTopSongName2: " + thirdTopSongName2.getText());
         assertTrue(thirdTopSongName2.getText().equals("First Class"));
 
         System.out.println("thirdTopSongArtist2: " + thirdTopSongArtist2.getText());
         assertTrue(thirdTopSongArtist2.getText().equals("Jack Harlow"));
 
-
-
-        // check to see rankings changed from I Love It, Cool For the Summer, and The Way Life Goes
-        // to I Love It, Summertime Sadness, and First Class
+        // check that Congratulations and First Class were added to users rec list under
+        // 'My Recommendations' and they can be deleted
         WebElement recsList = topSongsAndSearchDiv2.findElement(By.id("recsList"));
         WebElement songRecsList = recsList.findElement(By.tagName("ul"));
 
-        // get list of top song items
+        // get list of recs
         List<WebElement> threeRecSongs = songRecsList.findElements(By.tagName("li"));
 
-        // get song # 1 info (in list for, first div = play icon, second div = number icon, third div = name and artist
+        // get rec song # 1 info (in list for, first div = play icon, second div = number icon, third div = name and artist
         List<WebElement> firstRecSong = threeRecSongs.get(0).findElements(By.tagName("div"));
 
         // get 2nd element, song name and artist info
         WebElement firstRecSongName = firstRecSong.get(2).findElement(By.tagName("span"));
         WebElement firstRecSongArtist = firstRecSong.get(2).findElement(By.tagName("p"));
 
-        // first rec should be I Love It (feat. Charli XCX)
+        // first rec should be Congratulations
         System.out.println("firstRecSongName: " + firstRecSongName.getText());
         assertTrue(firstRecSongName.getText().equals("Congratulations"));
 
         System.out.println("firstRecSongArtist: " + firstRecSongArtist.getText());
         assertTrue(firstRecSongArtist.getText().equals("Post Malone"));
 
-        // get song # 2 Summertime Sadness info (in list for, first div = play icon, second div = number icon, third div = name and artist
+        // get rec song # 2 info (in list for, first div = play icon, second div = number icon, third div = name and artist
         List<WebElement> secondRecSong = threeRecSongs.get(1).findElements(By.tagName("div"));
 
         // get 2nd element, song name and artist info
         WebElement secondRecSongName = secondRecSong.get(2).findElement(By.tagName("span"));
         WebElement secondRecSongArtist = secondRecSong.get(2).findElement(By.tagName("p"));
 
-        // second rec should be Summertime Sadness
+        // second rec should be First Class
         System.out.println("secondRecSongName: " + secondRecSongName.getText());
         assertTrue(secondRecSongName.getText().equals("First Class"));
 
@@ -1180,7 +1208,7 @@ public class UITest extends TestCase {
         WebElement songRecsButtonsDiv2 = threeRecSongs.get(0).findElement(By.id("songRecsButtons"));
         WebElement deleteRecButton2 = songRecsButtonsDiv2.findElement(By.id("deleteRecButton"));
 
-        // delete song
+        // delete songs
         deleteRecButton.click();
         deleteRecButton2.click();
 
@@ -1190,7 +1218,6 @@ public class UITest extends TestCase {
         // 1: I love it, 2: cool for the summer, 3: congratulations
         WebElement topSongsListDiv3 = playingAndTopRecs.findElement(By.id("topSongsList"));
         WebElement topSongsList3 = topSongsListDiv3.findElement(By.tagName("ul"));
-
 
         // get list of song items
         List<WebElement> threeTopSongs3 = topSongsList3.findElements(By.tagName("li"));
@@ -1216,7 +1243,7 @@ public class UITest extends TestCase {
         WebElement secondTopSongName3 = secondTopSong3.get(2).findElement(By.tagName("span"));
         WebElement secondTopSongArtist3 = secondTopSong3.get(2).findElement(By.tagName("p"));
 
-        // check top song #1 name and artist
+        // check top song #2 name and artist
         System.out.println("secondTopSongName3: " + secondTopSongName3.getText());
         assertTrue(secondTopSongName3.getText().equals("Cool for the Summer"));
 
@@ -1230,20 +1257,20 @@ public class UITest extends TestCase {
         WebElement thirdTopSongName3 = thirdTopSong3.get(2).findElement(By.tagName("span"));
         WebElement thirdTopSongArtist3 = thirdTopSong3.get(2).findElement(By.tagName("p"));
 
-        // check top song #1 name and artist
+        // check top song #3 name and artist
         System.out.println("thirdTopSongName3: " + thirdTopSongName3.getText());
         assertTrue(thirdTopSongName3.getText().equals("Congratulations"));
 
         System.out.println("thirdTopSongArtist3: " + thirdTopSongArtist3.getText());
         assertTrue(thirdTopSongArtist3.getText().equals("Post Malone"));
 
-        Thread.sleep(3000);
+        Thread.sleep(1000);
 
         teardownHelper();
     }
 
     /**
-     * Tests that the My Recommendations button in the side bar brings you to correct page
+     * Tests that the 'My Recommendations' button in the side-bar brings you to correct page
      * with the correct information loaded.
      * @throws InterruptedException
      */
@@ -1340,7 +1367,6 @@ public class UITest extends TestCase {
         String artistFourName = artistFour.getText();
         System.out.println("artistFourName: " + artistFourName);
         assertTrue(artistFourName.equals("Lorde"));
-
 
         // press the right side bar button to see new artist
         topArtistsButtonRight.click();
@@ -1549,6 +1575,7 @@ public class UITest extends TestCase {
     }
 
     // testing without specific song / artist names
+    // this works best for the future in case users top songs and artists have changed
 
     /**
      * *** THIS IS DIFFERENT FROM testHomePagePlayer()
@@ -1905,6 +1932,8 @@ public class UITest extends TestCase {
 // can't get test to work
 // inaccesible data bc of nest divs w no ids from spotify player
 // save code for later
+// test used to verify home screen player works when top song is pressed
+// by checking currently playing song
 
 //        WebElement playingInfoDiv = playerBox.findElement(By.className("rswp__active _InfoRSWP __mvqn38"));
 //        WebElement PlayerRSWP = playerBox.findElement(By.tagName("div"));
