@@ -28,8 +28,8 @@
 .full-screen {
     background: linear-gradient(
             90deg,
-            rgb(255, 255, 255) 0%,
-            rgb(30, 215, 96) 100%
+            rgb(30, 215, 96) 0%,
+            rgb(255, 255, 255) 100%
     );
 }
 
@@ -64,7 +64,8 @@ label {
     margin: 10px;
     padding: 10px;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
+    width: 100%;
     /*flex-wrap: wrap;*/
     /*flex-direction: row;*/
 }
@@ -149,6 +150,44 @@ label {
 /*    text-transform: capitalize;*/
 /*    color: black;*/
 /*}*/
+
+.friendify {
+    padding: 20px;
+    font-size: 90px;
+
+    -webkit-text-stroke-width: 2px;
+    -webkit-text-stroke-color: black;
+}
+
+.glow {
+    padding: 20px;
+    font-size: 80px;
+    color: black;
+    /*text-align: center;*/
+    /*-webkit-text-stroke-width: 2px;*/
+    /*-webkit-text-stroke-color: black;*/
+    -webkit-animation: glow 2s ease-in-out infinite alternate;
+    -moz-animation: glow 2s ease-in-out infinite alternate;
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+
+@-webkit-keyframes glow {
+    from {
+        text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #1DB954, 0 0 40px #1DB954, 0 0 50px #1DB954, 0 0 60px #1DB954, 0 0 70px #1DB954;
+    }
+
+    to {
+        text-shadow: 0 0 20px #1DB954, 0 0 30px #1DB954, 0 0 40px #1DB954, 0 0 50px #1DB954, 0 0 60px #1DB954, 0 0 70px #1DB954, 0 0 80px #1DB954;
+    }
+}
+
+.welcome-line {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
 
 .form-rec {
     padding: 10px;
@@ -306,4 +345,70 @@ label {
 
 .edit-icon {
     color: #fff;
+}
+
+.neonText {
+    padding-left: 50px;
+    color: #1DB954;
+    text-shadow:
+            0 0 7px #fff,
+            0 0 10px #fff,
+            0 0 21px #fff,
+            0 0 42px #ff4da6,
+            0 0 82px #ff4da6,
+            0 0 92px #ff4da6,
+            0 0 102px #ff4da6,
+            0 0 151px #ff4da6;
+}
+
+/*body {*/
+/*    font-size: 18px;*/
+/*    font-family: "Yellowtail", sans-serif;*/
+/*    background-color: #010a01;*/
+/*    background-image: url("https://cdn.pixabay.com/photo/2017/02/12/12/42/wall-2059909_640.png")*/
+/*}*/
+
+h4 {
+    text-align: center;
+    font-weight: 400;
+}
+
+h4 {
+    font-size: 5.2rem;
+    animation: pulsate 0.11s ease-in-out infinite alternate;
+    -webkit-text-stroke-width: 2px;
+    -webkit-text-stroke-color: black;
+}
+
+h2 {
+    font-size: 1.8rem;
+}
+
+@keyframes pulsate {
+
+    100% {
+
+        text-shadow: 0 0 4px #fff,
+        0 0 11px #fff,
+        0 0 19px #fff,
+        0 0 40px #ff4da6,
+        0 0 80px #ff4da6,
+        0 0 90px #ff4da6,
+        0 0 100px #ff4da6,
+        0 0 150px #ff4da6;
+
+    }
+
+    0% {
+
+        text-shadow: 0 0 4px #fff,
+        0 0 10px #fff,
+        0 0 18px #fff,
+        0 0 38px #ff4da6,
+        0 0 73px #ff4da6,
+        0 0 80px #ff4da6,
+        0 0 94px #ff4da6,
+        0 0 140px #ff4da6;
+
+    }
 }

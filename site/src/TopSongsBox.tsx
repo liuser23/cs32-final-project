@@ -21,16 +21,16 @@ function TopSongsBox (props : {topSongs : track[], setNowPlaying : (nowPlaying :
     }
 
     return (
-        <div className={"Topsongs-box"}>
+        <div id="topSongsBox" className={"Topsongs-box"}>
             <p style={{paddingTop: "15px"}}className={"Top-title"}>Top Songs</p>
-            <button className={"Top-navbutton-left"} onClick={decrementIndex}></button>
-            <div className={"Top-items-list"}>
-                {props.topSongs.slice(index,index+4).map(x => <div key={x.uri} className={"Song-box"}>
+            <button id={"songNavButtonLeft"} className={"Top-navbutton-left"} onClick={decrementIndex}></button>
+            <div id={"topSongsList"} className={"Top-items-list"}>
+                {props.topSongs.slice(index,index+4).map(x => <div key={x.uri} id="songBox" className={"Song-box"}>
                         <img className={"Song-art"} src={x.album.images[0]?.url ?? DefaultAlbum} onClick={() => props.setNowPlaying(x)} alt={`album cover of ` + x.name}/>
                     {x.name}
                 </div>)}
             </div>
-            <button className={"Top-navbutton-right"} onClick={incrementIndex}></button>
+            <button id={"songNavButtonRight"} className={"Top-navbutton-right"} onClick={incrementIndex}></button>
         </div>
     );
 }

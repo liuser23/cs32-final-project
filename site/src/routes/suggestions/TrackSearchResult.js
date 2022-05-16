@@ -6,15 +6,15 @@ export default function TrackSearchResult({track, chooseTrack, isRec}) {
     }
 
     return (
-        <div className="d-flex m-2 align-items-center"
+        <div id={"songResult"} className="d-flex m-2 align-items-center"
              style={{cursor: "pointer"}}
             onClick={handlePlay}
             >
 
             <img src={track.album.images[0].url} style={{height: "64px", width: "64px"}}/>
-            <div className="ml-3">
-                <div>{track.name}</div>
-                <div className="text-muted">{track.artists[0].name}</div>
+            <div id={"songInfo"} className="ml-3">
+                <div id={"songName"}>{track.name}</div>
+                <div id={"songArtist"} className="text-muted">{track.artists[0].name}</div>
             </div>
         </div>
     )

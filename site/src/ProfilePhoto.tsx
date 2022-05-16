@@ -4,8 +4,8 @@ import './App.css';
 function ProfilePhoto( props : {image : string}) {
 
     return (
-        <div className={"Pfp-container"}>
-            <img src={props.image} className={"Pfp-image"} alt={"Your profile photo!"}/>
+        <div className={"Pfp-container"} id="profilePic">
+            <img src={props.image} style={{objectFit: 'contain'}} className={"Pfp-image"} alt={"Your profile photo!"}/>
         </div>
     )
 }

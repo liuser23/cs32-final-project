@@ -59,19 +59,19 @@ function MyRecommendations(props: {authentication: Authentication}) {
     }
 
     return (
-        <div className={"Main-window"}>
-            <div className={"Recommendations-header"}>
+        <div id={"mainWindow"} className={"Main-window"}>
+            <div id="recsHeader" className={"Recommendations-header"}>
                 My Recommendations
             </div>
-            <hr className = {"Profile-horizontal-line"}/>
+            <hr style={{margin:'10px'}} className = {"Profile-horizontal-line"}/>
             <RecommenderInput title={"Find users whose music taste is..."} type={0} val={recType} updateValue={setRecType}/>
-            <hr className = {"Recommender-divider"}/>
-            <RecommenderInput title={"Importance of songs: "} type={1} val={songWeight} updateValue={setSongWeight}/>
-            <hr className = {"Recommender-divider"}/>
-            <RecommenderInput title={"Importance of artists: "} type={1} val={artistWeight} updateValue={setArtistWeight}/>
-            <hr className = {"Recommender-divider"}/>
-            <RecommenderInput title={"Importance of genres: "} type={1} val={genreWeight} updateValue={setGenreWeight}/>
-            <hr className = {"Recommender-divider"}/>
+            <hr style={{margin:'10px'}} className = {"Recommender-divider"}/>
+            <RecommenderInput title={"Importance of songs:"} type={1} val={songWeight} updateValue={setSongWeight}/>
+            <hr style={{margin:'10px'}}  className = {"Recommender-divider"}/>
+            <RecommenderInput title={"Importance of artists:"} type={1} val={artistWeight} updateValue={setArtistWeight}/>
+            <hr style={{margin:'10px'}} className = {"Recommender-divider"}/>
+            <RecommenderInput title={"Importance of genres:"} type={1} val={genreWeight} updateValue={setGenreWeight}/>
+            <hr style={{margin:'10px'}} className = {"Recommender-divider"}/>
             <Button variant="outlined" color={"secondary"} onClick={getRecommendations}>Get recommendations</Button>
             <br/>
             {recOutput.map(x => <div>Display Name: {x.displayName} User ID: {x.id}</div>)}
