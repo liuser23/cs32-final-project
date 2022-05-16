@@ -227,20 +227,20 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
                   style={{margin: "8px", padding: "20px", border: '1px solid rgba(0, 0, 0, 0.1)'}}
                   className={classes.customHoverFocus}
                   secondaryAction={
-                      <React.Fragment>
-                          <IconButton onClick={() => chooseTrack(song)} edge="end" aria-label="play">
+                      <div id={"topSongsButtons"}>
+                          <IconButton id="playSongButton" onClick={() => chooseTrack(song)} edge="end" aria-label="play">
                               <PlayCircleOutlineIcon style={{marginLeft: "10px"}}/>
                           </IconButton>
-                          <IconButton onClick={() => addToPlaylist()} edge="end" aria-label="Play">
+                          <IconButton id="playlistButton" onClick={() => addToPlaylist()} edge="end" aria-label="Play">
                               <PlaylistAddIcon/>
                           </IconButton>
-                      </React.Fragment>
+                      </div>
                   }>
             <ListItemAvatar>
                 <Avatar class="material-icons">
-                    {song?.place === 0 &&  <LooksOne className={classes.icons}/>}
-                    {song?.place === 1 &&  <LooksTwo className={classes.icons}/>}
-                    {song?.place === 2 &&  <Looks3 className={classes.icons}/>}
+                    {song?.place === 0 &&  <LooksOne id="number-icon" alt="Number One Icon" className={classes.icons}/>}
+                    {song?.place === 1 &&  <LooksTwo id="number-icon" alt="Number Two Icon" className={classes.icons}/>}
+                    {song?.place === 2 &&  <Looks3 id="number-icon" alt="Number Three Icon" className={classes.icons}/>}
                     {song?.place === -1 && <HelpOutlineIcon className={classes.icons}/>}
                     {song?.place > 3 && <HelpOutlineIcon className={classes.icons}/>}
 
@@ -255,17 +255,17 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
                   style={{margin: "8px", padding: "20px", border: '1px solid rgba(0, 0, 0, 0.1)'}}
                   className={classes.customHoverFocus}
                   secondaryAction={
-                      <React.Fragment>
-                          <IconButton onClick={() => chooseTrack(song)} edge="end" aria-label="play">
+                      <div id={"songRecsButtons"}>
+                          <IconButton id="playSongButton" onClick={() => chooseTrack(song)} edge="end" aria-label="play">
                               <PlayCircleOutlineIcon style={{margin: "10px"}}/>
                           </IconButton>
-                          <IconButton onClick={() => addToPlaylist()} edge="end" aria-label="Play">
+                          <IconButton id="playlistButton" onClick={() => addToPlaylist()} edge="end" aria-label="Play">
                               <PlaylistAddIcon/>
                           </IconButton>
-                          <IconButton onClick={() => deleteRecommendation(song)} edge="end" aria-label="delete">
+                          <IconButton id="deleteRecButton" onClick={() => deleteRecommendation(song)} edge="end" aria-label="delete">
                               <DeleteIcon style={{margin: "20px"}}/>
                           </IconButton>
-                      </React.Fragment>
+                      </div>
                   }>
             <ListItemAvatar>
                 <Avatar sx={{ height: '60px', width: '60px', marginRight: "10px" }} alt="Album cover" src={song?.album.images[0].url? song?.album.images[0].url : SpotifyLogo}/>
@@ -277,26 +277,26 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
     return (
         // darkModeOn ? 'black' : 'white'
         <div id="mainWindow" className={"Main-window"} style={{background: darkModeOn ? 'black' : 'white'}}>
-            <Container className="d-flex flex-column py-2" style={{height: "100vh"}}>
+            <Container id="mainDiv" className="d-flex flex-column py-2" style={{height: "100vh"}}>
                 {/*<div className="top-bar">*/}
                 {/*    <IconButton style={{ color: "#1DB954"}} edge="end"*/}
                 {/*                aria-label="Home">*/}
                 {/*        <HomeIcon/>*/}
                 {/*    </IconButton>*/}
                 {/*</div>*/}
-                <div
+                <div id={"findSongRecsBar"}
                     style={{display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: "30px"}}
                 >
                     <div style={{flex: 1, height: '1px', backgroundColor: "#1DB954"}}/>
 
-                    <div>
+                    <div id={"findSongRecsBarHeader"}>
                         <h3 style={{textAlign: 'center', color: "#1DB954"}}>Find Song Recommendations</h3>
                     </div>
 
                     <div style={{flex: 1, height: '1px', backgroundColor: "#1DB954"}}/>
                 </div>
                 <div id="searchBarDiv" className={'adding-song'} >
-                    <Form.Control className={'adding-song'}
+                    <Form.Control id="searchBarForm" className={'adding-song'}
                         size='lg'
                         type="text"
                         placeholder="Search Songs/Albums"
@@ -305,7 +305,7 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
                     />
 
                 </div>
-                <div className="flex-grow-1 my-2" style={{overflowY: "auto", width: '100%'}}>
+                <div id={"searchResultsFindSongDiv"} className="flex-grow-1 my-2" style={{overflowY: "auto", width: '100%'}}>
                     {searchResults.map(track => (
                         <TrackSearchResult
                             track={track}
@@ -316,25 +316,25 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
                     ))}
                     {searchResults.length === 0 && (
                         <React.Fragment>
-                            <div
+                            <div id={"topRecsBar"}
                                 style={{display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: "30px"}}
                             >
                                 <div style={{flex: 1, height: '1px', backgroundColor: "#1DB954"}}/>
 
-                                <div>
+                                <div id={"topRecsBarHeader"}>
                                     <h3 style={{textAlign: 'center', color: "#1DB954"}}>Top Recommendations</h3>
                                 </div>
 
                                 <div style={{flex: 1, height: '1px', backgroundColor: "#1DB954"}}/>
                             </div>
-                            <div className="playing-and-top-recs">
-                                <div className="currently-playing">
+                            <div id={"playing-and-top-recs"} className="playing-and-top-recs">
+                                <div id="currently-playing" className="currently-playing">
                                     <img src={nowPlaying?.album.images[0].url}
                                          style={{height: "300px", width: "300px", border: '10px solid rgb(0, 0, 0)'}}/>
-                                    <List sx={{width: '300px'}}>
-                                        <ListItem className={classes.customHoverFocusNoMargin}
+                                    <List id="list" sx={{width: '300px'}}>
+                                        <ListItem id="listItem" className={classes.customHoverFocusNoMargin}
                                                   style={{border: '1px solid rgba(0, 0, 0, 0.1)'}}>
-                                            <ListItemText primary={nowPlaying?.name} secondary={nowPlaying?.artists[0].name}/>
+                                            <ListItemText id="listItemText" primary={nowPlaying?.name} secondary={nowPlaying?.artists[0].name}/>
 
                                             <IconButton onClick={() => addToPlaylist()} edge="end" aria-label="Play">
                                                 <PlaylistAddIcon/>
@@ -342,35 +342,35 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
                                         </ListItem>
                                     </List>
                                 </div>
-                                <div className="topSongsList">
-                                    <List sx={{width: '450px', padding: "10px"}}>
+                                <div id="topSongsList" className="topSongsList">
+                                    <List id="topSongsList" sx={{width: '450px', padding: "10px"}}>
                                         {topSongsList}
                                     </List>
                                 </div>
                             </div>
-                            <div>
-                                <div
+                            <div id={"topRecsAndSearchBarDiv"}>
+                                <div id={"makeRecsBar"}
                                     style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}
                                 >
                                     <div style={{flex: 1, height: '1px', backgroundColor: "#1DB954"}}/>
 
-                                    <div>
+                                    <div id={"makeRecsBarHeader"}>
                                         <h3 style={{textAlign: 'center', color: "#1DB954"}}>Make Recommendations</h3>
                                     </div>
 
                                     <div style={{flex: 1, height: '1px', backgroundColor: "#1DB954"}}/>
                                 </div>
-                                <div className="adding-song">
+                                <div  id="addingSong" className="adding-song">
                                     {/*className={classes.root}*/}
-                                    <Form.Control className={'adding-song'}
+                                    <Form.Control id="searchRecForm" className={'adding-song'}
                                         size="lg"
                                         type="text"
-                                        placeholder="Search Songs"
+                                        placeholder="Search Songs to Recommend"
                                         value={searchRecs}
                                         onChange={e => setSearchRecs(e.target.value)}
                                     />
                                 </div>
-                                <div className="flex-grow-1 my-2" style={{overflowY: "auto"}}>
+                                <div id={"searchResultsAddRecDiv"} className="flex-grow-1 my-2" style={{overflowY: "auto"}}>
                                     {searchResultsRecommendation.map(track => (
                                         <TrackSearchResult
                                             track={track}
@@ -380,19 +380,19 @@ export default function Dashboard({sessionToken, nowPlaying, setNowPlaying}) {
                                         />
                                     ))}
                                 </div>
-                                <div className="recsList">
+                                <div id={"recsList"} className="recsList">
                                     <List sx={{width: '100%', padding: "10px"}}>
                                         {listRecommendation}
                                     </List>
                                 </div>
                             </div>
-                            <div className="text-center" style={{whiteSpace: "pre"}}>
-                                <div
+                            <div id={"lyricsBarDiv"} className="text-center" style={{whiteSpace: "pre"}}>
+                                <div id={"lyricsBar"}
                                     style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}
                                 >
                                     <div style={{flex: 1, height: '1px', backgroundColor: "#1DB954"}}/>
 
-                                    <div>
+                                    <div id={"lyricsBarHeader"}>
                                         <h3 style={{textAlign: 'center', color: "#1DB954"}}>Lyrics</h3>
                                     </div>
 

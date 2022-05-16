@@ -132,7 +132,7 @@ import {SidebarConfig} from "../App";
 function EditProfile() {
 
     return (
-        <div className={"Empty-Background"} style={{flex: 1, padding: '370px'}}>
+        <div id="emptyBackground" className={"Empty-Background"} style={{flex: 1, padding: '370px'}}>
             <div >
                 <Button variant="outlined" color="success" size="large" className="Empty-Button" type='submit' >My Recs</Button>
             </div>

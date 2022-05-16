@@ -20,16 +20,16 @@ function TopArtistsBox(props : {topArtists : artist[]}) {
     }
 
     return (
-        <div className={"Topsongs-box"}>
+        <div id="topArtistsBox" className={"Topsongs-box"}>
             <p style={{paddingTop: "15px"}} className={"Top-title"}>Top Artists</p>
-                <button className={"Top-navbutton-left"} onClick={decrementIndex}></button>
-                <div className={"Top-items-list"}>
-                    {props.topArtists.slice(index,index+4).map(x => <div className={"Song-box"}>
+                <button id={"songNavButtonLeft"} className={"Top-navbutton-left"} onClick={decrementIndex}></button>
+                <div id={"topArtistsList"} className={"Top-items-list"}>
+                    {props.topArtists.slice(index,index+4).map(x => <div id="artistBox" className={"Song-box"}>
                         <img className={"Song-art"} src={x.images[0]?.url ?? DefaultAlbum} alt={`album cover of ` + x.name}/>
                         {x.name}
                     </div>)}
                 </div>
-                <button className={"Top-navbutton-right"} onClick={incrementIndex}></button>
+                <button id={"songNavButtonRight"} className={"Top-navbutton-right"} onClick={incrementIndex}></button>
         </div>
     );
 }

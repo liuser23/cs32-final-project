@@ -5,7 +5,7 @@ function ProfileHeader(props : {username : string}) {
 
     return(
         <div className={"Profile-header"}>
-            <p className={"User-name"}>{props.username}</p>
+            <p id="userNameText" className={"User-name"}>{props.username}</p>
         </div>
     );
 }

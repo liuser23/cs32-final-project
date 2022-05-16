@@ -7,7 +7,7 @@ function AccMenuButton(props : {picture : string, picAlt : string, txtContent : 
     return (
         <Link className={"Accmenu-button"} to={props.route}>
             <img className={"Button-img"} src={props.picture} alt={props.picAlt}/>
-            <p className={"Button-text"}>{props.txtContent}</p>
+            <p id={"buttonText"} className={"Button-text"}>{props.txtContent}</p>
         </Link>
     )
 }

@@ -7,10 +7,8 @@ import Button from '@mui/material/Button';
 
 function SignOut() {
     return (
-        <div className={"Empty-Background"} style={{flex: 1, padding: '370px'}}>
-            <div >
+        <div id="emptyBackground" className={"Empty-Background"} style={{flex: 1, padding: '370px'}}>
                 <Button variant="outlined" color="success" size="large" className="Empty-Button" type='submit' >Sign Out</Button>
-            </div>
         </div>
     )
 }
