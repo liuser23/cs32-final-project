@@ -16,6 +16,8 @@ Spotify dashboard.
 * There is also a selenium bot that functions to provide front end testing. This bot can be
 enabled through the normal unit test interface. 
 * In order to run the api tests, you must load the file secret/access_token.txt with a valid access token.
+* The UITest needs the secret/ login, password, and username. Also, run in full screen for all buttons to be accesible. 
+* 
 
 ## Specifications
 The specification document can be found [here](https://docs.google.com/document/d/1RpRd8VrG_hTVj1xbJnsyPMMRMbHINGpbKk06meK5d1Q/edit?usp=sharing)
